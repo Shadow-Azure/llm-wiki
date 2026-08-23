@@ -51,3 +51,9 @@ sources: []
 - `.claude/skills/backfill/` → `.claude/skills/llm-wiki-backfill/`，SKILL.md frontmatter name 与 description 同步更新
 - CLAUDE.md query 工作流指针同步更名
 - 更名理由：命令名携带库标识，避免与其他项目/工具的通用 "backfill" 语义冲突
+
+## [2026-08-23] schema | main 继承视频文件排除规则（.gitignore）
+
+- 应用户要求，将 `demo/video-learning` 分支的 .gitignore 修改继承到 main：`*.mp4` / `*.mov` / `*.mkv` / `*.webm` / `*.ogv` 不入版本库，视频仅本地保留（元数据 / 字幕 / 截图照常入库）
+- 背景：视频学习工作流演示（demo/q5-video-learning.md，Q5 大作文视频）验证了"视频内嵌播放 + AI 内容地图 + 批注讨论"形态；演示页与 6 张关键画面仍留在 demo 分支，未合入 main
+- 后续：视频学习工作流是否固化进 CLAUDE.md（视频来源页模板、时间戳锚点约定），待用户确认演示效果后决定

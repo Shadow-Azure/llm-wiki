@@ -76,7 +76,7 @@ sources: []       # 依据的 raw/ 路径列表
 1. 先读 [[wiki/index]] 定位相关页面
 2. 读相关页面；证据不足时按需读 `raw/` 原文核对
 3. 综合回答并附 wikilink 引用；明确区分"wiki 已有结论"与"本次新推理"
-4. 答案有长期价值（对比表、分析、新连接）→ 征得用户同意后回填为新页面，并完成 index/log 同步，log 记为 `query-filed`
+4. 答案有长期价值（对比表、分析、新连接）→ 征得用户同意后回填为新页面，并完成 index/log 同步，log 记为 `query-filed`。此步已固化为 `/llm-wiki-backfill` 命令（`.claude/skills/llm-wiki-backfill/`），用户说"回填"或键入 `/llm-wiki-backfill` 触发
 
 ### research（研究）
 

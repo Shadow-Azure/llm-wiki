@@ -47,7 +47,7 @@ sources:
 
 ## 本库实例化
 
-本仓库即该模式的一个实例：通用个人知识库，中文正文 + 英文 slug，schema 见 [CLAUDE.md](../../CLAUDE.md)。
+本仓库即该模式的一个实例：通用个人知识库，中文正文 + 英文 slug，schema 见 [CLAUDE.md](../../CLAUDE.md)。Obsidian 在此架构中承担人类一侧的"IDE"角色（见 [[wiki/entities/obsidian|Obsidian]] 实体页）。
 
 ## 依据来源
 

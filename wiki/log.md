@@ -7,7 +7,7 @@ sources: []
 
 # 日志
 
-> 追加式时间线，只增不改。条目格式：`## [YYYY-MM-DD] 操作 | 标题`，操作 ∈ init | ingest | query-filed | lint | schema。
+> 追加式时间线，只增不改。条目格式：`## [YYYY-MM-DD] 操作 | 标题`，操作 ∈ init | ingest | query-filed | research | lint | schema。
 > 快捷查看：`grep "^## \[" wiki/log.md | tail -5`
 
 ## [2026-08-23] init | 仓库初始化
@@ -20,3 +20,8 @@ sources: []
 - 新建页面：sources/karpathy-llm-wiki、concepts/llm-wiki、concepts/wiki-vs-rag、entities/andrej-karpathy、overview
 - 更新：index.md（首次填充）
 - 备注：Karpathy 原文 gist 的评论区含社区实践经验，登记为后续候选来源
+
+## [2026-08-23] schema | CLAUDE.md 新增 research 工作流
+
+- 新增 research（研究）操作：先查库 → 收集材料落 raw → 批量 ingest → 区分来源论断与 AI 推理（后者标注"待来源验证"）→ 修订综述 → 同步 index/log → 登记后续线索
+- log 操作枚举新增 `research`

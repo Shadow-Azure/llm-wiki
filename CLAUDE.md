@@ -78,6 +78,18 @@ sources: []       # 依据的 raw/ 路径列表
 3. 综合回答并附 wikilink 引用；明确区分"wiki 已有结论"与"本次新推理"
 4. 答案有长期价值（对比表、分析、新连接）→ 征得用户同意后回填为新页面，并完成 index/log 同步，log 记为 `query-filed`
 
+### research（研究）
+
+触发：用户说"研究一下 X"、"帮我调研 X"，要求你主动检索外部信息并产出综合。
+
+1. **先查库**：读 [[wiki/index]] 检查已有相关页面。已有结论不重复研究，研究应站在现有综合之上，并向用户明确区分"本库已知"与"本次新增"。
+2. **收集材料**：web 搜索并阅读，有价值的材料逐篇落库为 `raw/YYYY-MM-DD-<slug>.md`（frontmatter 记录 source URL 与 accessed 日期）。向用户报告检索结果与取舍理由（收录了什么、放弃了什么、为什么）。
+3. **批量 ingest**：对落库材料执行 ingest 流程（此场景允许低监督批量）；完成后逐源汇报摘要与本源触及的页面。
+4. **标注知识性质**：页面中严格区分**来源论断**（可溯源到 raw，附 wikilink）与 **AI 推理**（自己的综合、推断、新连接——显式标注"AI 推断，待来源验证"，lint 时优先复查）。
+5. **修订综述**：更新 [[wiki/overview]] 的"正在形成的主题"与"开放问题"。
+6. **同步**：更新 [[wiki/index]]；[[wiki/log]] 追加 `## [YYYY-MM-DD] research | 主题`，列出本次落库的 raw 文件与新建/更新的页面。
+7. **登记后续线索**：研究中发现但未深挖的线索，记入来源摘要页的"后续线索"小节或 overview 的"开放问题"。
+
 ### lint（体检）
 
 触发：用户说"lint 一下 wiki"，或每摄入约 10 个来源后主动建议。
@@ -96,7 +108,7 @@ sources: []       # 依据的 raw/ 路径列表
 ## index.md 与 log.md
 
 - **index.md**：内容目录，查询第一入口。按 sources / concepts / entities / 综述分节，每页一行 `[[wikilink]] — 一句话摘要`。每次 ingest 后更新。
-- **log.md**：追加式时间线，只增不改。条目格式 `## [YYYY-MM-DD] 操作 | 标题`，操作 ∈ `init | ingest | query-filed | lint | schema`。保持前缀一致，以便 `grep "^## \[" wiki/log.md | tail -5` 解析。
+- **log.md**：追加式时间线，只增不改。条目格式 `## [YYYY-MM-DD] 操作 | 标题`，操作 ∈ `init | ingest | query-filed | research | lint | schema`。保持前缀一致，以便 `grep "^## \[" wiki/log.md | tail -5` 解析。
 
 ## Obsidian 约定
 

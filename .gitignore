@@ -1,0 +1,9 @@
+# Claudian 会话数据
+.claudian/
+
+# Obsidian 设备相关状态（其余配置纳入版本控制）
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+
+# macOS
+.DS_Store

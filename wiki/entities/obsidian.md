@@ -4,6 +4,10 @@ created: 2026-08-23
 updated: 2026-08-23
 sources:
   - "raw/2026-04-04-karpathy-llm-wiki.md"
+  - "raw/2026-08-23-obsidian-docs-anatomy-of-a-plugin.md"
+  - "raw/2026-08-23-obsidian-docs-build-a-plugin.md"
+  - "raw/2026-08-23-obsidian-docs-manifest.md"
+  - "raw/2026-08-23-obsidian-docs-developer-policies.md"
 ---
 
 # Obsidian
@@ -23,6 +27,14 @@ sources:
 - 关键认识：LLM Wiki 模式**不依赖 Obsidian 本身，依赖的是"纯文本本地文件"**——LLM 直接读写文件系统，不经任何 API；Obsidian 是恰好把 wikilink + frontmatter 渲染得最好的查看器。
 - 本库工具链约定（见 [CLAUDE.md](../../CLAUDE.md)）：Web Clipper 剪藏来源入 `raw/`、附件本地化到 `raw/assets/`、graph view 观察 wiki 形态、Dataview 查 frontmatter。
 
+## 插件机制
+
+- **形态**：`.obsidian/plugins/<id>/` 文件夹三件套（`manifest.json` + `main.js` + 可选 `styles.css`）；代码为 `Plugin` 子类（`onload()`/`onunload()` 生命周期），**与宿主同进程运行于 Electron renderer**，桌面端有完整 Node 能力（`isDesktopOnly` 即为此标记，移动端无 Node）。
+- **开发 → 构建 → 分发全流程**已入库：[[wiki/concepts/obsidian-plugin-development|插件开发]] · [[wiki/concepts/obsidian-plugin-distribution|分发与治理]] · [[wiki/concepts/obsidian-plugin-networking|网络访问与动态资源]]。
+- **治理**：社区目录（community.obsidian.md）自动审核（含构建一致性校验）+ 政策红线（禁混淆 / 自更新 / 客户端遥测，网络使用须披露）；首次提交后更新免重提，用户端直接从 GitHub Release 拉取。
+- 官方开发者文档 15 页快照见 [[wiki/sources/obsidian-developer-docs]]。
+- 与 deepseek-harness、VSCode 的机制横向对比见 [[wiki/concepts/plugin-mechanism-comparison]]；本库维护会话所用的 [[wiki/entities/claudian|Claudian]] 是"同进程全权 + 生态桥"路线的实例。
+
 ## 生态位
 
 - **最重要的单一特性**：笔记 = 本地纯 Markdown 文件。数据开放、零锁定、git/脚本/agent 可直接操作；双链与插件都只是这层之上的视图。"你的数据是开放的，软件是闭源的"是社区共识性表述（※ 检索来源为 HN/Reddit 讨论，待剪藏）。
@@ -34,3 +46,5 @@ sources:
 - [[wiki/sources/karpathy-llm-wiki]]
 - [[wiki/concepts/llm-wiki]] · [[wiki/concepts/wiki-vs-rag]]
 - [[wiki/concepts/note-tool-landscape]]
+- [[wiki/concepts/obsidian-plugin-development]] · [[wiki/concepts/obsidian-plugin-distribution]] · [[wiki/concepts/obsidian-plugin-networking]]
+- [[wiki/concepts/plugin-mechanism-comparison]] · [[wiki/entities/claudian]]

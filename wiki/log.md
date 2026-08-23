@@ -57,3 +57,39 @@ sources: []
 - 应用户要求，将 `demo/video-learning` 分支的 .gitignore 修改继承到 main：`*.mp4` / `*.mov` / `*.mkv` / `*.webm` / `*.ogv` 不入版本库，视频仅本地保留（元数据 / 字幕 / 截图照常入库）
 - 背景：视频学习工作流演示（demo/q5-video-learning.md，Q5 大作文视频）验证了"视频内嵌播放 + AI 内容地图 + 批注讨论"形态；演示页与 6 张关键画面仍留在 demo 分支，未合入 main
 - 后续：视频学习工作流是否固化进 CLAUDE.md（视频来源页模板、时间戳锚点约定），待用户确认演示效果后决定
+
+## [2026-08-23] research | Obsidian 插件开发与分发全流程（官方文档落库）
+
+- 触发：用户 research（插件开发看什么文件、构建打包、发布到社区市场、调外部服务接口、动态下载加载资源），应用户要求下载官方文档
+- 落库 raw ×15：obsidianmd/obsidian-developer-docs@main 官方开发者文档 markdown 快照（getting started 3 页 + settings、manifest/versions/requestUrl 参考、releasing 4 页、community directory 4 页），每页 frontmatter 记 source URL 与 repo path
+- 新建：sources/obsidian-developer-docs（15 页合集摘要）、concepts/obsidian-plugin-development、concepts/obsidian-plugin-distribution、concepts/obsidian-plugin-networking
+- 更新：entities/obsidian（新增"插件机制"节）、overview（规模/主题/开放问题）、index.md
+- 关键入库事实：现行提交通道是 community.obsidian.md 网站 + 自动审核四节（旧博客常写的 obsidian-releases PR 流程已过时）；requestUrl 官方免 CORS；政策明文禁自更新/自装依赖，网络使用须 README 披露；可执行代码动态加载为灰色地带（页面已标注 AI 推断）
+- 备注：上一轮"三方插件机制对比"（Obsidian vs deepseek-harness vs VSCode，含 Claudian 实例）尚未回填，待用户示意
+
+## [2026-08-23] query-filed | 插件机制三方对比 + 本地视频播放器可行性
+
+- 覆盖两轮 query：①Obsidian（[[wiki/entities/claudian|Claudian]] 实例）vs [[wiki/entities/deepseek-harness|deepseek-harness]] vs VSCode 的插件机制对比；②本地视频播放器插件可行性分析
+- 新建：concepts/plugin-mechanism-comparison（12 维度对比表 + 五条洞察）、concepts/video-player-plugin-feasibility（L0–L4 功能阶梯 + 合规检查 + 竞品）、entities/claudian、entities/deepseek-harness
+- 更新：entities/obsidian（插件机制节与相关页面补对比/Claudian 链接）、concepts/obsidian-plugin-development（关联节）、overview（"正在形成的主题"落地、开放问题改链）、index.md
+- 溯源约定：对比页 Obsidian 列有 raw 支撑；dsh / Claudian 列基于库外代码仓实读（路径已注明）；VSCode 列基于官方文档（待剪藏）；五条洞察整体标注 AI 综合
+- 待剪藏登记：VSCode 官方文档三页（extension host / activation events / contribution points）、Obsidian help file-formats、HEVC 论坛帖、Media Extended 文档、dsh 的 architecture.md 与 cordis-primer.md、claudian README
+- lint 线索：claudian / deepseek-harness 两实体页 sources 为空（库外代码仓），是下次 lint 的优先补源对象
+
+## [2026-08-23] research | deepseek-harness 插件开发与分发全流程（官方文档落库）
+
+- 触发：用户 research（dsh 插件开发看什么文件、打包构建、发布到市场、外部接口调用、动态下载加载、视频播放插件可行性），应用户要求下载官方文档
+- 落库 raw ×32：deepseek-ai/deepseek-harness 官方 docs 中文版快照（commit b150a551，2026-08-21 提交；自本地 clone 剪藏）——user/develop 全部 9 页、cordis-tutorial 8 页、cookbook 5 页、subsystems 5 页、architecture/cordis-primer/glossary、CLI 参考、README
+- 新建：sources/dsh-official-docs（32 页合集摘要）、concepts/dsh-plugin-development、concepts/dsh-plugin-distribution、concepts/dsh-plugin-networking、concepts/dsh-video-plugin-feasibility
+- 更新：entities/deepseek-harness（补 sources + 双端/动态插件/分发要点，**清偿上一条 lint 债**）、concepts/plugin-mechanism-comparison（"能否改 UI" dsh 行修正：web profile 有正式扩展点；溯源说明改为已剪藏）、overview、index.md
+- 关键入库事实：分发单位是组合包（npm 包 + dsh.bundle manifest），安装 dsh plugin --profile add 四来源（npm/tarball/git/本地），bundle 变更需重启、patch 层热重载；**官方无插件市场**（docs 无 marketplace 一词），README 仅约定 dsh-plugin topic，社区市场（dsh.deepseek404.com 等）与应用内市场插件均为第三方；外部服务调用同进程全权 + 凭据 seam（env 引用按操作解析）；动态加载三层——HMR / dsh.client lazy bundle / dynamicCordisRunner（agent 自写自挂插件，带审批闸门）；视频播放插件 Web UI 完全可行（conversation node 渲染 React + webServer 自建路由），工具卡片为封闭枚举不可行，附件 v1 仅图片
+- AI 推断已标注待验证项：webServer Range 流式细节、CSP/外部源约束、Electron IPC 下路由行为、Cordis-Koishi 渊源
+- 后续线索登记：社区市场与 discussion #961 实战帖待剪藏；claudian 实体页 sources 仍空（下次 lint）
+
+## [2026-08-23] query-filed | dsh 插件前端接入（slots 系统与浏览器半）
+
+- 起因：用户 query（插件如何接入前端界面）+ 一轮前端新手向简化解释（"后厨/前厅"直觉模型已并入新页定义句）
+- 新建：concepts/dsh-frontend-integration（两半架构与自动发现、五接入点、slots 五纪律、~20 具名插槽清单、打包三坑、视频插件接线草图）
+- 更新（交叉补链）：concepts/dsh-plugin-development（关联节 + 工具卡片 bullet）、concepts/dsh-plugin-networking（关联节）、concepts/dsh-video-plugin-feasibility（建议路径）、concepts/plugin-mechanism-comparison（溯源说明）、sources/dsh-official-docs（后续线索补 AGENTS.md/web-styling）、index.md
+- 溯源：settings 卡片配对/conversation node/client modules/webServer 有 raw 支撑；**slots 纪律与插槽清单来自库外代码仓实读**（`packages/client/AGENTS.md` + 源码 grep），按 backfill 边界不写 raw/，已在页面标注待剪藏并登记 sources 页后续线索
+- 待剪藏（优先）：packages/client/AGENTS.md、docs/web-styling.zh.md、slot-type-chain 与 gui-web-client-architecture 两份 agent note

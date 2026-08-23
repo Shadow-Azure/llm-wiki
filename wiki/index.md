@@ -21,7 +21,7 @@ sources: []
 - [[wiki/concepts/wiki-vs-rag|编译式知识库 vs RAG]] — 查询时临时检索拼装 vs 摄入时编译一次持续保鲜；积累性、交叉引用、矛盾处理的全维度对比
 - [[wiki/concepts/note-tool-landscape|笔记工具格局]] — 本地优先 vs 云端 SaaS 两大阵营；国内外开源/闭源盘点、AGPL/MIT/MPL/EE 协议商用含义、"Obsidian 最适合接 AI"论证（AI 推断待验证）
 - [[wiki/concepts/bidirectional-links|双向链接与关系图谱]] — 前向链接只存一份、反向索引算"谁指向我"、图谱是可视化投影；断链合法与多重上下文两大机制；与 LLM Wiki 模式的微观连接
-- [[wiki/concepts/obsidian-plugin-development|Obsidian 插件开发]] — 三件套解剖（manifest/主入口/样式）、Plugin 生命周期、esbuild 构建、versions.json 回退、设置存 data.json
+- [[wiki/concepts/obsidian-plugin-development|Obsidian 插件开发]] — 三件套解剖（manifest/主入口/样式）、Plugin 生命周期、esbuild 构建、versions.json 回退、设置存 data.json、UI 接入六插槽（前端新手向，含视频面板最小示例）
 - [[wiki/concepts/obsidian-plugin-distribution|Obsidian 插件分发]] — 社区目录闭环：GitHub Release 三资产 → 自动审核四节 → 发布；更新免重提；政策红线与披露义务
 - [[wiki/concepts/obsidian-plugin-networking|Obsidian 插件网络访问]] — requestUrl 免 CORS 的官方通道；网络使用须披露、自更新禁令；动态资源可行性与代码加载的灰色地带
 - [[wiki/concepts/dsh-plugin-development|dsh 插件开发]] — 官方阅读路线、插件三形态、fiber 生命周期、defineTool DSL、能力三角色分包

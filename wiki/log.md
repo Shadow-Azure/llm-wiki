@@ -93,3 +93,12 @@ sources: []
 - 更新（交叉补链）：concepts/dsh-plugin-development（关联节 + 工具卡片 bullet）、concepts/dsh-plugin-networking（关联节）、concepts/dsh-video-plugin-feasibility（建议路径）、concepts/plugin-mechanism-comparison（溯源说明）、sources/dsh-official-docs（后续线索补 AGENTS.md/web-styling）、index.md
 - 溯源：settings 卡片配对/conversation node/client modules/webServer 有 raw 支撑；**slots 纪律与插槽清单来自库外代码仓实读**（`packages/client/AGENTS.md` + 源码 grep），按 backfill 边界不写 raw/，已在页面标注待剪藏并登记 sources 页后续线索
 - 待剪藏（优先）：packages/client/AGENTS.md、docs/web-styling.zh.md、slot-type-chain 与 gui-web-client-architecture 两份 agent note
+
+## [2026-08-23] query-filed | Obsidian 插件 UI 接入指南（前端新手向）
+
+- 起因：用户 query（插件在前端界面上怎么接入，前端不熟，要简单解释），答复末尾已提议并入 development 页，用户以 /llm-wiki-backfill 确认
+- 更新：concepts/obsidian-plugin-development 新增"UI 接入（前端新手向）"一节——心智模型（界面即网页、插槽即注册函数）、六插槽表（ribbon/command/notice/settingTab/statusBar/registerView）、最少前端知识 4 概念（DOM/createEl/CSS 类/事件回调）、视频面板 ItemView 最小示例（即播放器 L1 骨架）、DevTools 技巧、dsh slots 对照链接
+- 无新建页（内容并入既有页面，符合"单薄不建新页"边界）；index.md 同步该页摘要
+- 溯源：插槽表与 ItemView 示例来自官方 User interface 系列文档（未剪藏，页内已标注待复核）；createEl/DevTools/设置页部分有 raw 支撑
+- 与 dsh-frontend-integration 成对照：Obsidian 命令式注册插槽 vs dsh 声明式挂载 slots（两页已互链）
+- 待剪藏登记：官方 User interface 系列（Commands/Views/Ribbon/Modals/Status bar/HTML elements 等）

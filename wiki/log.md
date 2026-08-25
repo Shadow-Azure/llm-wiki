@@ -102,3 +102,14 @@ sources: []
 - 溯源：插槽表与 ItemView 示例来自官方 User interface 系列文档（未剪藏，页内已标注待复核）；createEl/DevTools/设置页部分有 raw 支撑
 - 与 dsh-frontend-integration 成对照：Obsidian 命令式注册插槽 vs dsh 声明式挂载 slots（两页已互链）
 - 待剪藏登记：官方 User interface 系列（Commands/Views/Ribbon/Modals/Status bar/HTML elements 等）
+
+## [2026-08-25] query-filed | dsh 插件化能力边界与 Cordis vendoring
+
+- 起因：用户四轮 query（插件化能力上限 / 通俗机制+Web 组装 / systemPrompt 与 webServer 详解 / 打点边界、脊柱位置、"实现皆可换"辨析），代码仓实读 `/Users/zn-ice/2026/deepseek-harness`；用户选定精简版回填方案（/llm-wiki-backfill）
+- 新建：concepts/dsh-plugin-capability-boundaries — 30 core / 28 seam / 1 bundle 角色普查（capability-seams 总表）、可换/不可换清单、core 两种动机（systemPrompt 公告栏 / webServer 大门剖析）、"能拔≠能用"（inject 永不满足→fiber 永远 pending）、脊柱两层（cordis 机制层 + dsh 自有领域层）+ 宿主引导、打点辨析（sessionTelemetry=seam 默认 DISABLED 可整行不装+依赖反转订阅事件流 vs tokenMeter=core 进程内计量）
+- 新建：concepts/cordis-vendoring — vendor/ 9 包清单（7/9 取自 deepseek-harness fork，AI 推断待验证）、@deepseek-ai rescope 防 squat、18 处本地修改（fiber 加固/事务化调和/懒配置反向移植 PR#41）、上游 cordiverse/cordis **MIT**（Shigma）三重证据与商用含义；**证实 Koishi 渊源推断**（原 AI 推断已在对比页标记已验证）
+- 更新：concepts/dsh-frontend-integration 并入"官方 Web 的四层装配"（空根→dsh-base 78 行→dsh-web-app 445 行禁用 agent 平面改 preset 接管→浏览器 roster/__DSH_BOOT__ 领养→用户 patch）
+- 精化标记（铁律 7，非事实矛盾，精度提升）：entities/deepseek-harness 与 concepts/plugin-mechanism-comparison 的"任何行（含 agent loop）可被 patch 替换/无特权内核"两处补 † 精化注记——"可 patch"≠"有得换、换了能用"
+- 同步：index +2 行、改 2 行摘要（前端接入/实体页）、bump updated；sources/dsh-official-docs 后续线索增补待剪藏清单
+- 待剪藏登记：vendor/README.md、THIRD_PARTY_NOTICES.md、capability-seams.zh.md（优先级提高）、system-prompt / session-telemetry 包 README、profile-boot.ts + 两份 bundle patch
+

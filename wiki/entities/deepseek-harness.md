@@ -1,7 +1,7 @@
 ---
 type: entity
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-08-25
 sources:
   - "raw/2026-08-23-dsh-docs-repo-readme.md"
   - "raw/2026-08-23-dsh-docs-architecture.md"
@@ -18,9 +18,11 @@ sources:
 
 **一句话身份**：DeepSeek 开源的通用 agent harness（TypeScript / pnpm monorepo，`npx @deepseek-ai/dsh`），设计哲学 **"everything is a plugin"**——模型适配器、工具注册表、会话日志、连 agent loop 本身都是插件，没有可打补丁的特权内核。2026-08 开源即爆火（三天近 13 万 star）；目前 developer preview，官方明言将有破坏性变更。
 
+> **精化（2026-08-25，代码仓实读）**："一切皆插件"指**挂载形态统一**（连 core 服务也是配置行）；可替换性上分 30 core / 28 seam / 1 bundle 三种角色——core 服务无并列实现、agentLoop 是唯一具体循环，"可 patch 替换"≠"有得换、换了能用"。详见 [[wiki/concepts/dsh-plugin-capability-boundaries]]。
+
 ## 插件机制要点
 
-- **框架**：vendored **Cordis**（服务容器 + 类型化事件 + 可逆 effect）。
+- **框架**：vendored **Cordis**（服务容器 + 类型化事件 + 可逆 effect）——源码收编进 `vendor/`（9 包，rescope 为 `@deepseek-ai/*`，18 处本地修改），上游 cordiverse/cordis 为 **MIT**（作者 Shigma），详见 [[wiki/concepts/cordis-vendoring]]。
 - **声明**：插件为导出固定字段的 ES module——`name`、`inject`（声明依赖的**服务**而非具体实现，激活顺序由服务可用性驱动）、`Config`（运行时 schema）、`apply(ctx, config)` 或 `Service` 子类。
 - **组合**：profile（如 `web`/`headless`）→ bundle → `cordis.patch.yml` 声明式配置树；patch 按 `id` 定位并**整行替换**任意插件行（含核心行）——"替换核心"的官方途径，层叠 last-write-wins。
 - **生命周期**：所有注册都是可逆 effect（disposer 逆序自动回滚），base bundle 自带 HMR。
@@ -43,7 +45,9 @@ sources:
 ## 相关页面
 
 - [[wiki/concepts/plugin-mechanism-comparison]] · [[wiki/entities/obsidian]] · [[wiki/entities/claudian]]
+- 能力边界与角色普查 → [[wiki/concepts/dsh-plugin-capability-boundaries]]；框架层收编 → [[wiki/concepts/cordis-vendoring]]；官方 Web 装配流程 → [[wiki/concepts/dsh-frontend-integration]]（"官方 Web 的四层装配"节）
 
 ## 依据来源
 
 - [[wiki/sources/dsh-official-docs|dsh 官方文档（32 页快照，2026-08-23）]]——本页要点均已可溯源到 raw（此前仅库外代码仓实读 `/Users/zn-ice/2026/deepseek-harness`，现已剪藏其 docs/）
+- 2026-08-25 增补（角色普查、vendoring 细节）来自库外代码仓实读（capability-seams 总表、vendor/README 等），**待剪藏**（登记于来源页后续线索）

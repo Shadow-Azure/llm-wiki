@@ -1,7 +1,7 @@
 ---
 type: index
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-08-25
 sources: []
 ---
 
@@ -27,8 +27,10 @@ sources: []
 - [[wiki/concepts/dsh-plugin-development|dsh 插件开发]] — 官方阅读路线、插件三形态、fiber 生命周期、defineTool DSL、能力三角色分包
 - [[wiki/concepts/dsh-plugin-distribution|dsh 插件分发]] — 组合包（npm+dsh.bundle manifest）；四安装来源与层叠规则；官方无市场，社区围绕 dsh-plugin topic 自建
 - [[wiki/concepts/dsh-plugin-networking|dsh 插件网络与动态加载]] — 同进程全权调外部服务+凭据 seam；三层动态加载（HMR/lazy bundle/dynamicCordisRunner——agent 可自写自挂插件）
-- [[wiki/concepts/dsh-frontend-integration|dsh 插件前端接入]] — 浏览器半（dsh.client）+ slots 系统：五个接入点、~20 具名插槽、组装纪律与打包三坑
-- [[wiki/concepts/plugin-mechanism-comparison|插件机制三方对比]] — Obsidian（同进程全权）vs deepseek-harness（无特权内核）vs VSCode（进程隔离+受限 API）；声明式谱系、扩展对象、隔离换自由五条洞察
+- [[wiki/concepts/dsh-frontend-integration|dsh 插件前端接入]] — 浏览器半（dsh.client）+ slots 系统：五个接入点、~20 具名插槽、官方 Web 四层装配、组装纪律与打包三坑
+- [[wiki/concepts/dsh-plugin-capability-boundaries|dsh 插件化能力边界]] — 30 core / 28 seam / 1 bundle 角色普查；core 两种动机（公告栏 vs 大门）；"能拔≠能用"；脊柱两层；上报打点=seam 默认关 vs 计量=core
+- [[wiki/concepts/cordis-vendoring|Cordis vendoring]] — dsh 源码收编框架层：9 包清单、@deepseek-ai rescope、18 处本地修改；上游 cordiverse/cordis 为 MIT（Shigma，即 Koishi 作者）
+- [[wiki/concepts/plugin-mechanism-comparison|插件机制三方对比]] — Obsidian（同进程全权）vs deepseek-harness（无特权内核†）vs VSCode（进程隔离+受限 API）；声明式谱系、扩展对象、隔离换自由五条洞察（†2026-08-25 精化：形态无特权，30 core 脊柱固定）
 - [[wiki/concepts/video-player-plugin-feasibility|本地视频播放器插件可行性]] — 完全可行（demo 已验证）；功能阶梯 L0–L4、合规检查、Media Extended 竞品与 AI 原生差异化
 - [[wiki/concepts/dsh-video-plugin-feasibility|dsh 视频播放插件可行性]] — Web UI 完全可行（conversation node 渲染 video + webServer 自建路由）；工具卡片路线不可行；agent 动态生成插件是独有玩法
 
@@ -37,7 +39,7 @@ sources: []
 - [[wiki/entities/andrej-karpathy|Andrej Karpathy]] — AI 研究者与教育者，LLM Wiki 模式提出者（2026-04）
 - [[wiki/entities/obsidian|Obsidian]] — 本地 Markdown 知识库的查看器/编辑器，LLM Wiki 模式中人类一侧的"IDE"；软件闭源、数据本地开放
 - [[wiki/entities/claudian|Claudian]] — 把 Claude Agent SDK 嵌入 Obsidian 的桌面插件（本库 agent 侧）；同进程 spawn CLI + 聊天内联批准；"插件里养插件"的生态桥实例
-- [[wiki/entities/deepseek-harness|deepseek-harness（dsh）]] — DeepSeek 开源 agent harness；Cordis 插件框架，"everything is a plugin"（连 agent loop 都可被 patch 替换）；双端插件 + 动态插件（agent 自写自挂）；官方文档已落库
+- [[wiki/entities/deepseek-harness|deepseek-harness（dsh）]] — DeepSeek 开源 agent harness；Cordis 插件框架（vendored，上游 MIT），"everything is a plugin"（形态统一；能力边界 30 core/28 seam/1 bundle）；双端插件 + 动态插件（agent 自写自挂）；官方文档已落库
 
 ## 综述
 

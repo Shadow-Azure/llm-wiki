@@ -61,8 +61,9 @@ sources:
 
 ## 后续线索
 
-- `capability-seams.md`（40KB 能力 seam 总目录）与 `config-catalog.md`、`module-graph.md`、`tool-catalog.md` 三份大目录未剪藏——深挖时再取。
+- `capability-seams.md`（40KB 能力 seam 总目录）与 `config-catalog.md`、`module-graph.md`、`tool-catalog.md` 三份大目录未剪藏——深挖时再取。**capability-seams 已于 2026-08-25 实读引用**（30/28/1 角色普查，见 [[wiki/concepts/dsh-plugin-capability-boundaries]]），剪藏优先级提高。
 - cordis-api/ 目录（Context API 参考）与 postmortem/ 目录未剪藏。
 - `packages/client/AGENTS.md`（客户端栈/slots 纪律，前端接入的权威文件）与 `docs/web-styling.zh.md` 未剪藏——2026-08-23 前端接入 query 已实读引用，优先登记。
 - 社区插件市场（dsh.deepseek404.com、dshplugin.dev 等）与官方 discussion #961 实战帖为社区来源，待剪藏。
-- Cordis 与 Koishi 生态的关系〔AI 推断，待来源验证——primer 未提及，需查 cordiverse/cordis 仓库〕。
+- ~~Cordis 与 Koishi 生态的关系〔AI 推断，待来源验证〕~~（**已验证 2026-08-25**：上游作者 Shigma 即 Koishi 作者，MIT——见 [[wiki/concepts/cordis-vendoring]]）。
+- **新增待剪藏（2026-08-25 query 实读引用）**：`vendor/README.md`（9 包 manifest + 18 处修改日志）、`THIRD_PARTY_NOTICES.md`、`packages/core/system-prompt/README.md`、`packages/session/session-telemetry/README.md`、`apps/cli/src/profile-boot.ts` + `packages/bundle/{base,web-app}/cordis.patch.yml`（Web 四层装配的依据）——支撑 [[wiki/concepts/cordis-vendoring]] 与 [[wiki/concepts/dsh-plugin-capability-boundaries]] 两页。

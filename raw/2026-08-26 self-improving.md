@@ -53,6 +53,8 @@
 
 如果你想，我可以进一步深挖其中某一家（比如 DeepSeek Harness 的 Cordis 架构或 HarnessX 的 AEGIS 引擎）的细节。
 
+---------------
+
 是的，HarnessX 现在已经开源了。
 
 官方仓库：[https://github.com/Darwin-Agent/HarnessX](https://github.com/Darwin-Agent/HarnessX)
@@ -68,6 +70,8 @@ curl -sSf https://raw.githubusercontent.com/Darwin-Agent/HarnessX/main/scripts/i
 ```
 
 另外论文里那份"平均 +14.5%、小模型最高 +44%"的结果，现在仓库的 README 给出了可复现的基准数据，比如 Qwen 3.5 9B 在 GAIA 上默认 Harness 从 33% 进化到 47%（+14pp，不动模型权重），配合模型进化后进一步提升到 55.77%（相对提升 +64%）。
+
+---------------
 
 有的，而且这块已经非常热闹了。整体上可以分成两条主线：**工具/运行层**（和 HarnessX 同一赛道，改的是 Agent 的运行时管线、工具编排、控制流）和**技能层**（改的是 SKILL.md 这类"怎么把一件事做对"的知识模块）。后者在 2025 年 12 月 Anthropic 发布 Agent Skills 开放标准后爆发式增长，因为 SKILL.md + 脚本的文件夹结构第一次给了"技能"一个可编辑、可验证、可版本化的载体。
 
@@ -113,6 +117,8 @@ curl -sSf https://raw.githubusercontent.com/Darwin-Agent/HarnessX/main/scripts/i
 不管是 HarnessX 改运行时，还是上面这些改 SKILL.md，骨架完全一致：**跑任务→收集轨迹→诊断失败模式→生成有边界的改动→评测门控→保留/回滚→入库**。踩的坑也一样：过拟合、奖励作弊（Agent 背题或迎合打分器）、验证器质量决定进化质量。Skill 层还有一个特有瓶颈——**组合崩溃**：单个技能 95% 成功率，嵌套 5 层只剩约 77%，SkillCraft 的评测把这个问题量化得很清楚，所以"原子技能可造"之后的下一个战场是"技能怎么稳定组合"。
 
 如果想系统跟踪，推荐两个清单：[Awesome-Dynamic-Agent-Skills](https://github.com/yubol-bobo/Awesome-Dynamic-Agent-Skills)（技能库生命周期，124 篇论文审计）和 [Awesome-Self-Improving-Agents](https://github.com/FrontisAI/Awesome-Self-Improving-Agents)。另外 TMLR 2026 有篇综述 [Dynamic Agent Skills: A Lifecycle Survey](https://arxiv.org/abs/2607.10113)，把这类系统统一定义为"生命周期管理、可验证、持续演化的技能仓库"，可以直接当索引用。
+
+-------------
 
 两个都查清楚了，一个是论文级的"LLM+进化算法"路线（AlphaEvolve），一个是产品级的"生产者-消费者科研流水线"路线（Hyra）。两者共同点是用"自动评估器"当裁判、跑"提出方案→执行实验→打分→沉淀经验→再改进"的循环，但实现思路差别很大。下面分别拆解。
 
@@ -244,3 +250,67 @@ LLM 的输出是标准 diff 格式（`<<<<<<< SEARCH ... ======= ... >>>>>>> REP
 |明确不进化|模型权重、Harness 骨架|模型权重、Harness 本身|
 
 所以更准确地说：AlphaEvolve 是"**让代码自己演化出更快的算法**"，Hyra 是"**让一套做实验的流水线自动产出更好的研究成果物**"。两者都还停留在"改外部工件"的层面，没有进入"改自己的权重/改自己的框架"那种严格意义上的递归自我改进。
+
+-----------------
+
+有，而且 2025–2026 年这已经形成了完整的产业图谱。核心共识是：**用户数据（尤其"用户修正"）是自进化最值钱的燃料**——一次用户纠错就是一条带标签的样本（"看起来对、实际错"），比合成测试数据珍贵得多。但四个层面的成熟度差别很大：skill 层产品化最快，harness/记忆层次之，工具底座层最不成熟，模型层只有少数巨头在做且以"群体飞轮"为主。
+
+## 先定义"用户数据"包括什么
+
+业界实际使用的信号源大致两类（CopilotKit 的[总结](https://cloud.tencent.com.cn/developer/article/2709351)最清晰）：
+
+1. **Agent 运行轨迹**：每一步被问了什么、调用了哪些工具、在哪里失败、返回了什么；
+2. **用户在协同界面上的活动**：点击、编辑、批准、修正——尤其是"用户把 Agent 的输出改成了什么"。
+
+两条合在一起才有意义：只追踪 Agent 看不到用户为什么修正，只观察用户不知道 Agent 为什么失败。
+
+## 四个层面分别怎么用用户数据进化
+
+### 1. 模型层（weights）——巨头专属，群体飞轮
+
+- **xAI Grok 4.5 是最强案例**：官方明确说模型"与 Cursor 联合训练"，Cursor 贡献了数万亿 token 的开发者交互数据——调试轨迹、多文件 diff、**用户对 Agent 输出的修正**。这正是 SpaceX 2026 年 6 月约 600 亿美元收购 Cursor 的核心逻辑：拿到全球最大的开发者行为轨迹，反哺 Grok。[相关分析](https://apidog.com/blog/grok-4-5-cursor-training-data/) 指出这是第一个"直接用商业编辑器用户会话训练的前沿模型"，效果可观测：Terminal Bench 2.1 上 83.3%，且 token 效率远高（平均 1.6 万 token 完成 SWE Bench Pro 任务，约为对手 1/4——模型从"用户奖励最短可用修复"的真实行为里学会了少废话）。
+- **NVIDIA NVInfo AI 数据飞轮**（[EACL 2026 industry paper](https://aclanthology.org/2026.eacl-industry.33/)）：3 万员工的知识助手，3 个月收集 495 个负样本，定位两类失败模式后微调——路由模型从 Llama 3.1 70B 换成微调后的 8B，准确率 96%、延迟降 70%；query rephrasal 微调后准确率 +3.7%、延迟降 40%。
+- **Microsoft/GitHub Copilot**：2026 年 3 月起允许从用户提示词和代码学习（默认开启可 opt-out），加上 Copilot 记忆用户偏好（"Work IQ"）。
+- 注意：模型层的"个体自进化"（每个人一个不断微调的模型）基本不存在，现实都是**聚合到群体模型**再发布，中间隔着隐私合规、脱敏、数据治理。
+
+### 2. Harness 层（记忆/运行时/策略）——产品化最快的第二层
+
+- **EverMind Raven + EverMe**：用户跨 Agent 的长期记忆汇入 EverOS，Raven 依据历史轨迹持续调整"技能体系、运行策略、工具调用"这套 Harness，HarnessBank 负责验证改进是否真实有效——这是上一轮聊过的"用户数据→harness 自进化"最完整的商业叙事（[科技日报报道](https://www.stdaily.com/web/gdxw/2026-08/25/content_569502.html)）。
+- **华为云 Hermes Agent（Nous Research 开源）**：GEPA 进化引擎从**每条执行轨迹**里自动提炼"进化基因"（有博主用 4.7 万条执行记录提炼出 1,247 粒基因），跑"执行-评估-优化-学习"闭环，跨会话持续完善"用户认知智能体"；配套用户记忆/工作记忆/长期记忆三层结构。[华为云部署方案](https://www.huaweicloud.com/intl/zh-cn/solution/implementations/deploying-hermes-agent.html)
+- **CopilotKit Intelligence**：用 AG-UI 协议实时捕获用户与 Agent 协同的每个事件，明确把学习落在三个层面——模型权重、**Harness（循环、工具许可、行动前检查）**、上下文（prompt 注入）；学习容器按用户/团队/应用划分，支持自托管和审计。
+- **阿里云 AgentLoop**（[核心概念文档](https://www.alibabacloud.com/help/en/agentloop/latest/core-concept)）：企业级"智能体自进化平台"，五阶段数据飞轮——采集 traces → 清洗成 trajectories → 沉淀为数据集和 **Experience（经验：有效的工具调用序列、优化的 prompt 策略）** → 驱动评估/实验/Prompt-Skill 调优 → 反馈回 Agent。明确支持"记忆库与经验库上下文自进化"。
+
+### 3. 工具底座层（tool foundation）——最不成熟，通常依附于 harness/skill
+
+严格意义的"工具底座自进化"独立产品很少，主流做法是**从执行轨迹自动造/优化工具**，用户数据是其中一种轨迹来源：
+
+- **EvoSOP**（论文）：从真实执行轨迹里提取标准作业程序（SOP），构建→合并→评估→修剪，形成版本化工具集；
+- **UCT**（论文）：训练-free 的 tool creator，推理时根据经验自动创建和更新工具；
+- **Dust Self-Improving Skills**：分析用户使用情况后，改进建议里明确包含"调整现有工具"或"给 skill 添加新工具"——这是少见的、产品化的"用户数据驱动工具更新"；
+- 更广义的案例：飞书 aily 支持用户用对话直接生成业务技能和系统应用（官方展示百余元 token 生成价值 2 万元的应用），但那是"用户驱动的创建"，不是系统自动进化。
+
+### 4. Skill 层——产品化最活跃
+
+- **Dust（Multiplayer AI）"Self-Improving Skills"**（[官方文档](https://docs.dust.tt/docs/user-documentation/agents/self-improving-skills)）：每晚批量分析使用某 skill 的用户对话——显式信号（thumbs up/down、文字评论）+ 隐式信号（用户修正输出、工具该触发没触发、对话跑偏）——生成带证据的改进建议（指令、工具调整、新工具），由技能维护者审批后以 diff 形式应用。**这是目前最典型的"用户数据→skill 自进化"商业产品**。
+- **Warp**：[skill 优化闭环](https://www.warp.dev/blog/building-a-skill-optimization-loop) 用 observer skill + 自动 grader + computer use 评估内层 skill 表现，分析失败模式后生成 diff、提 PR 更新 skill；Code with Claude 2026 上还分享了"把指令当代码，像 PR 一样编辑、评审、合并，让团队判断自动回流"的方法论。
+- **Anthropic 官方**：Agent Skills 标准 + Skill Creator 2.0（Create→Eval→Improve→Benchmark），并有专门的 webinar 讲 Warp 如何"把人类反馈信号转成 skill 更新"。
+- **华为云三段式**：用户修正触发任务反思，用补丁机制精准更新 SKILL.md，个人技能库按用户隔离、团队技能库脱敏泛化后共享。
+- **社区/开源**：Hermes GEPA、OpenClaw AutoSkill（短期记忆→长期记忆→结晶成 SKILL.md）、dsh-skill-evolve（从成功会话提炼 skill）等。
+
+## 一张总表
+
+|层面|代表方案|用户数据怎么用|成熟度|
+|---|---|---|---|
+|模型权重|Grok 4.5×Cursor、NVIDIA NVInfo、Copilot|用户交互轨迹/修正聚合为训练语料，群体飞轮|巨头专属，合规门槛最高|
+|Harness/记忆|EverMe+Raven、Hermes GEPA、CopilotKit、阿里 AgentLoop|跨会话记忆→运行策略/工具规则调整，经验库回流|产品化进行中，企业级平台已上线|
+|工具底座|EvoSOP、UCT、Dust|从执行轨迹造/优化工具|论文为主，产品化零星|
+|Skill|Dust Self-Improving Skills、Warp、Skill Creator 2.0、华为云|用户使用+反馈→自动生成改进建议→人工审批|产品化最活跃|
+
+## 几个关键判断
+
+1. **进化深度和更新频率成反比**。改 skill/prompt 最便宜、最快、最容易回滚，所以最先产品化；改 harness（记忆、工具规则）次之；改模型权重最贵、最慢、受隐私合规约束，所以只有平台型巨头在做，而且都是"群体级"而非"个人级"。
+2. **"用户修正"是最强信号但最稀疏**。所以所有产品都在补隐式信号（编辑、撤销、该调工具没调、对话跑偏），并用批量分析（Dust 的夜间批量、AgentLoop 的轨迹流水线）摊薄成本。
+3. **隐私/数据主权是分水岭**。企业级方案强调数据隔离和自托管（CopilotKit、AgentLoop 的 AgentSpace 多租户），C 端方案强调用户授权和记忆可管理（EverMe），模型层则靠脱敏和 opt-out。
+4. **完整闭环目前只存在于少数产品**。真正把"用户数据→观测→评估→优化→再上线"全链路做成平台的是阿里 AgentLoop、CopilotKit Intelligence 这类"进化基础设施"，而把"用户数据→skill 改进"做进日常产品的代表是 Dust 和 Warp。工具底座的独立进化，还在等一个杀手级产品。
+
+一句话回答你的问题：**有，四个层面都有真实方案，但落地程度从 skill（最成熟）→ harness/记忆（产品化中）→ 工具底座（论文为主）→ 模型权重（巨头专属）依次递减**；而几乎所有方案的核心，都是把"用户修正"当成免费的、持续产生的标签数据。

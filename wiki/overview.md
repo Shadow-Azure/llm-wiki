@@ -1,7 +1,7 @@
 ---
 type: overview
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-08-30
 sources:
   - "raw/2026-04-04-karpathy-llm-wiki.md"
   - "raw/2026-08-23-obsidian-docs-build-a-plugin.md"
@@ -26,6 +26,8 @@ sources:
 - 知识管理 / LLM 与个人工具（等待第一批真实领域来源进来后自然分化）
 - **平台扩展性 / 插件机制**：双锚点展开——Obsidian（[[wiki/concepts/obsidian-plugin-development|开发]] / [[wiki/concepts/obsidian-plugin-distribution|分发]] / [[wiki/concepts/obsidian-plugin-networking|网络访问]]，官方目录 + 审核的闭环）与 [[wiki/entities/deepseek-harness|deepseek-harness]]（[[wiki/concepts/dsh-plugin-development|开发]] / [[wiki/concepts/dsh-plugin-distribution|分发]] / [[wiki/concepts/dsh-plugin-networking|网络与动态加载]]，无特权内核 + 无官方市场）；[[wiki/concepts/plugin-mechanism-comparison|三方对比]]（含 VSCode、[[wiki/entities/claudian|Claudian]] 实例）是两条主线的汇合点
 - **视频播放插件构想双平台化**：[[wiki/concepts/video-player-plugin-feasibility|Obsidian 版]]（demo 已验证）与 [[wiki/concepts/dsh-video-plugin-feasibility|dsh 版]]（Web UI 有官方扩展点，且多出"agent 动态生成插件"路线）——同一功能在两种插件哲学下的实现对照，本身正在成为理解两类平台的试金石
+- **dsh 双文档面（2026-08-30 起）**：插件生态面（[[wiki/sources/dsh-official-docs|官方文档 32 页]] → 开发/分发/网络/前端/能力边界五页）+ 运行时架构面（[[wiki/sources/dsh-source-runtime|源码仓实读 v0.1.2-alpha.1]] → [[wiki/concepts/dsh-agent-loop|agent loop]] / [[wiki/concepts/dsh-session-log|session log]] / [[wiki/concepts/dsh-tool-pipeline|tool pipeline]] / [[wiki/concepts/dsh-coordination-subsystems|协调子系统]] 四页）。运行时面的核心发现：dsh 把"策略"统一为管线上的 waterfall 监听者，把自治全部限幅（goal 256 轮、jobs 唤醒预算 3、resume 必须人工 re-arm）
+- **与 self-opt 检索库的汇流**：[[raw/self-opt/INDEX.md|自进化四层图谱]]（harness/skill 层的 17 个方法核实）与 dsh 源码研究在此相交——dsh 的 skill 写入即生效 + goal/continuable subagent + feedback 留白，是"用户数据驱动自进化"唯一的**开源可自托管**完整实现样本；对照页待做
 
 ## 开放问题
 

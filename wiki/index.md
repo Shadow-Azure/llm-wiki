@@ -1,7 +1,7 @@
 ---
 type: index
 created: 2026-08-23
-updated: 2026-08-25
+updated: 2026-08-30
 sources: []
 ---
 
@@ -14,6 +14,7 @@ sources: []
 - [[wiki/sources/karpathy-llm-wiki|Karpathy《LLM Wiki》（2026-04-04）]] — LLM 增量编译维护个人 wiki 的模式原文（gist），本库的方法论源头
 - [[wiki/sources/obsidian-developer-docs|Obsidian 官方开发者文档（2026-08-23 快照，15 页）]] — 插件开发/构建/提交流程/政策红线/requestUrl 的官方规范合集
 - [[wiki/sources/dsh-official-docs|DeepSeek Harness 官方文档（2026-08-23 快照，32 页）]] — 插件开发四部曲/Cordis 教程/实操手册/五子系统/CLI 参考合集；"everything is a plugin"的一手规范
+- [[wiki/sources/dsh-source-runtime|dsh 源码仓运行时架构（2026-08-30 实读，v0.1.2-alpha.1）]] — agent 循环/会话日志/工具管线/协调子系统九份架构文档剪藏 + 本地源码实读（`/Users/zn-ice/2026/deepseek-harness` @ cd5ef814）
 
 ## 概念（concepts/）
 
@@ -33,6 +34,10 @@ sources: []
 - [[wiki/concepts/plugin-mechanism-comparison|插件机制三方对比]] — Obsidian（同进程全权）vs deepseek-harness（无特权内核†）vs VSCode（进程隔离+受限 API）；声明式谱系、扩展对象、隔离换自由五条洞察（†2026-08-25 精化：形态无特权，30 core 脊柱固定）
 - [[wiki/concepts/video-player-plugin-feasibility|本地视频播放器插件可行性]] — 完全可行（demo 已验证）；功能阶梯 L0–L4、合规检查、Media Extended 竞品与 AI 原生差异化
 - [[wiki/concepts/dsh-video-plugin-feasibility|dsh 视频播放插件可行性]] — Web UI 完全可行（conversation node 渲染 video + webServer 自建路由）；工具卡片路线不可行；agent 动态生成插件是独有玩法
+- [[wiki/concepts/dsh-agent-loop|dsh agent loop]] — turn/step 状态机、inbox durable 投影（followup/steer/inject 唤醒语义）、pre-step 权威决策、取消恢复与续接三层、scope per-agent 注册
+- [[wiki/concepts/dsh-session-log|dsh 会话日志]] — append-only 单一事实源、"model-visible means logged" 运行时不变量、surface 投影与 51 事件词表、compaction 原地替换、崩溃修复、spill 豁免
+- [[wiki/concepts/dsh-tool-pipeline|dsh 工具管线]] — 三道 waterfall + monotonic guards + fail-closed 审批 + fs 闸门 + 沙箱世界共享；PTC 代码模式（run_code 子调用携父 token 重入管线）
+- [[wiki/concepts/dsh-coordination-subsystems|dsh 协调子系统]] — skill 渐进披露/写入即生效、subagent 变体与 depth 记账、goal/Ralph/jobs 的自治限幅（人工 re-arm、唤醒预算）、feedback 留白与元级自证（.agents/notes 1646 篇）
 
 ## 实体（entities/）
 

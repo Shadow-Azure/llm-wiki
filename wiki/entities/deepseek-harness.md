@@ -1,7 +1,7 @@
 ---
 type: entity
 created: 2026-08-23
-updated: 2026-08-25
+updated: 2026-08-30
 sources:
   - "raw/2026-08-23-dsh-docs-repo-readme.md"
   - "raw/2026-08-23-dsh-docs-architecture.md"
@@ -12,6 +12,11 @@ sources:
   - "raw/2026-08-23-dsh-docs-cli-reference.md"
   - "raw/2026-08-23-dsh-docs-subsystem-extensions.md"
   - "raw/2026-08-23-dsh-docs-subsystem-client-modules.md"
+  - "raw/2026-08-30-dsh-src-agent-lifecycle.md"
+  - "raw/2026-08-30-dsh-src-subsystem-core.md"
+  - "raw/2026-08-30-dsh-src-subsystem-session.md"
+  - "raw/2026-08-30-dsh-src-subsystem-tools.md"
+  - "raw/2026-08-30-dsh-src-subsystem-skills.md"
 ---
 
 # deepseek-harness（dsh）
@@ -19,6 +24,14 @@ sources:
 **一句话身份**：DeepSeek 开源的通用 agent harness（TypeScript / pnpm monorepo，`npx @deepseek-ai/dsh`），设计哲学 **"everything is a plugin"**——模型适配器、工具注册表、会话日志、连 agent loop 本身都是插件，没有可打补丁的特权内核。2026-08 开源即爆火（三天近 13 万 star）；目前 developer preview，官方明言将有破坏性变更。
 
 > **精化（2026-08-25，代码仓实读）**："一切皆插件"指**挂载形态统一**（连 core 服务也是配置行）；可替换性上分 30 core / 28 seam / 1 bundle 三种角色——core 服务无并列实现、agentLoop 是唯一具体循环，"可 patch 替换"≠"有得换、换了能用"。详见 [[wiki/concepts/dsh-plugin-capability-boundaries]]。
+
+## 运行时架构要点（2026-08-30 源码实读，v0.1.2-alpha.1 @ cd5ef814）
+
+- 本地 clone `/Users/zn-ice/2026/deepseek-harness`：~50 packages、4700+ TS 文件；仓库自带 `docs/`（架构）+ `docs/subsystems/`（45 份子系统文档，多为生成物）+ 生成目录（tool-catalog 2279 行等）。
+- 四大运行时支柱，已各立概念页：[[wiki/concepts/dsh-agent-loop|agent loop（turn/step 状态机）]] · [[wiki/concepts/dsh-session-log|会话日志（单一事实源 + compaction）]] · [[wiki/concepts/dsh-tool-pipeline|工具管线（三道 waterfall + fail-closed 审批 + PTC）]] · [[wiki/concepts/dsh-coordination-subsystems|协调子系统（skill/subagent/goal/Ralph + 自治限幅）]]。
+- 一句话结构观：**循环写日志、日志投影历史、工具走管线、策略全是监听者**——"everything is a plugin" 在运行时的形态是"策略 = 管线上的 waterfall 监听者"。
+- 协调子系统全部带自治限幅（goal round ≤256、jobs maxConsecutiveWakes=3、goal resume 必须人工 re-arm）；skill 写入发现根同会话即生效——自进化插件的机制地基（连 [[raw/self-opt/INDEX.md|self-opt 检索库]]）。
+- 来源页：[[wiki/sources/dsh-source-runtime|dsh 源码仓运行时架构（v0.1.2-alpha.1）]]。
 
 ## 插件机制要点
 

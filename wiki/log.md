@@ -113,3 +113,12 @@ sources: []
 - 同步：index +2 行、改 2 行摘要（前端接入/实体页）、bump updated；sources/dsh-official-docs 后续线索增补待剪藏清单
 - 待剪藏登记：vendor/README.md、THIRD_PARTY_NOTICES.md、capability-seams.zh.md（优先级提高）、system-prompt / session-telemetry 包 README、profile-boot.ts + 两份 bundle patch
 
+
+## [2026-08-30] research | dsh 源码仓运行时架构（agent loop / session log / tool pipeline / 协调子系统）
+
+- 起因：用户要求分析本地代码仓 `/Users/zn-ice/2026/deepseek-harness`（v0.1.2-alpha.1 @ cd5ef814，~50 packages、4700+ TS 文件）并生成知识文档 + 给出学习路径；先查库确认已有 32 页官方文档剪藏覆盖"插件生态面"，本次补"运行时架构面"
+- 落库 raw（9 份源码仓架构文档剪藏，附 clip frontmatter，正文未动）：agent-lifecycle、tool-execution-pipeline、event-producer-consumer、capability-seams（销 2026-08-25 待剪账）、subsystems/{core,session,compaction,skills,tools}
+- 新建 wiki：sources/dsh-source-runtime（来源页：四域综合 + 生成目录未剪清单 + 与 self-opt 的连接）；concepts/dsh-agent-loop（turn/step 状态机、inbox durable 投影与三种唤醒语义、pre-step 权威决策、request-error retry、continuation 三层、scope）；concepts/dsh-session-log（append-only 单一事实源、model-visible means logged 不变量、surface 投影、compaction 原地替换 + KV cache 前缀技巧、崩溃修复合成 closer、spill 豁免、invariant companion 体系）；concepts/dsh-tool-pipeline（三道 waterfall 职责表、monotonic guards 单调性、审批四层 fail-closed、fs intent 闸门、沙箱世界共享、PTC 完整图景）；concepts/dsh-coordination-subsystems（skill 渐进披露/写入即生效、subagent spawn/fork/continuable 与 depth 记账、goal armed/disarmed 与人工 re-arm、Ralph、jobs 唤醒预算、feedback 留白、.agents/notes 元级自证）
+- 更新：entities/deepseek-harness（新增"运行时架构要点"节 + sources +5）；sources/dsh-official-docs（capability-seams 销账 + 双文档面互链）；overview（"dsh 双文档面"与"self-opt 汇流"两条主题）；index（sources +1、concepts +4）
+- 知识性质标注：四概念页中"AI 综合自实读"的行号级论断已注明路径与 commit，行号随上游漂移风险已声明；与 self-opt 图谱的对照判断标为 AI 推断待专页验证
+- 后续线索（登记于 sources/dsh-source-runtime）：config-catalog / module-graph / persistence-catalog / tool-catalog 四份生成目录、45 份子系统文档中未剪的 40 份、postmortem/ 与 cordis-api/、dsh×self-opt 对照专页

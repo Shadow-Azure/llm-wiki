@@ -1,7 +1,7 @@
 ---
 type: concept
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-09-06
 sources:
   - "raw/2026-08-23-obsidian-docs-anatomy-of-a-plugin.md"
   - "raw/2026-08-23-obsidian-docs-build-a-plugin.md"
@@ -15,7 +15,7 @@ sources:
 
 # Obsidian 插件开发
 
-**定义**：Obsidian 插件是 vault `.obsidian/plugins/<id>/` 文件夹内的三件套（manifest.json + main.js + 可选 styles.css），代码以 `Plugin` 子类的 `onload()`/`onunload()` 生命周期挂进宿主，**与宿主同进程运行于 Electron renderer**（桌面端有完整 Node 能力）。
+**定义**：Obsidian 插件是 vault `.obsidian/plugins/<id>/` 文件夹内的三件套（manifest.json + main.js + 可选 styles.css），代码以 `Plugin` 子类的 `onload()`/`onunload()` 生命周期挂进宿主，**与宿主同进程运行于 [[wiki/concepts/electron|Electron]] renderer**（桌面端有完整 Node 能力）。
 
 ## 插件解剖：该看什么文件
 

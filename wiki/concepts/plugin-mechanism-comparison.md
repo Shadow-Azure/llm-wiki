@@ -1,7 +1,7 @@
 ---
 type: concept
 created: 2026-08-23
-updated: 2026-08-25
+updated: 2026-09-06
 sources:
   - "raw/2026-08-23-obsidian-docs-anatomy-of-a-plugin.md"
   - "raw/2026-08-23-obsidian-docs-build-a-plugin.md"
@@ -18,7 +18,7 @@ sources:
 
 | 维度 | Obsidian | deepseek-harness | VSCode |
 |---|---|---|---|
-| 宿主定位 | Electron 笔记应用 | Node agent 运行框架 | Electron IDE |
+| 宿主定位 | [[wiki/concepts/electron|Electron]] 笔记应用 | Node agent 运行框架 | [[wiki/concepts/electron|Electron]] IDE |
 | 插件形态 | 文件夹：manifest + main.js (+css) | ES module：name/inject/Config/apply | npm 包：package.json + main/browser 入口 |
 | 清单声明内容 | 纯元数据，**无能力声明** | 服务依赖 + 配置 schema | **能力合同**：contribution points + activation events |
 | 发现/组合 | 目录安装 / 社区目录分发 | 声明式 YAML 配置树（patch 层叠） | Marketplace / VSIX |

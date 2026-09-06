@@ -250,3 +250,13 @@ sources: []
 - 新建：sources/obsidian-oss-alternatives-landscape
 - 更新：concepts/note-tool-landscape（star/活跃度实测表、二次开发支持分级、协议谱系补 BUSL/LGPL/GPL、Anytype 矛盾标记、三条线索收账、"Obsidian 生态位无人完整占据"开源侧印证）、index、本 log
 - 综述同步：overview"正在形成的主题"知识管理条目深化 + 开放问题登记（AppFlowy 新后端 / Logseq DB 稳定版 / AS Notes）
+
+## [2026-09-06] query-filed | Tauri/Electron 架构对比 + cc-switch 源码实读（新建 5 页）
+
+- 触发：用户确认回填，覆盖本会话 7 轮问答：cc-switch 源码定位 → 语言/架构/分层分析 → Tauri 跨平台机制 → 框架热度 → Tauri 1/2 关系 → Electron 架构 → Rust 后端选择与静态分发辨析
+- 新建：entities/cc-switch（本地实读 /Users/zn-ice/2026/cc-switch @ 5315fa28）、concepts/tauri、concepts/electron、concepts/tauri-vs-electron、concepts/self-contained-binaries
+- 关键论断落库：①两框架唯一本质区别 = 浏览器「借 vs 带」，其余皆下游；②Tauri 后端语言被「零运行时」目标锁死（分叉树论证）；③「零依赖」两义：静态消灭 vs 携带搬家（glibc 地狱归因为动态链接默认值，非语言天花板）；④2026 共识分界：成熟度/一致性 vs 体积/内存/权限
+- 数据实测（2026-09-06 GitHub API）：tauri 110,843⭐ / electron 122,902⭐ / cc-switch 131,292⭐；cc-switch 代码量 Rust 106,220 行 vs TS+TSX 77,154 行
+- 反向补链 3 页（updated 同步 bump）：plugin-mechanism-comparison（宿主定位行 Electron×2）、obsidian-plugin-development（Electron renderer 首提，Obsidian 本体即 Electron 应用）、bilinote-architecture（Tauri 首提）
+- 待剪藏登记（各页「依据来源」小节）：Tauri 2.0 官方博客与迁移指南、Electron 官方进程模型文档、2026 对比基准文（96%/75% 口径）、crates.io vs npm 生态数据、Reddit WebKitGTK 迁移案例帖
+- 未动 overview（query-filed 无此义务）；「桌面框架」主题簇首建，库规模 42→47 页

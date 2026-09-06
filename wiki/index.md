@@ -5,7 +5,7 @@ updated: 2026-09-06
 sources: []
 ---
 
-<!-- 2026-09-06 三次更新：开源扩展盘点 + open-notebook 实读 + 类 Obsidian 开源格局实测（research） -->
+<!-- 2026-09-06 四次更新：开源扩展盘点 + open-notebook 实读 + 类 Obsidian 开源格局实测（research）+ Tauri/Electron/cc-switch 架构分析回填（query-filed） -->
 
 # 索引
 
@@ -55,6 +55,10 @@ sources: []
 - [[wiki/concepts/dsh-session-log|dsh 会话日志]] — append-only 单一事实源、"model-visible means logged" 运行时不变量、surface 投影与 51 事件词表、compaction 原地替换、崩溃修复、spill 豁免
 - [[wiki/concepts/dsh-tool-pipeline|dsh 工具管线]] — 三道 waterfall + monotonic guards + fail-closed 审批 + fs 闸门 + 沙箱世界共享；PTC 代码模式（run_code 子调用携父 token 重入管线）
 - [[wiki/concepts/dsh-coordination-subsystems|dsh 协调子系统]] — skill 渐进披露/写入即生效、subagent 变体与 depth 记账、goal/Ralph/jobs 的自治限幅（人工 re-arm、唤醒预算）、feedback 留白与元级自证（.agents/notes 1646 篇）
+- [[wiki/concepts/tauri|Tauri]] — 借系统 WebView + Rust 后端的桌面应用框架；2.0 插件化/capabilities/移动端；体积优势的根源
+- [[wiki/concepts/electron|Electron]] — Chromium+Node+C++ 胶水全家桶；主/渲染双进程 + contextBridge 安全桥；VS Code 与 Obsidian 的地基
+- [[wiki/concepts/tauri-vs-electron|Tauri vs Electron]] — 桌面应用「借 vs 带」两范式全维度对比；后端语言被体积约束锁死的分叉树论证；中间形态收敛
+- [[wiki/concepts/self-contained-binaries|自包含二进制分发]] — 静态链接（musl/crt-static/rustls）与 glibc 地狱归因；「依赖消灭 vs 搬家」；Node native addon ABI 对照
 
 ## 实体（entities/）
 
@@ -62,6 +66,7 @@ sources: []
 - [[wiki/entities/obsidian|Obsidian]] — 本地 Markdown 知识库的查看器/编辑器，LLM Wiki 模式中人类一侧的"IDE"；软件闭源、数据本地开放
 - [[wiki/entities/claudian|Claudian]] — 把 Claude Agent SDK 嵌入 Obsidian 的桌面插件（本库 agent 侧）；同进程 spawn CLI + 聊天内联批准；"插件里养插件"的生态桥实例
 - [[wiki/entities/deepseek-harness|deepseek-harness（dsh）]] — DeepSeek 开源 agent harness；Cordis 插件框架（vendored，上游 MIT），"everything is a plugin"（形态统一；能力边界 30 core/28 seam/1 bundle）；双端插件 + 动态插件（agent 自写自挂）；官方文档已落库
+- [[wiki/entities/cc-switch|cc-switch]] — 六款 AI CLI 的供应商切换器（⭐131k 实测）；Tauri 2 实读样本：Rust 58% 五层架构 + axum 本地反向代理子系统
 
 ## 综述
 

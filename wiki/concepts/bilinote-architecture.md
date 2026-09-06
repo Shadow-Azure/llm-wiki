@@ -21,7 +21,7 @@ sources:
 | 笔记生成 | 结构化 Markdown（风格 9 预设 + 格式 4 选项）、自动截图插入（ffmpeg 抓帧→/static/screenshots）、**原片时间戳跳转链接**、markmap 思维导图 |
 | RAG 问答 | chromadb PersistentClient（每任务一个 collection，索引转写+视频元信息）+ Function Calling（chat_tools：模型主动查原文） |
 | 多引擎 | LLM 工厂（deepseek/qwen/universal + checkpoint + request_chunker 长转写分块）；转写 5 引擎（fast-whisper/mlx-whisper/groq/bcut 必剪/kuaishou 快手） |
-| 交付 | 四形态共享一个 FastAPI 后端（:8483）：Web（React :3015）、桌面（Tauri+PyInstaller）、浏览器插件（Vue3 MV3）、Docker |
+| 交付 | 四形态共享一个 FastAPI 后端（:8483）：Web（React :3015）、桌面（[[wiki/concepts/tauri|Tauri]]+PyInstaller）、浏览器插件（Vue3 MV3）、Docker |
 | 配套 | 导出 PDF/DOCX、ppt_generator、可选 minio、i18n、blinker 信号后处理 |
 
 ## 二、视频处理：视频就是输入本身

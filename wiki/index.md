@@ -55,6 +55,7 @@ sources: []
 - [[wiki/concepts/dsh-session-log|dsh 会话日志]] — append-only 单一事实源、"model-visible means logged" 运行时不变量、surface 投影与 51 事件词表、compaction 原地替换、崩溃修复、spill 豁免
 - [[wiki/concepts/dsh-tool-pipeline|dsh 工具管线]] — 三道 waterfall + monotonic guards + fail-closed 审批 + fs 闸门 + 沙箱世界共享；PTC 代码模式（run_code 子调用携父 token 重入管线）
 - [[wiki/concepts/dsh-coordination-subsystems|dsh 协调子系统]] — skill 渐进披露/写入即生效、subagent 变体与 depth 记账、goal/Ralph/jobs 的自治限幅（人工 re-arm、唤醒预算）、feedback 留白与元级自证（.agents/notes 1646 篇）
+- [[wiki/concepts/dsh-docs-workflow|dsh 文档工程工作流]] — docs-as-code 十步机器强制流水线：分层 AGENTS.md+字数预算、Agent Note 决策落档、JSDoc 即契约、type-equiv 逐字等价围栏、gen/verify 生成目录、双语三件套哈希公证、run-gates 门禁组合、CI 内嵌、文档站投影、归档冻结
 - [[wiki/concepts/tauri|Tauri]] — 借系统 WebView + Rust 后端的桌面应用框架；2.0 插件化/capabilities/移动端；体积优势的根源
 - [[wiki/concepts/electron|Electron]] — Chromium+Node+C++ 胶水全家桶；主/渲染双进程 + contextBridge 安全桥；VS Code 与 Obsidian 的地基
 - [[wiki/concepts/tauri-vs-electron|Tauri vs Electron]] — 桌面应用「借 vs 带」两范式全维度对比；后端语言被体积约束锁死的分叉树论证；中间形态收敛

@@ -51,7 +51,7 @@ sources:
 
 ## 元级自证：dsh 用自己的机制开发自己
 
-`.agents/notes/` 有 **1646 个工程决策笔记**（proposed/implemented/rejected/archived × feature/bug-fix/architecture/…，"每个非平凡 PR 必须新增或更新至少一个 note"，机器校验）；`.agents/skills/` 有 10 个仓库自用 skill（dsh-doc、dsh-code-review、dsh-pre-push-checks…）——而 `.agents/skills` 正是 skill 发现根 rank 200。**开发 agent 的经验沉淀与运行时 agent 用的是同一套 skill 机制**。这与本库 [[wiki/concepts/llm-wiki|LLM Wiki]] 的 log.md（追加式时间线）+ skill 沉淀思路同构。
+`.agents/notes/` 有 **1646 个工程决策笔记**（proposed/implemented/rejected/archived × feature/bug-fix/architecture/…，"每个非平凡 PR 必须新增或更新至少一个 note"，机器校验；完整生命周期与三门禁见 [[wiki/concepts/dsh-docs-workflow]]）；`.agents/skills/` 有 10 个仓库自用 skill（dsh-doc、dsh-code-review、dsh-pre-push-checks…）——而 `.agents/skills` 正是 skill 发现根 rank 200。**开发 agent 的经验沉淀与运行时 agent 用的是同一套 skill 机制**。这与本库 [[wiki/concepts/llm-wiki|LLM Wiki]] 的 log.md（追加式时间线）+ skill 沉淀思路同构。
 
 ## 与其他概念的关联
 

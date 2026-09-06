@@ -1,7 +1,7 @@
 ---
 type: source
 created: 2026-08-30
-updated: 2026-08-30
+updated: 2026-09-06
 sources:
   - "raw/2026-08-30-dsh-src-agent-lifecycle.md"
   - "raw/2026-08-30-dsh-src-tool-execution-pipeline.md"
@@ -45,5 +45,6 @@ sources:
 - 未剪藏的大目录：`docs/config-catalog.md`、`docs/module-graph.md`（1958 行）、`docs/persistence-catalog.md`、`docs/tool-catalog.md`（2279 行，64 工具条目/59 唯一名）——均生成物，深挖对应域时再取。
 - 未剪藏的子系统文档（45 份中本次只剪 5 份）：goal、subagent、agent-team、workflow、typert、spill、llm-streaming、system-prompt、sandbox、approval 等；分析中的论断以本地路径溯源。
 - `docs/postmortem/`、`docs/cordis-api/` 未剪藏。
+- 文档工程工作流（AGENTS.md 分层、Agent Note、type-equiv、双语三件套、run-gates 门禁）已立概念页 [[wiki/concepts/dsh-docs-workflow]]（2026-09-06 实读同一 commit）；其依据的 `docs/AGENTS.md`、`docs/i18n/README.md` 等仍未剪藏。
 - [[wiki/sources/dsh-official-docs|官方文档来源页]]后续线索中登记的 vendor/README、cordis.patch.yml 等仍待剪。
 - 与 [[raw/self-opt/INDEX.md|self-opt 检索库]] 的连接：dsh 运行时的 goal/continuable subagent/skill 写入即生效机制，是"用户数据驱动自进化"四层图谱中 harness 层+skill 层的一个**开源、可自托管的实现样本**，值得单独做对照页。

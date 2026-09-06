@@ -260,3 +260,12 @@ sources: []
 - 反向补链 3 页（updated 同步 bump）：plugin-mechanism-comparison（宿主定位行 Electron×2）、obsidian-plugin-development（Electron renderer 首提，Obsidian 本体即 Electron 应用）、bilinote-architecture（Tauri 首提）
 - 待剪藏登记（各页「依据来源」小节）：Tauri 2.0 官方博客与迁移指南、Electron 官方进程模型文档、2026 对比基准文（96%/75% 口径）、crates.io vs npm 生态数据、Reddit WebKitGTK 迁移案例帖
 - 未动 overview（query-filed 无此义务）；「桌面框架」主题簇首建，库规模 42→47 页
+
+## [2026-09-06] query-filed | dsh 文档工程工作流（docs-as-code 十步流水线）
+
+- 触发：用户确认回填，覆盖本会话 2 轮问答——十步文档-代码协同流程的通俗讲解 + 各步真实文档/代码示例取证（3 个并行探索代理取回逐字片段 + 主会话直读 8 文件）
+- 新建：concepts/dsh-docs-workflow（实读 `/Users/zn-ice/2026/deepseek-harness` @ cd5ef814，2026-09-06 复核未漂移）——十步：规则注入（分层 AGENTS.md + 词数预算）/ Agent Note 决策落档（路径即状态、三门禁、活文档）/ JSDoc 即契约 + README 模板（Model Experience 三层）/ type-equiv 防伪围栏（compiler API 逐字比对、保留 JSDoc）/ gen--verify 成对生成目录 / 双语三件套哈希公证（git blob hash + 结构签名 + merge driver）/ run-gates 叶子组合（doc-quick=filter(quick)）/ CI 内嵌（docSyncLeafGates 五通道复用）/ 文档站投影（无副本测试）/ 归档冻结（sha256 append-only，语义判断反配额）
+- 更新：entities/deepseek-harness（要点区加"文档工程线"条目 + 相关页面链接）、concepts/dsh-coordination-subsystems（.agents/notes 处反向补链）、sources/dsh-source-runtime（updated bump + 后续线索登记新页）、index（concepts 加行）
+- 关键决策：立 concept 页而非 source 页——无新 raw/ 剪藏，实读存证沿用 dsh-source-runtime 的 commit；dsh「文档侧」自此与运行时四支柱并列
+- AI 推断已标注：AGENTS.md≈上下文/token 预算的归因、与 LLM Wiki 同构的判断（均标"待来源验证"）
+- 待剪藏登记（新页后续线索）：docs/AGENTS.md（tier 表 + 写作规则）、docs/i18n/README.md（双语契约）——可直接借鉴的方法论文档；packages/typert 生成器实现未深挖

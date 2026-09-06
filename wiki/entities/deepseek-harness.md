@@ -31,6 +31,7 @@ sources:
 - 四大运行时支柱，已各立概念页：[[wiki/concepts/dsh-agent-loop|agent loop（turn/step 状态机）]] · [[wiki/concepts/dsh-session-log|会话日志（单一事实源 + compaction）]] · [[wiki/concepts/dsh-tool-pipeline|工具管线（三道 waterfall + fail-closed 审批 + PTC）]] · [[wiki/concepts/dsh-coordination-subsystems|协调子系统（skill/subagent/goal/Ralph + 自治限幅）]]。
 - 一句话结构观：**循环写日志、日志投影历史、工具走管线、策略全是监听者**——"everything is a plugin" 在运行时的形态是"策略 = 管线上的 waterfall 监听者"。
 - 协调子系统全部带自治限幅（goal round ≤256、jobs maxConsecutiveWakes=3、goal resume 必须人工 re-arm）；skill 写入发现根同会话即生效——自进化插件的机制地基（连 [[raw/self-opt/INDEX.md|self-opt 检索库]]）。
+- **文档工程线**（2026-09-06 实读）：全仓 docs-as-code 十步流水线——Agent Note 决策落档（1646 篇）、type-equiv 逐字等价围栏、gen/verify 生成目录、双语三件套哈希公证、约 30 个文档门禁内嵌 CI。详见 [[wiki/concepts/dsh-docs-workflow]]。
 - 来源页：[[wiki/sources/dsh-source-runtime|dsh 源码仓运行时架构（v0.1.2-alpha.1）]]。
 
 ## 语言与工程栈 + 架构图（2026-09-06 核对，仓仍 @ cd5ef814 未漂移）
@@ -94,7 +95,7 @@ sources:
 ## 相关页面
 
 - [[wiki/concepts/plugin-mechanism-comparison]] · [[wiki/entities/obsidian]] · [[wiki/entities/claudian]]
-- 能力边界与角色普查 → [[wiki/concepts/dsh-plugin-capability-boundaries]]；框架层收编 → [[wiki/concepts/cordis-vendoring]]；官方 Web 装配流程 → [[wiki/concepts/dsh-frontend-integration]]（"官方 Web 的四层装配"节）
+- 能力边界与角色普查 → [[wiki/concepts/dsh-plugin-capability-boundaries]]；框架层收编 → [[wiki/concepts/cordis-vendoring]]；官方 Web 装配流程 → [[wiki/concepts/dsh-frontend-integration]]（"官方 Web 的四层装配"节）；docs-as-code 十步流水线 → [[wiki/concepts/dsh-docs-workflow]]
 
 ## 依据来源
 

@@ -1,7 +1,7 @@
 ---
 type: entity
 created: 2026-08-23
-updated: 2026-08-30
+updated: 2026-09-06
 sources:
   - "raw/2026-08-23-dsh-docs-repo-readme.md"
   - "raw/2026-08-23-dsh-docs-architecture.md"
@@ -32,6 +32,42 @@ sources:
 - 一句话结构观：**循环写日志、日志投影历史、工具走管线、策略全是监听者**——"everything is a plugin" 在运行时的形态是"策略 = 管线上的 waterfall 监听者"。
 - 协调子系统全部带自治限幅（goal round ≤256、jobs maxConsecutiveWakes=3、goal resume 必须人工 re-arm）；skill 写入发现根同会话即生效——自进化插件的机制地基（连 [[raw/self-opt/INDEX.md|self-opt 检索库]]）。
 - 来源页：[[wiki/sources/dsh-source-runtime|dsh 源码仓运行时架构（v0.1.2-alpha.1）]]。
+
+## 语言与工程栈 + 架构图（2026-09-06 核对，仓仍 @ cd5ef814 未漂移）
+
+- **语言**：TypeScript 4728 个 .ts 文件为主体；`native/landlock-run` 用 **C**（Linux Landlock 沙箱启动器）；~20 个 .py 为辅助脚本。包管理 pnpm 11.7 monorepo——workspaces 五区：`vendor/*`（收编的 Cordis 9 包）、`packages/*/*`（两级分组，如 `packages/core/agent-loop`）、`native/*`、`apps/*`（cli / web）、`website`。包发布格式 `lib/index.js` + `lib/types/*.d.ts`（根统一构建，各包无独立 build script）。
+- **整体架构图**：
+
+```
+┌──────────────── apps（产品面）─────────────────┐
+│   dsh CLI (apps/cli)        dsh Web (apps/web)  │
+└───────┬─────────────────────────┬──────────────┘
+        │ CLI/headless profile    │ web profile
+        │                         │ （浏览器 half: conversation node + slots + settings）
+        ▼                         ▼
+┌─── profile → bundle → cordis.patch.yml（声明式组合，id 定位整行替换，last-write-wins）───┐
+│                                                                                       │
+│   Cordis 内核（vendor/ 9 包，@deepseek-ai rescope）                                    │
+│   服务容器 · 类型化事件（emit 观察 / waterfall around 可短路 / parallel / serial）· 可逆 effect │
+│                                                                                       │
+└───────────────────────────────────┬───────────────────────────────────────────────────┘
+                                    ▼  （一切服务皆以插件形态挂载：30 core / 28 seam / 1 bundle）
+┌─── 运行时四支柱（packages/core/* 等）────────────────────────────────────────────────┐
+│                                                                                     │
+│  agent loop ──每步写──> session log（append-only 单一事实源，compaction 原地替换）      │
+│  turn/step 状态机            │ 投影出：历史、回放、surface UI                          │
+│    │ 调工具                  │                                                       │
+│    ▼                        │                                                        │
+│  tool pipeline：pre-execute（审批闸门 allow/deny/ask）→ execute（沙箱/fs provider）     │
+│       → post-execute  ←—— 策略全是 waterfall 监听者（retry/打点/审批…皆插件）            │
+│                                                                                     │
+│  协调子系统：skill（写入即生效）/ subagent（depth 记账）/ goal（≤256 轮，re-arm 人工）     │
+│              jobs（唤醒≤3）/ feedback                                                │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+   侧翼：native/landlock-run（C，Linux 沙箱启动器）· mcp / lsp / e2b / sandbox 等集成包
+```
+
+- 一句话读图：**循环在左上写日志，日志向右投影一切；工具请求向下穿管线，策略以监听者形态横插管线；所有方框都是 Cordis 服务容器里的插件行，patch 文件可以整行换掉任何一个。**
 
 ## 插件机制要点
 

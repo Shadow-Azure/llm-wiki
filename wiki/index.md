@@ -1,9 +1,11 @@
 ---
 type: index
 created: 2026-08-23
-updated: 2026-08-30
+updated: 2026-09-06
 sources: []
 ---
+
+<!-- 2026-09-06 两次更新：开源扩展盘点 + open-notebook 实读 -->
 
 # 索引
 
@@ -15,11 +17,21 @@ sources: []
 - [[wiki/sources/obsidian-developer-docs|Obsidian 官方开发者文档（2026-08-23 快照，15 页）]] — 插件开发/构建/提交流程/政策红线/requestUrl 的官方规范合集
 - [[wiki/sources/dsh-official-docs|DeepSeek Harness 官方文档（2026-08-23 快照，32 页）]] — 插件开发四部曲/Cordis 教程/实操手册/五子系统/CLI 参考合集；"everything is a plugin"的一手规范
 - [[wiki/sources/dsh-source-runtime|dsh 源码仓运行时架构（2026-08-30 实读，v0.1.2-alpha.1）]] — agent 循环/会话日志/工具管线/协调子系统九份架构文档剪藏 + 本地源码实读（`/Users/zn-ice/2026/deepseek-harness` @ cd5ef814）
+- [[wiki/sources/hkuds-videorag-vimo|HKUDS VideoRAG / Vimo（2025-02，KDD'2026）]] — 开源"chat with your videos"图 RAG 框架 + Electron 桌面应用（Beta 未发布）；README 全文剪藏
+- [[wiki/sources/omagent-video-understanding|OmAgent video_understanding（EMNLP 2024）]] — ASR+场景切分+抽帧+向量索引+DnC 任务树的教科书开源管线；Rewinder 工具
+- [[wiki/sources/hkuds-videoagent|HKUDS VideoAgent（2025-07，~1.8k stars）]] — 理解+剪辑+重制一体的多智能体框架；图驱动工作流生成；Q&A 仅需 Whisper（transcript QA）
+- [[wiki/sources/player-embedded-ai-snapshot|播放器内嵌 AI 形态快照（7 来源，2023-10~2026-08）]] — YouTube/B站原生 AI + LunaNotes 等扩展品类拥挤；全部 transcript-based；Obsidian 生态无 AI
+- [[wiki/sources/video-understanding-api-products|视频理解 API 层与垂直产品快照（7 来源）]] — TwelveLabs/VideoDB/通义听悟 API 层；tl;dv/Knowt/BibiGPT 垂直应用；MCP 成视频工具标配
+- [[wiki/sources/video-agent-academic-landscape|视频 agent 学术与参考架构快照（6 来源）]] — VideoAgent ECCV/Video-RAG NeurIPS/NVIDIA 五段管线/Video-MME 基准（长视频墙 + ASR 融合 +7~10pt）
+- [[wiki/sources/media-extended-v4-no-ai|Media Extended v4.0 发布说明（2025-09-17）]] — 官方一手证据：零 AI 能力，AI 是转闭源动因
+- [[wiki/sources/oss-video-extension-landscape|开源在线视频分析项目格局（star 实测 2026-09-06）]] — B站/YouTube 方向开源高星盘点：BiliNote 7.2k（本地后端+MV3 插件+字幕优先策略）、BibiGPT-v1 6.2k、biliscope 827；纯扩展高星稀疏
+- [[wiki/sources/open-notebook-architecture|Open Notebook 关键文件选辑（2026-09-06 本地实读）]] — ⭐38.3k NotebookLM 开源替代：ADR-004/007 全文 + 摄取图源码注解 + 容器编排配置
+- [[wiki/sources/bilinote-architecture|BiliNote 关键源码选辑（2026-09-06 本地实读）]] — B站 player API 字幕直拉七步 + yt-dlp 412 风控 monkey patch + 编排核心 skip_download 决策
 
 ## 概念（concepts/）
 
 - [[wiki/concepts/llm-wiki|LLM Wiki]] — 由 LLM 持久编译维护的知识库：三层架构、三大操作、index+log 导航，维护成本趋零使知识复利
-- [[wiki/concepts/wiki-vs-rag|编译式知识库 vs RAG]] — 查询时临时检索拼装 vs 摄入时编译一次持续保鲜；积累性、交叉引用、矛盾处理的全维度对比
+- [[wiki/concepts/wiki-vs-rag|编译式知识库 vs RAG]] — 查询时临时检索拼装 vs 摄入时编译一次持续保鲜；积累性、交叉引用、矛盾处理的全维度对比；视频模态同一对照的印证（预索引 vs 直塞）
 - [[wiki/concepts/note-tool-landscape|笔记工具格局]] — 本地优先 vs 云端 SaaS 两大阵营；国内外开源/闭源盘点、AGPL/MIT/MPL/EE 协议商用含义、"Obsidian 最适合接 AI"论证（AI 推断待验证）
 - [[wiki/concepts/bidirectional-links|双向链接与关系图谱]] — 前向链接只存一份、反向索引算"谁指向我"、图谱是可视化投影；断链合法与多重上下文两大机制；与 LLM Wiki 模式的微观连接
 - [[wiki/concepts/obsidian-plugin-development|Obsidian 插件开发]] — 三件套解剖（manifest/主入口/样式）、Plugin 生命周期、esbuild 构建、versions.json 回退、设置存 data.json、UI 接入六插槽（前端新手向，含视频面板最小示例）
@@ -32,8 +44,12 @@ sources: []
 - [[wiki/concepts/dsh-plugin-capability-boundaries|dsh 插件化能力边界]] — 30 core / 28 seam / 1 bundle 角色普查；core 两种动机（公告栏 vs 大门）；"能拔≠能用"；脊柱两层；上报打点=seam 默认关 vs 计量=core
 - [[wiki/concepts/cordis-vendoring|Cordis vendoring]] — dsh 源码收编框架层：9 包清单、@deepseek-ai rescope、18 处本地修改；上游 cordiverse/cordis 为 MIT（Shigma，即 Koishi 作者）
 - [[wiki/concepts/plugin-mechanism-comparison|插件机制三方对比]] — Obsidian（同进程全权）vs deepseek-harness（无特权内核†）vs VSCode（进程隔离+受限 API）；声明式谱系、扩展对象、隔离换自由五条洞察（†2026-08-25 精化：形态无特权，30 core 脊柱固定）
-- [[wiki/concepts/video-player-plugin-feasibility|本地视频播放器插件可行性]] — 完全可行（demo 已验证）；功能阶梯 L0–L4、合规检查、Media Extended 竞品与 AI 原生差异化
-- [[wiki/concepts/dsh-video-plugin-feasibility|dsh 视频播放插件可行性]] — Web UI 完全可行（conversation node 渲染 video + webServer 自建路由）；工具卡片路线不可行；agent 动态生成插件是独有玩法
+- [[wiki/concepts/video-player-plugin-feasibility|本地视频播放器插件可行性]] — 完全可行（demo 已验证）；功能阶梯 L0–L4、合规检查；竞品小节 2026-09 修订：Media Extended v4.0 一手证据零 AI，空位收窄为"本地库+KM+播放器内嵌 AI"
+- [[wiki/concepts/dsh-video-plugin-feasibility|dsh 视频播放插件可行性]] — Web UI 完全可行（conversation node 渲染 video + webServer 自建路由）；工具卡片路线不可行；agent 动态生成插件是独有玩法；MCP 对接视频理解 API 是现实通道
+- [[wiki/concepts/ai-video-assistant-landscape|AI 视频助手格局]] — "AI agent + 视频"五层格局（平台原生/浏览器扩展/垂直应用/API 基础设施/开源工程）；transcript-first 压倒性主流；agent 动作三档谱系；空位假设的拆分裁决
+- [[wiki/concepts/open-notebook-architecture|Open Notebook 架构分析]] — 本地仓五问（功能/视频能力/Docker 必然性/技术栈/学习路径）；SurrealDB+worker+Node 三运行时使 compose 成最小分发单元；视频=纯转写无时间戳；ADR 文化范本
+- [[wiki/concepts/bilinote-architecture|BiliNote 架构分析]] — 本地仓五问同题异构对照：SQLite+线程池使 Docker 非必需（vs SurrealDB 使其必然）；B站三级取数通道+自维护风控补丁；字幕优先 skip_download 省下载；与 open-notebook 合读=个人视频工具架构课
+- [[wiki/concepts/yt-dlp|yt-dlp]] — ⭐189k 公有领域下载器；冒充官方客户端问 InnerTube 私有 API + 签名解密 + PO Token 猫鼠对抗（2026：token 绑视频 ID，插件化现生成）；视频-AI 工具链最上游取料工
 - [[wiki/concepts/dsh-agent-loop|dsh agent loop]] — turn/step 状态机、inbox durable 投影（followup/steer/inject 唤醒语义）、pre-step 权威决策、取消恢复与续接三层、scope per-agent 注册
 - [[wiki/concepts/dsh-session-log|dsh 会话日志]] — append-only 单一事实源、"model-visible means logged" 运行时不变量、surface 投影与 51 事件词表、compaction 原地替换、崩溃修复、spill 豁免
 - [[wiki/concepts/dsh-tool-pipeline|dsh 工具管线]] — 三道 waterfall + monotonic guards + fail-closed 审批 + fs 闸门 + 沙箱世界共享；PTC 代码模式（run_code 子调用携父 token 重入管线）

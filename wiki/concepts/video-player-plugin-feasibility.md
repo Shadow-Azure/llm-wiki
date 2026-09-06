@@ -1,8 +1,10 @@
 ---
 type: concept
 created: 2026-08-23
-updated: 2026-08-23
-sources: []
+updated: 2026-09-05
+sources:
+  - "raw/2026-09-05-media-extended-v4-no-ai.md"
+  - "raw/2026-09-05-player-embedded-ai-snapshot.md"
 ---
 
 # 本地视频播放器插件（Obsidian）可行性
@@ -32,10 +34,12 @@ sources: []
 - Node API（fs / child_process / whisper）→ `isDesktopOnly: true`；纯 Web API 可兼顾移动端（移动端资源路径行为有差异〔AI 推断，待验证〕）
 - **二进制分发限制**：官方渠道 release 仅允许 `main.js / manifest.json / styles.css` 三资产——原生二进制不能随插件分发。出路：wasm bundle 进 main.js（Smart Connections 先例）；或引导用户自备/运行时下载（[[wiki/concepts/obsidian-plugin-networking|灰色地带]]，须披露）〔AI 推断，待验证〕
 
-## 竞品与差异化
+## 竞品与差异化（2026-09-05 research 修订）
 
-- 头部：**Media Extended**（时间戳笔记、YouTube、截图、transcript；[官网](https://mx.pkmer.net/) / [社区页](https://community.obsidian.md/plugins/media-extended)），字幕排版由 Subtitles MD 补位——均**待剪藏**。
-- 差异化空档：现有竞品是"播放器 + 笔记"，不是 AI 工作流——"转写→内容地图→批注"闭环（demo 已验证形态）是明确空位。
+- **Media Extended 一手证据**（[[wiki/sources/media-extended-v4-no-ai]]）：v4.0（2025-09-17）官方确认**零 AI 能力**——无 ASR（自动字幕"调查中"，索引靠用户自备 .srt/.vtt/.ass），AI 摘要/章节仅是 "exploring" roadmap；且开发者把交付 AI 摘要列为**转闭源的动因**。已剪藏，不再"待剪藏"。
+- **外部格局已剧变**：播放器内嵌 AI（提问+时间戳跳转+笔记）在平台原生（YouTube Gemini Ask、B站 AI 总结）与浏览器扩展层（LunaNotes/NoteGPT/Video Notebook/AI 课代表）**已经拥挤**——原假设"此闭环是空位"作为泛化命题**不成立**，详见 [[wiki/concepts/ai-video-assistant-landscape]]。
+- **收窄后的真实空位**：①本地视频文件库 + 个人知识库（笔记图谱）+ 播放器内嵌 AI——全品类无人占据（hoverNotes 最接近但限在线平台且为厂商自述）；②消费级播放器 AI 全部 transcript-based，视觉理解（画面/PPT/场景）进个人笔记缺位。
+- 对本页功能阶梯的影响：L3（转写→内容地图→批注）恰落在空位上，但差异化窗口有时限（竞品闭源化 + AI 路线图），优先级应提高。
 
 ## 建议路径
 

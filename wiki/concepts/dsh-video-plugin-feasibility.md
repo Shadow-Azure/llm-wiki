@@ -1,7 +1,7 @@
 ---
 type: concept
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-09-05
 sources:
   - "raw/2026-08-23-dsh-docs-conversation-node.md"
   - "raw/2026-08-23-dsh-docs-subsystem-client-modules.md"
@@ -48,6 +48,10 @@ sources:
 ## 建议路径
 
 先读 `docs/cookbook/adding-a-conversation-node.zh.md`（233 行，含完整代码）→ 用 `--patch` overlay 挂最小 `<video>` node 验证渲染 → 加 `webServer` prefix 路由喂本地 mp4 → 再决定走静态 bundle 分发还是 `dsh-tool-cordis` 动态路线。前端接入全貌（两半架构/slots 纪律/打包坑）见 [[wiki/concepts/dsh-frontend-integration]]。
+
+## 外部格局参照（2026-09-05 补充）
+
+视频 AI 的竞品真实格局与空位收窄分析见 [[wiki/concepts/ai-video-assistant-landscape]]。与本页直接相关的两点：①业界 MCP 已成"视频理解即工具"的标配接口（VideoDB/BibiGPT/TwelveLabs），dsh 插件可直接对接这些 API 获得"AI 看视频"能力而无需自建索引管线；②HKUDS VideoAgent 的"图驱动工作流生成"（agent 编排工具能力）与本页"agent 动态生成插件"路线同构，是 dsh 差异化玩法的外部先例。
 
 ## 依据来源与后续线索
 

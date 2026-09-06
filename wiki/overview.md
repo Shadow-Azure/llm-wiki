@@ -20,6 +20,7 @@ sources:
   - "raw/2026-09-06-open-notebook-architecture.md"
   - "raw/2026-09-06-bilinote-architecture.md"
   - "raw/2026-09-06-content-core-formats.md"
+  - "raw/2026-09-06-obsidian-oss-alternatives-landscape.md"
 ---
 
 # 综述
@@ -34,7 +35,7 @@ sources:
 
 ## 正在形成的主题
 
-- 知识管理 / LLM 与个人工具（等待第一批真实领域来源进来后自然分化）
+- 知识管理 / LLM 与个人工具：[[wiki/concepts/note-tool-landscape|笔记工具格局]]已两次深化（2026-08-23 营垒划分 + 协议商用含义；2026-09-06 22 仓 star/协议/活跃度实测 + 二次开发分级），核心发现："高 star""开源协议""可二次开发"三轴不重合（star 最高的是 Notion 形态、PKM 三强全 AGPL、Anytype/Outline 实为源码可见非开源），而 Obsidian"纯 Markdown + 双链"的生态位在开源世界确实无人完整占据——为"AI 维护型知识库"选择 Obsidian 的论证再获一侧证
 - **平台扩展性 / 插件机制**：双锚点展开——Obsidian（[[wiki/concepts/obsidian-plugin-development|开发]] / [[wiki/concepts/obsidian-plugin-distribution|分发]] / [[wiki/concepts/obsidian-plugin-networking|网络访问]]，官方目录 + 审核的闭环）与 [[wiki/entities/deepseek-harness|deepseek-harness]]（[[wiki/concepts/dsh-plugin-development|开发]] / [[wiki/concepts/dsh-plugin-distribution|分发]] / [[wiki/concepts/dsh-plugin-networking|网络与动态加载]]，无特权内核 + 无官方市场）；[[wiki/concepts/plugin-mechanism-comparison|三方对比]]（含 VSCode、[[wiki/entities/claudian|Claudian]] 实例）是两条主线的汇合点
 - **视频播放插件构想双平台化**：[[wiki/concepts/video-player-plugin-feasibility|Obsidian 版]]（demo 已验证）与 [[wiki/concepts/dsh-video-plugin-feasibility|dsh 版]]（Web UI 有官方扩展点，且多出"agent 动态生成插件"路线）——同一功能在两种插件哲学下的实现对照，本身正在成为理解两类平台的试金石
 - **AI 视频助手格局（2026-09-05 research 起）**：[[wiki/concepts/ai-video-assistant-landscape|五层格局]]确立——平台原生与浏览器扩展层播放器 AI 已拥挤（且全为 transcript-based）、API 层时间戳索引商品化 + MCP 标准化、开源 agent 框架走向"理解+剪辑+重制"一体；"本地视频库 + 个人知识库 + 播放器内嵌 AI"与"视觉理解进个人笔记"被裁决为真实空位，直接改变两个视频插件构想页的差异化定位；此主题与 [[wiki/concepts/wiki-vs-rag]] 汇合——视频域的"预索引 vs 长上下文直塞"是编译式知识库论点的模态重现。**2026-09-06 深化**：[[wiki/concepts/open-notebook-architecture|open-notebook 实读]]（个人 KM 品类的 transcript-first 教科书实例，视频入库即失时间戳）与 [[wiki/concepts/bilinote-architecture|BiliNote 实读]]（同题异构对照：B站三级取数 + 字幕优先编排）合读即"个人视频工具架构课"；[[wiki/concepts/yt-dlp|yt-dlp]] 概念页确立视频-AI 工具链最上游取料工的地位，并记下取数策略谱系（纯字幕 API ↔ 字幕+下载兜底）
@@ -49,6 +50,7 @@ sources:
 - dsh 动态插件的隔离边界：`dynamicCordisRunner` / `dsh-tool-cordis` 允许 agent 自写自挂插件（内存态、卸载即消失），官方自认"可能影响同一进程中的其他会话"——审批闸门能守住"谁批准"，守不住"批准后跑飞"，运行时隔离缺位与 Obsidian 同病（见 [[wiki/concepts/dsh-plugin-networking]]）。
 - dsh 无官方插件市场：发现层完全外包给 npm/GitHub topic + 社区自建市场（300+ 插件收录），质量与安全把关机制如何演化值得跟踪（社区市场来源待剪藏）。
 - **视频域开放问题（2026-09-05 research 登记）**：①"转写 QA 够不够"无第三方裁决——HKUDS VideoAgent 的 Q&A 只需 Whisper vs TwelveLabs 宣称 segment"不是读转录稿"；②学术（纯视觉 captioning）与工程（ASR-first）路线未收敛；③YouTube Gemini Ask 的可用范围（Premium/地区/语言）未核实；④新一代视频 LM（Video-MME 榜首 video-SALMONN 2+，81.6%）会否侵蚀"必须预索引"的前提；⑤Vimo Beta 发布后的真实体验（宣传与现实有时间差：awesome-video-agents 称已发布，README 却 Coming Soon）。
+- **笔记工具域开放问题（2026-09-06 research 登记）**：①AppFlowy 接替 AppFlowy-Cloud 的自托管后端形态未明（直接关系其二次开发评估）；②Logseq DB 版稳定安装版无时间表（社区已等约两年）；③AS Notes（VS Code wikilink + 纯 Markdown，Foam 潜在后继）star/协议未实测。
 
 ## 下一步
 

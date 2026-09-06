@@ -240,3 +240,13 @@ sources: []
 - 裁定（用户确认）：self-opt/ 维持"用户自管检索库"例外定位——wiki 直链 raw/self-opt/* 可接受，不建 source 页
 - 实质变更：仅 wiki/overview.md——frontmatter updated 2026-09-05→2026-09-06、sources 补 4 个 09-06 raw 路径；规模行三处数字校正（41→42 页 / concepts 23→24 / 68→69 raw，消除页内"65 raw"自相矛盾）；AI 视频助手主题段补录 09-06 深化（open-notebook/bilinote 合读、yt-dlp 取料工与取数策略谱系）；self-opt 汇流段记录例外裁定；"下一步"重写（lint 收账 → ingest self-improving 列首位）并附本次 lint 记录
 - 未执行（等用户后续指令）：ingest self-improving；dsh×self-opt 对照专页
+
+## [2026-09-06] research | 类 Obsidian 开源项目格局（高 star / 开源友好 / 二次开发）
+
+- 触发：用户问"类似 Obsidian 的开源项目，高 star、开源友好、支持二次开发"
+- 先查库：站在 [[wiki/concepts/note-tool-landscape]]（2026-08-23 建页）之上，本次补齐其缺失维度（star 实测、二次开发通道）并收账其登记的三条线索
+- 落库 raw：`raw/2026-09-06-obsidian-oss-alternatives-landscape.md`（22 仓 GitHub API 实测 + 5 份 LICENSE 原文抓取 + TriliumNext/Logseq/Standard Notes 官方公告检索）
+- 关键裁决：① Anytype 客户端实为 Any Source Available License 1.0（**修正本库旧表述"客户端开源"**，矛盾已标记于格局页）；② Outline 已转 BUSL-1.1（2030-09-01 转 Apache-2.0）；③ Joplin 确认 AGPL-3.0-or-later（推翻"MIT"旧印象）；④ Trilium = 社区接管 + 原仓转移 + 拿回原名（AGPL 治理活标本）；⑤ Logseq DB 版至 2026-05 无稳定版时间表；⑥ AppFlowy-Cloud 2026-09-01 归档
+- 新建：sources/obsidian-oss-alternatives-landscape
+- 更新：concepts/note-tool-landscape（star/活跃度实测表、二次开发支持分级、协议谱系补 BUSL/LGPL/GPL、Anytype 矛盾标记、三条线索收账、"Obsidian 生态位无人完整占据"开源侧印证）、index、本 log
+- 综述同步：overview"正在形成的主题"知识管理条目深化 + 开放问题登记（AppFlowy 新后端 / Logseq DB 稳定版 / AS Notes）

@@ -269,3 +269,114 @@ sources: []
 - 关键决策：立 concept 页而非 source 页——无新 raw/ 剪藏，实读存证沿用 dsh-source-runtime 的 commit；dsh「文档侧」自此与运行时四支柱并列
 - AI 推断已标注：AGENTS.md≈上下文/token 预算的归因、与 LLM Wiki 同构的判断（均标"待来源验证"）
 - 待剪藏登记（新页后续线索）：docs/AGENTS.md（tier 表 + 写作规则）、docs/i18n/README.md（双语契约）——可直接借鉴的方法论文档；packages/typert 生成器实现未深挖
+
+## [2026-09-26] research | AI-RAN 新手总览（官方架构 + WG1/WG3 + 生态/试点）
+
+- 触发：用户在 `ai-ran` 分支要求检索并汇总 AI-RAN 资料，先建立基本概念、问题、业界通用方案和通俗例子
+- 先查库：`wiki/index.md` 无既有 AI-RAN 页；本次为新增主题，不与既有知识管理/插件/视频主题重复
+- 落库 raw（8 份，均记录 source URL/accessed）：
+  - `raw/2026-09-26-ai-ran-architecture-overview.md`：AI-RAN Alliance v1.2 官方架构、dual functions、三层功能域
+  - `raw/2026-09-26-ai-ran-wg1-whitepaper.md`：AI-for-RAN 空口演进、AI receiver、DeepRx 与 OTA 泛化问题
+  - `raw/2026-09-26-ai-ran-wg3-whitepaper.md`：AI-on-RAN、可验证 SLA、上行韧性、渐进部署路径
+  - `raw/2026-09-26-ai-ran-platform-infrastructure-orchestrator.md`：多站点/多集群/异构加速器编排
+  - `raw/2026-09-26-nvidia-ai-ran-solutions.md`：NVIDIA AI Aerial 的 AI-for/on/and-RAN 产品化叙事
+  - `raw/2026-09-26-nvidia-telecom-6g-ai-native-platforms.md`：多厂商 6G AI-native 平台生态承诺
+  - `raw/2026-09-26-nvidia-t-mobile-physical-ai-ai-ran.md`：T-Mobile/NVIDIA/Nokia 物理 AI 边缘试点
+  - `raw/2026-09-26-ocudu-realtime-ai-ran-platform.md`：DU 内实时 AI dApp、E3 interface 与 Class A/B/C 契约
+- 新建：sources/ai-ran-architecture-overview、sources/ai-ran-wg1-whitepaper、sources/ai-ran-wg3-whitepaper、sources/ai-ran-platform-infrastructure-orchestrator、sources/nvidia-ai-ran-solutions、sources/nvidia-telecom-6g-ai-native-platforms、sources/nvidia-t-mobile-physical-ai-ai-ran、sources/ocudu-realtime-ai-ran-platform、concepts/ai-ran
+- 更新：index（8 条来源摘要 + AI-RAN 概念行）、overview（规模核定、AI 原生通信主题、AI-RAN 开放问题）
+- 关键综合：AI-RAN ≠ 单一产品或协议；它是 AI-for-RAN（优化 RAN）、AI-on-RAN（RAN 设施承载 AI 应用）和 AI-and-RAN（共享基础设施）的集合。通用方案把加速计算、云原生平台、RAN workload、dUPF/local breakout、telemetry/MLOps、统一编排和可验证 SLA 组合起来；难点在硬实时隔离、上行稳定性、安全治理、模型泛化与商业闭环
+- 证据强度：AI-RAN Alliance PDF 为官方架构/白皮书；NVIDIA/T-Mobile 新闻稿与产品页为厂商/试点证据，不能等同于中性商用基准。概念页将 NVIDIA 2-3x capacity utilization 明确标为厂商宣称
+- 登记后续线索：3GPP Rel-18/19 AI/ML air interface 状态、CAMARA/NEF/NWDAF/RAIE 的 AI-on-RAN API 链路、GPU MIG/调度对 RAN L1 的保障、独立 TCO/能耗/SLA 数据、OCUDU 与 O-RAN/NVIDIA Aerial 的兼容边界
+
+## [2026-09-26] research | AI-RAN 训练/模型/推理基建与大厂进展
+
+- 触发：用户要求继续搜索业界进展，重点关注 AI-RAN 数据、训练、模型基建、架构与方法，尤其是国内外大厂方案
+- 先查库：站在本轮新建的 [[wiki/concepts/ai-ran]] 之上，本次不重复基础定义，转向“数据—训练—模型—推理—编排”进阶层
+- 落库 raw（6 份）：
+  - `raw/2026-09-26-ai-ran-alliance-mwc-2026-progress.md`：132 成员、33 demo、4 blueprints、D4AI、SKT/SoftBank/Swarm orchestrator、SynaXG GH200、数字孪生
+  - `raw/2026-09-26-nvidia-ai-native-ran-spectral-efficiency.md`：AI Aerial 算法优先、ML beamforming 1.62x、DRL link adaptation 1.3x/<30 μs、ARC-Pro/Nokia anyRAN
+  - `raw/2026-09-26-softbank-ai-for-ran-verification.md`：UL channel interpolation +20%、SRS prediction +13%、AI MAC scheduling +8%
+  - `raw/2026-09-26-softbank-aitras-roi-and-architecture.md`：GH200/OpenShift、GPUaaS、RAN Heavy 33% vs AI-heavy 219% 五年 ROI、LTM、Dynamic Scoring
+  - `raw/2026-09-26-avidthink-ai-in-mobile-ran.md`：SON→AI-native、O-RAN RIC、China Mobile/ZTE >15%、Ericsson 15%、Nokia MantaRay 700k/day、GPU/ASIC/FPGA、federated learning
+  - `raw/2026-09-26-mwc-shanghai-china-ai-native-network-context.md`：330 城 5G-A、U6GHz、China Mobile 算力网络 capex +62.4%、ISAC/6G 背景
+- 新建：sources/ai-ran-alliance-mwc-2026-progress、sources/nvidia-ai-native-ran-spectral-efficiency、sources/softbank-ai-for-ran-verification、sources/softbank-aitras-roi-and-architecture、sources/avidthink-ai-in-mobile-ran、sources/mwc-shanghai-china-ai-native-network-context、concepts/ai-ran-training-inference-infrastructure
+- 更新：concepts/ai-ran（新增进阶阅读链接）、index、overview、本 log
+- 关键综合：AI-RAN 基建可拆成数据面（RAN telemetry/OTA/HIL/数字孪生）、训练面（仿真→HIL→OTA→shadow→灰度）、模型面（信道估计/链路自适应/波束赋形/neural receiver/MAC 调度/LLM-agent）、推理面（non-RT、near-RT、real-time L1、edge AI）和编排面（GPU partitioning、SKT 集群编排、SoftBank dynamic scoring、agent swarm）
+- 国内外裁决：海外 NVIDIA/SoftBank/Samsung/Nokia/SKT/Qualcomm/Vodafone 已围绕 AI-RAN Alliance 术语形成方案和 demo；国内已确认 China Mobile/ZTE RAN-native AI >15% 和 AsiaInfo 实时链路自适应 demo；国内 5G-A/U6GHz/算力网络/ISAC 提供相邻数据与算力底座，但 Huawei/ZTE 是否采用同一 AI-RAN 产品标签仍待一手材料核实
+- 证据强度：NVIDIA、SoftBank、Ericsson、Nokia、SynaXG、China Mobile/ZTE 等数字均标注为厂商/联盟宣称或场景估算；MWC Shanghai 为二手媒体背景；后续必须追原始实验条件和独立复核
+
+## [2026-09-26] research | AI-RAN 基础学习路径与 RAN/O-RAN 补充
+
+- 触发：用户要求补充 RAN 基础、vRAN/O-RAN、通信线、服务线和厂商方案，并用通俗类比、循序渐进方式整理学习路径
+- 先查库：复用前两轮 AI-RAN 主线与训练/推理基建来源，避免重复抓取；针对 O-RAN 架构术语和 NVIDIA Aerial 官方工具链补两手可访问来源
+- 新建 raw（2 份）：
+  - `raw/2026-09-26-oran-sc-architecture.md`：O-RU/O-DU/O-CU、SMO/Non-RT RIC、Near-RT RIC/xApp、O1/E2 术语
+  - `raw/2026-09-26-nvidia-ai-aerial-developer-portal.md`：Sionna、Aerial Framework、CUDA-Accelerated RAN、pyAerial/Data Lake/AODT、ARC-OTA/Compact/Pro
+- 新建：sources/oran-sc-architecture、sources/nvidia-ai-aerial-developer-portal、concepts/ai-ran-foundations-learning-path
+- 更新：concepts/ai-ran（入口链接与补充 raw）、index、overview、本 log
+- 关键综合：学习路径按 RAN 基础（UE/上下行/RU-DU-CU/调度/MCS/切片/QoS）、vRAN/O-RAN（软件化动机、开放接口、SMO/RIC 三层控制环）、通信线（信道估计/链路自适应/AI receiver/MIMO/能耗）、服务线（边缘推理/dUPF/local breakout/SLA/telemetry/网络 API）、厂商方案（NVIDIA Aerial、设备商路线、运营商试点）展开
+- 通俗锚点：DU 像安检现场实时判图员、MCS 像雨天换挡降速、切片像同一家医院的急诊通道、AI receiver 像降噪耳机、beamforming 像定向耳麦、SLA 像物流超时赔付合同
+- 证据边界：O-RAN SC 为社区架构术语；NVIDIA Aerial 为厂商门户；NVIDIA/SoftBank/China Mobile/ZTE 等增益与 ROI 只能作为实验、demo、试点或场景模型，不可外推为全网商用事实
+- 登记后续线索：O-RAN A1/E2/O1 的权限与时延模型、Aerial CUDA-Accelerated RAN 开源与接口完成度、CAMARA/NEF/NWDAF/RAIE 的 AI-on-RAN API 收敛、独立 TCO/能耗/SLA 数据、国内 Huawei/ZTE 一手 AI-RAN 白皮书
+
+## [2026-09-26] query-filed | AI-RAN 训练模型与传统 RAN 功能映射
+
+- 触发：用户要求基于 [[wiki/concepts/ai-ran-training-inference-infrastructure|AI-RAN 训练、模型与推理基建]]中的论文/白皮书，重新解释训练与模型解决传统 RAN 哪部分功能，并澄清 L1/L2 内部模块
+- 新建：concepts/ai-ran-training-model-ran-function-mapping
+- 更新：concepts/ai-ran-training-inference-infrastructure（新增映射页入口）、index、overview、本 log
+- 关键综合：AI-RAN 模型不是替代整座基站，而是接管 L1/L2/运维中的单点决策。信道估计/SRS 预测对应 PHY 测量，link adaptation 对应 MCS 外环，beamforming/MU-MIMO 对应空间处理，neural receiver 对应均衡/解调/失真补偿，AI MAC scheduling 对应资源分配，RIC/AIOps/LLM 主要落在近实时控制或秒级运维；RLC/PDCP、HARQ 状态机、编解码和 RF 仍以协议/确定性实现为主
+- 文档结构：先拆传统 L1/L2/L3/SON 模块，再用工厂摄像头上行逐步走到信道估计、反馈、调度、MIMO 和接收机；随后按 OCUDU 的 100 μs/<10 ms/observer 契约解释模型放置边界，并给出训练数据到 RAN 功能的映射
+- 证据边界：SoftBank UL +20%、SRS +13%、MAC +8%，NVIDIA beamforming 1.62x 与 DRL link adaptation 1.3x 分别保留实验/仿真/厂商宣称口径；OCUDU 的 Class A/B/C 被用作实时模型治理框架，而不是普遍商用标准
+- 登记后续线索：信道估计/link adaptation/beamforming 项目的传统基线与统一测试口径；AI 与 OLLA/PF/MMSE 的混合运行与回退机制；HARQ 风险预测是否值得独立建模；RLC/PDCP 是否存在安全且可验证的 AI 增益场景
+
+## [2026-09-26] research | RU/DU/CU 职责与空口资源调度展开
+
+- 触发：用户要求详细展开 [[wiki/concepts/ai-ran-foundations-learning-path|AI-RAN 基础学习路径]]中 RU/DU/CU 职责和空口资源调度，要求通俗举例并说明资源组合、限制和优化目标
+- 落库 raw（1 份）：`raw/2026-09-26-sharetechnote-nr-frame-structure.md`，摘录 NR frame/subframe/slot、numerology、normal CP 14 symbols、PRB=12 subcarriers 和 guardband 提示
+- 新建：sources/sharetechnote-nr-frame-structure
+- 更新：concepts/ai-ran-foundations-learning-path（RU/DU/CU、空口资源与调度两节大幅扩展）、index、本 log
+- 关键综合：RU/DU/CU 按“CU 管业务与连接规则、DU 管毫秒级调度/PHY、RU 管电波”拆解；用下行/上行接力和视频通话说明 CU-CP/CU-UP/DU/RU 分工。空口资源按时间、频率、方向、空间、功率五维组合；100 MHz/30 kHz SCS 下约有 270+ PRB、每秒约 2000 slot，组合数量巨大但控制/参考/TDD/guardband 会占用资源。调度目标不是单点最大吞吐，而是带 PRB、功率、干扰、BLER、QoS、公平性和能耗约束的效用最大化
+- 新增例子：TDD 上行 slot 内 80 PRB 同时服务摄像头、语音和大文件上传；分别给出 40/10/30 PRB、symbol 数、MCS 和 beam 的组合，说明 max C/I、均分和 QoS-aware 调度的差异
+- 证据边界：ShareTechnote 用于降低 NR 资源栅格理解门槛，正式口径仍应回到 3GPP 38.211/38.300/38.101；容量数字是教学估算，未计入完整 PDCCH/DMRS/CSI/guardband/TDD 配置
+
+## [2026-09-26] query-filed | RU/DU/CU 输入输出链路细化
+
+- 触发：用户反馈 [[wiki/concepts/ai-ran-foundations-learning-path|AI-RAN 基础学习路径]] 1.3 节中 RU/DU/CU 的例子仍偏粗糙，要求每个环节说明输入、输出和该步解决的问题
+- 更新：concepts/ai-ran-foundations-learning-path 的 1.3 节；不新建页面
+- 关键修改：把短视频下行拆成核心网→CU-UP→CU-CP→DU→RU→UE→反馈的七个环节；把工厂摄像头上行拆成 UE→RU→DU→CU-UP→dUPF/边缘服务五个环节。每个环节都用表格列出输入、输出、解决的问题和类比
+- 例子扩展：新增视频通话/短视频、工厂摄像头上行、AGV 控制对比；区分 CU-CP 控制消息、CU-UP 业务数据包、DU 实时调度与编码、RU 射频/数字 IQ 转换
+- 证据边界：RLC/MAC/PDCP/SDAP、F1-U、QFI/DRB、SRS/DMRS/HARQ 等描述用于教学映射；具体协议流程和消息字段仍需以 3GPP 38.401/38.211/38.321/38.331 等规范原文为准
+- 补充修正：删除短视频示例中的具体缓存字节数，避免被误读为单 slot 传输量；合并旧编号，保留机场类比和不做什么作为 1.3.5/1.3.6
+
+## [2026-09-26] research | AI-RAN 四级数据资产展开
+
+- 触发：用户要求详细展开“数据质量是第一瓶颈”中的第 2-4 类资产，说明合成信道、数字孪生回放、联邦/梯度数据的区别、生成方式、AI-RAN 用途和最终目标
+- 检索补充：NVIDIA Sionna 官方页/AODT 文档，arXiv O-RAN federated learning 样本；结合已有 AI-RAN Alliance MWC 2026 与 AvidThink 资料交叉验证
+- 落库 raw（2 份）：
+  - `raw/2026-09-26-nvidia-sionna-aodt-simulation-data.md`：Sionna 可微分 ray tracing/link/system 仿真；AODT EM/RAN simulation、calibration、mobility、output schema/waveform dumps
+  - `raw/2026-09-26-oran-federated-learning-papers.md`：Split FL in O-RAN、Federated DRL slicing xApps、mmWave CSI prediction
+- 新建：sources/nvidia-sionna-aodt-simulation-data、sources/oran-federated-learning-papers
+- 更新：concepts/ai-ran-training-inference-infrastructure（2.1-2.4 数据资产专节）、index、本 log
+- 关键综合：合成信道数据用物理/统计/ray-tracing 生成 CIR/H/IQ/标签，解决罕见场景与采集成本；数字孪生回放数据在标定虚拟网络上生成时间序列和反事实 KPI，解决不能生产网乱试；联邦/梯度级数据保留原始数据、只交换模型更新/局部指标，解决隐私协作与跨站点分布，但要治理非 IID、通信开销、投毒和隐私残余
+- 证据边界：NVIDIA 页面为厂商文档；AODT 能力按官方描述记录，不代表独立全网基准；arXiv 论文用于方法可行性，不能直接证明生产部署；四级资产是本库研究综合，不是 AI-RAN Alliance 官方分类
+
+## [2026-09-26] research | 数字孪生回放与联邦梯度专页
+
+- 触发：用户要求新增两份文档，详细解释数字孪生回放数据和联邦/梯度级数据的生成、使用、与合成数据/仿真的差异、训练验证关系、为什么聚合模型更新，以及落地方案
+- 补充检索：NVIDIA AODT welcome/quickstart/results/limitations/calibration，O-RAN Network Digital Twin、Colosseum、ARIADNE、能耗 xApp 数字孪生论文；FedAvg、FedProx、Secure Aggregation、DP-SGD、O-RAN FL/SFL/CSI prediction，以及 NVIDIA FLARE、Flower、OpenFL、TensorFlow Federated
+- 落库 raw（2 份）：
+  - `raw/2026-09-26-digital-twin-ran-playback-sources.md`
+  - `raw/2026-09-26-federated-learning-ran-technical-sources.md`
+- 新建：sources/digital-twin-ran-playback-sources、sources/federated-learning-ran-technical-sources、concepts/ai-ran-digital-twin-replay-data、concepts/ai-ran-federated-gradient-data
+- 更新：concepts/ai-ran-training-inference-infrastructure（2.2/2.3 增加专页入口）、index、overview、本 log
+- 关键综合：数字孪生回放数据是“场景+标定+时间轴状态机+baseline/反事实分支+数据契约”，不是孤立信道样本；合成数据偏训练样本，孪生偏安全实验和系统 KPI，同一生成系统可服务两者但必须拆分训练/验证场景。联邦/梯度级数据的本地训练确实产生模型；聚合的意义是在原始数据不能集中时，从共享全局模型出发合成交叉站点经验。FedAvg/FedProx 处理通信和非 IID/异构，Secure Aggregation/DP 降低泄露风险，O-RAN 中按 Non-RT/Near-RT/DU 时间尺度分层落地
+- 证据边界：AODT、FLARE、Flower 等按官方文档/README 记录；ARIADNE 的 11%/20% 是论文宣称；Colosseum/NDT 论文描述能力和用途，不等同于全网商用验证
+
+## [2026-09-26] query-filed | 训练仿真 OTA 部署闭环展开
+
+- 触发：用户反馈 [[wiki/concepts/ai-ran-training-inference-infrastructure|AI-RAN 训练、模型与推理基建]] 第 3 节的闭环流程过简，要求详细说明成熟方法如何形成闭环
+- 更新：concepts/ai-ran-training-inference-infrastructure 第 3 节；不新建页面
+- 关键修改：把 offline simulation → HIL → OTA → shadow → limited live pilot → production with rollback 展开为每阶段的输入、操作、输出、闸门和回退动作；补充业务/KPI 转成实验、baseline replay、反事实测试、故障注入、实时预算、分布漂移、champion/challenger、AI/non-AI 切换、再训练和审计证据
+- 新增贯穿例子：20 个小区上线 AI MAC scheduler，逐阶段跟踪吞吐、边缘速率、语音 p99、HARQ、GPU 抢占、场馆场景和回退事件；用完整反馈链说明失败样本如何回流到模型、孪生场景库和运行策略
+- 证据边界：具体数值均为教学示例，非公开实测结果；HIL/OTA/孪生映射引用已有 MWC 2026、SoftBank system-level simulator 和 NVIDIA AI Aerial ARC-OTA 来源，不代表全网商用验证

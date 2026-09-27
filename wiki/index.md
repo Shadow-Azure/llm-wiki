@@ -1,11 +1,11 @@
 ---
 type: index
 created: 2026-08-23
-updated: 2026-09-06
+updated: 2026-09-26
 sources: []
 ---
 
-<!-- 2026-09-06 四次更新：开源扩展盘点 + open-notebook 实读 + 类 Obsidian 开源格局实测（research）+ Tauri/Electron/cc-switch 架构分析回填（query-filed） -->
+<!-- 2026-09-26 research 三次更新：补充 O-RAN 架构与 NVIDIA Aerial 门户，新增 AI-RAN 基础学习路径；前两次覆盖 AI-RAN 官方架构/WG1/WG3/编排、训练推理基建与 MWC 2026/AITRAS/China Mobile 数据 -->
 
 # 索引
 
@@ -13,6 +13,25 @@ sources: []
 
 ## 来源摘要（sources/）
 
+- [[wiki/sources/ai-ran-alliance-mwc-2026-progress|AI-RAN Alliance MWC 2026 进展]] — 132 成员、33 demo、GPU/训练共享、SKT/SoftBank orchestrator、D4AI、数字孪生与边缘 AI
+- [[wiki/sources/sharetechnote-nr-frame-structure|ShareTechnote NR Frame Structure]] — radio frame/subframe/slot、numerology、14 symbols、PRB=12 subcarriers 和资源栅格直觉
+- [[wiki/sources/nvidia-ai-native-ran-spectral-efficiency|NVIDIA AI-Native RAN 频谱效率方法]] — GPU-native L1/L2、ML beamforming、DRL link adaptation、ARC-Pro/Nokia anyRAN
+- [[wiki/sources/softbank-ai-for-ran-verification|SoftBank AI-for-RAN 实测]] — UL 信道插值 +20%、SRS 预测 +13%、AI MAC 调度 +8%
+- [[wiki/sources/softbank-aitras-roi-and-architecture|SoftBank AITRAS ROI 与架构]] — GH200/OpenShift、GPUaaS、219% 五年 ROI 场景、LTM 和 Dynamic Scoring
+- [[wiki/sources/avidthink-ai-in-mobile-ran|AvidThink AI in the Mobile RAN]] — RAN AI 架构、China Mobile/ZTE、Ericsson、Nokia、GPU/ASIC、数据和 ROI 挑战
+- [[wiki/sources/mwc-shanghai-china-ai-native-network-context|MWC Shanghai 中国 5G-A/算力背景]] — 330 城 5G-A、U6GHz、算力网络投资和 ISAC 上下文
+- [[wiki/sources/ai-ran-architecture-overview|AI-RAN Alliance 架构总览 v1.2]] — 官方定义 AI-for-RAN/AI-on-RAN、加速基础设施、RU/DU/CU、dUPF、编排和 MLOps 分层
+- [[wiki/sources/oran-sc-architecture|O-RAN SC 架构概览]] — O-RU/O-DU/O-CU、SMO/Non-RT RIC、Near-RT RIC/xApp、O1/E2 开放接口术语
+- [[wiki/sources/ai-ran-wg1-whitepaper|AI-RAN WG1 AI-for-RAN 白皮书]] — AI 优化链路自适应、信道估计、AI receiver、MIMO 与 AI-native air interface 演进
+- [[wiki/sources/ai-ran-wg3-whitepaper|AI-RAN WG3 AI-on-RAN 白皮书]] — AI 应用需要 bounded latency、上行吞吐下限、可靠性与可执行 SLA；部署不必等 6G
+- [[wiki/sources/ai-ran-platform-infrastructure-orchestrator|AI-RAN Platform Infrastructure Orchestrator]] — 多站点/多集群/异构加速器的云原生编排、实时约束和多租户隔离
+- [[wiki/sources/nvidia-ai-ran-solutions|NVIDIA AI-RAN Solutions]] — GPU 加速、软件定义 RAN 与 AI workload 共用基础设施的产品化路线
+- [[wiki/sources/nvidia-ai-aerial-developer-portal|NVIDIA AI Aerial Developer Portal]] — Sionna、Aerial Framework、CUDA-Accelerated RAN、ARC-OTA/Compact/Pro 的官方工具链与部署入口
+- [[wiki/sources/nvidia-sionna-aodt-simulation-data|NVIDIA Sionna 与 AODT 仿真数据]] — 可微分 ray tracing/link/system 仿真与 EM/RAN 数字孪生工作流、标定、波形输出
+- [[wiki/sources/oran-federated-learning-papers|O-RAN 联邦学习论文样本]] — Non-RT/Near-RT RIC 联邦/分裂学习、资源分配 xApp 和 mmWave CSI 预测
+- [[wiki/sources/nvidia-telecom-6g-ai-native-platforms|NVIDIA 与全球电信厂商 6G AI-Native 平台承诺]] — 多厂商 6G/AI-RAN 生态方向与 OCUDU/AI-WIN 线索
+- [[wiki/sources/nvidia-t-mobile-physical-ai-ai-ran|NVIDIA/T-Mobile Physical AI 案例]] — 5G 网络作为 distributed AI computer 的边缘视觉/物理 AI 试点
+- [[wiki/sources/ocudu-realtime-ai-ran-platform|OCUDU dApp Platform]] — DU 内低于 10 ms、scheduler 100 μs 级实时 AI-RAN 运行时与 E3 interface
 - [[wiki/sources/karpathy-llm-wiki|Karpathy《LLM Wiki》（2026-04-04）]] — LLM 增量编译维护个人 wiki 的模式原文（gist），本库的方法论源头
 - [[wiki/sources/obsidian-developer-docs|Obsidian 官方开发者文档（2026-08-23 快照，15 页）]] — 插件开发/构建/提交流程/政策红线/requestUrl 的官方规范合集
 - [[wiki/sources/dsh-official-docs|DeepSeek Harness 官方文档（2026-08-23 快照，32 页）]] — 插件开发四部曲/Cordis 教程/实操手册/五子系统/CLI 参考合集；"everything is a plugin"的一手规范
@@ -31,6 +50,12 @@ sources: []
 
 ## 概念（concepts/）
 
+- [[wiki/concepts/ai-ran-training-inference-infrastructure|AI-RAN 训练、模型与推理基建]] — 数据/训练/模型/推理/编排五层方法，2026 大厂量化进展与国内外方案对照
+- [[wiki/concepts/ai-ran-training-model-ran-function-mapping|AI-RAN 训练模型与传统 RAN 功能映射]] — 把信道估计、链路自适应、beamforming、neural receiver、MAC 调度和运维模型逐个放回 L1/L2/L3/SON 功能块
+- [[wiki/concepts/ai-ran-digital-twin-replay-data|AI-RAN 数字孪生回放数据]] — 场景/标定/baseline replay/反事实分支，合成数据、仿真、测试与数字孪生的差异
+- [[wiki/concepts/ai-ran-federated-gradient-data|AI-RAN 联邦/梯度级数据]] — 本地训练、模型更新、FedAvg/FedProx/Secure Aggregation、非 IID 风险与 O-RAN 落地
+- [[wiki/concepts/ai-ran-foundations-learning-path|AI-RAN 基础学习路径]] — 用 RAN 基础、vRAN/O-RAN、通信线、服务线、厂商方案五站递进讲解概念、类比、证据边界和阅读顺序
+- [[wiki/concepts/ai-ran|AI-RAN]] — 把 AI/ML、加速计算和云原生编排融入 RAN；新手向概念、问题、三分法、参考架构、演进路线、案例、难点与学习路径
 - [[wiki/concepts/llm-wiki|LLM Wiki]] — 由 LLM 持久编译维护的知识库：三层架构、三大操作、index+log 导航，维护成本趋零使知识复利
 - [[wiki/concepts/wiki-vs-rag|编译式知识库 vs RAG]] — 查询时临时检索拼装 vs 摄入时编译一次持续保鲜；积累性、交叉引用、矛盾处理的全维度对比；视频模态同一对照的印证（预索引 vs 直塞）
 - [[wiki/concepts/note-tool-landscape|笔记工具格局]] — 本地优先 vs 云端 SaaS 两大阵营；国内外开源/闭源盘点 + star/活跃度实测（2026-09-06）；协议商用含义谱系（MIT→AGPL→BUSL/源码可见）；二次开发支持分级；"Obsidian 最适合接 AI"论证（AI 推断待验证，开源侧印证其生态位无人完整占据）

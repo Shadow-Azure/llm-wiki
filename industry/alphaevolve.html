@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Case 06 · AlphaEvolve</title>
+  <link rel="stylesheet" href="case-common.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <a class="back" href="index.html">← 返回案例库</a>
+      <div class="tag">Case 06 · Evolutionary Coding Agent</div>
+      <h1>AlphaEvolve</h1>
+      <p>AlphaEvolve 是 DeepMind 描述的进化式编码 Agent：LLM 负责提出程序修改，评价器负责判断候选是否正确、更快或更省资源，进化式数据库负责保留多样且高质量的父代。它把“模型猜一猜”变成“可执行评价约束下的搜索”。</p>
+      <div class="hero-meta">
+        <span>关键词：进化搜索</span><span>LLM 变异</span><span>可执行评价器</span><span>种群管理</span><span>防 reward hacking</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="problem">
+      <div class="section-head"><span class="no">01</span><h2>它想解决什么问题</h2></div>
+      <p class="lead">很多算法和系统优化问题有一个共同特点：目标可以用代码衡量，但搜索空间远超人类直觉。LLM 一次生成常常很惊艳，也可能悄悄犯错；单次采样也无法证明一个方案真的更好。</p>
+      <div class="grid">
+        <article class="card col-4"><div class="pill">问题 1</div><h3>搜索空间巨大</h3><p>循环顺序、分解方式、缓存策略、并行结构组合极多，人不可能穷举。</p></article>
+        <article class="card col-4"><div class="pill">问题 2</div><h3>单次生成不可靠</h3><p>模型可能写出看似合理但边界错误、性能更差或依赖特定硬件的程序。</p></article>
+        <article class="card col-4"><div class="pill">问题 3</div><h3>指标容易被误解</h3><p>只看运行时间，可能牺牲正确性；只看代码短，可能失去泛化。</p></article>
+        <article class="card col-4"><div class="pill">问题 4</div><h3>评价本身有噪声</h3><p>机器负载、缓存状态、并行度都会让同一程序的耗时波动。</p></article>
+        <article class="card col-4"><div class="pill">问题 5</div><h3>局部最优</h3><p>只保留当前最好的候选，很快会停止探索，失去多样性。</p></article>
+        <article class="card col-4"><div class="pill">问题 6</div><h3>候选不可追溯</h3><p>不知道哪个父代、哪条 mutation、哪组评价结果产生了新方案。</p></article>
+      </div>
+      <div class="note"><strong>适用前提：</strong>必须有足够好的评价器。如果正确性和性能都能被程序验证，进化式搜索才有意义。</div>
+    </section>
+
+    <section id="mechanism">
+      <div class="section-head"><span class="no">02</span><h2>它是怎么解决的</h2></div>
+      <p class="lead">AlphaEvolve 的模式可以抽象成：<strong>种子程序 → LLM 变异 → 沙箱评价 → 多目标打分 → 种群更新 → 迭代循环</strong>。</p>
+      <figure>
+        <svg viewBox="0 0 1040 430" role="img" aria-label="AlphaEvolve 架构">
+          <rect x="55" y="65" width="230" height="110" rx="16" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="170" y="104" text-anchor="middle" class="st">Program Database</text>
+          <text x="170" y="129" text-anchor="middle" class="ss">种子 / 父代 / 精英</text>
+          <text x="170" y="149" text-anchor="middle" class="ss">分数、血缘、多样性</text>
+
+          <rect x="360" y="65" width="230" height="110" rx="16" fill="#ecfeff" stroke="#a5f3fc"/>
+          <text x="475" y="104" text-anchor="middle" class="st">LLM Mutator</text>
+          <text x="475" y="129" text-anchor="middle" class="ss">修改、重写、组合</text>
+          <text x="475" y="149" text-anchor="middle" class="ss">提出候选 patch</text>
+
+          <rect x="665" y="65" width="230" height="110" rx="16" fill="#fff7ed" stroke="#fed7aa"/>
+          <text x="780" y="104" text-anchor="middle" class="st">Sandbox Runner</text>
+          <text x="780" y="129" text-anchor="middle" class="ss">编译、执行、压力测试</text>
+          <text x="780" y="149" text-anchor="middle" class="ss">资源与安全限制</text>
+
+          <rect x="360" y="255" width="230" height="110" rx="16" fill="#f0fdf4" stroke="#bbf7d0"/>
+          <text x="475" y="294" text-anchor="middle" class="st">Evaluator</text>
+          <text x="475" y="319" text-anchor="middle" class="ss">正确性 / 性能 / 成本</text>
+          <text x="475" y="339" text-anchor="middle" class="ss">多次测量与约束</text>
+
+          <rect x="665" y="255" width="230" height="110" rx="16" fill="#ede9fe" stroke="#ddd6fe"/>
+          <text x="780" y="294" text-anchor="middle" class="st">Selection</text>
+          <text x="780" y="319" text-anchor="middle" class="ss">保留精英，淘汰劣质</text>
+          <text x="780" y="339" text-anchor="middle" class="ss">维持多样性</text>
+
+          <path d="M285 120H360M590 120H665M780 175V255M665 310H590M475 255C440 205 390 175 360 165" stroke="#64748b" stroke-width="3" fill="none"/>
+          <path d="M360 300C270 300 200 240 200 175" stroke="#64748b" stroke-width="3" fill="none"/>
+        </svg>
+        <figcaption>图 1：LLM 是变异器，不是裁判。最终谁能留下，由正确性、性能、资源、稳定性和多样性共同决定。</figcaption>
+      </figure>
+
+      <h3>关键设计</h3>
+      <table>
+        <tr><th>设计</th><th>作用</th><th>如果没有它会怎样</th></tr>
+        <tr><td>种子程序</td><td>给搜索一个可运行的起点。</td><td>模型从空白生成，难以复用已有工程上下文。</td></tr>
+        <tr><td>可执行评价器</td><td>客观判断候选是否更好。</td><td>只能靠人眼或模型主观打分，容易被表面质量误导。</td></tr>
+        <tr><td>沙箱执行</td><td>隔离危险代码并限制资源。</td><td>死循环、非法访问或高成本实验会影响系统。</td></tr>
+        <tr><td>多目标评分</td><td>同时看正确性、速度、内存、复杂度。</td><td>候选刷一个指标牺牲其他指标。</td></tr>
+        <tr><td>多次测量</td><td>减少计时噪声。</td><td>把偶然快的候选误判为优秀。</td></tr>
+        <tr><td>进化式数据库</td><td>保留父代、分数、血缘和多样方案。</td><td>搜索过早收敛，也无法解释来源。</td></tr>
+        <tr><td>精英与探索平衡</td><td>既保留好候选，也尝试新方向。</td><td>系统反复微调同一局部。</td></tr>
+      </table>
+    </section>
+
+    <section id="example">
+      <div class="section-head"><span class="no">03</span><h2>示例：搜索更高效的矩阵乘法实现</h2></div>
+      <p class="lead">矩阵乘法是典型问题：正确性可以精确验证，乘加次数、耗时和内存也能测量；但不同分块、循环顺序、并行和缓存策略的组合非常多。</p>
+      <div class="timeline">
+        <div class="step"><h4>第 1 步：准备种子程序</h4><p>先放入一个正确但普通的分块矩阵乘法实现。它能在所有测试用例上通过，性能作为 baseline。</p></div>
+        <div class="step"><h4>第 2 步：定义评价器</h4><p>第一优先级是正确性：随机矩阵、单位矩阵、奇异矩阵、极小值和极大值都必须在容差内匹配。第二层是乘加次数、P50/P95 耗时、峰值内存。</p></div>
+        <div class="step"><h4>第 3 步：生成初始种群</h4><p>用多个 LLM 提议对分块大小、循环顺序、临时数组和边界分支的修改。每个候选都记录父代和 diff。</p></div>
+        <div class="step"><h4>第 4 步：沙箱执行</h4><p>每个候选在受限环境编译和运行。禁止网络、限制 CPU/内存/时间，超过预算直接淘汰。</p></div>
+        <div class="step"><h4>第 5 步：发现错误候选</h4><p>候选 A 把分块改大，速度快 8%，但在非方阵用例数值误差超标。评价器标记 invalid，不进入精英。</p></div>
+        <div class="step"><h4>第 6 步：发现性能候选</h4><p>候选 B 调整循环顺序并复用中间块，正确性全过，P95 耗时下降 12%，内存增加 3%。进入种群。</p></div>
+        <div class="step"><h4>第 7 步：测量噪声</h4><p>由于机器波动，每个最终候选重复跑多轮，取中位数和尾部表现。B 相对 baseline 的提升仍然稳定。</p></div>
+        <div class="step"><h4>第 8 步：继续变异</h4><p>下一轮以 B 和若干多样性候选为父代，尝试不同分块策略和边界展开。评价器继续淘汰错误和退化方案。</p></div>
+        <div class="step"><h4>第 9 步：输出可审计结果</h4><p>最终方案附带来源 diff、父代、测试矩阵、性能曲线和失败候选。不是只给一个“更快代码”。</p></div>
+      </div>
+      <div class="good"><strong>效果：</strong>LLM 的创造性被保留，但每个候选必须穿过正确性、性能、资源和稳定性四道关。最终留下的不是“听起来聪明”，而是“测得更好”。</div>
+    </section>
+
+    <section id="risks">
+      <div class="section-head"><span class="no">04</span><h2>实际会遇到的问题与处理方式</h2></div>
+      <table>
+        <tr><th>阶段</th><th>问题</th><th>表现</th><th>解决方法</th></tr>
+        <tr><td>生成</td><td>非法代码</td><td>语法错、类型错、API 不存在。</td><td>静态检查 + 编译错误反馈，让 LLM 修正或淘汰。</td></tr>
+        <tr><td>生成</td><td>过大重写</td><td>无法判断哪个变更带来收益。</td><td>限制 patch 范围，要求局部可测变异。</td></tr>
+        <tr><td>评价</td><td>正确性漏洞</td><td>常见用例通过，边界失败。</td><td>随机测试、极端输入、不变量和金标准对比。</td></tr>
+        <tr><td>评价</td><td>性能测量噪声</td><td>同一程序时间波动大。</td><td>多次运行、预热、中位数/P95、控制机器负载。</td></tr>
+        <tr><td>评价</td><td>reward hacking</td><td>减少计算但结果不正确。</td><td>正确性硬门槛；禁止修改测试；审查输出分布。</td></tr>
+        <tr><td>搜索</td><td>局部最优</td><td>所有候选都很相似。</td><td>保持多样性父代，允许探索性变异。</td></tr>
+        <tr><td>搜索</td><td>成本爆炸</td><td>候选太多，每次评价很贵。</td><td>先便宜过滤，再昂贵测试；限制代数和并发。</td></tr>
+        <tr><td>工程</td><td>不可复现</td><td>换机器后优势消失。</td><td>锁定硬件/依赖/输入，保存原始日志和环境。</td></tr>
+      </table>
+      <div class="warn"><strong>最大陷阱：</strong>评价器弱，进化就变成刷分器。AlphaEvolve 模式只适合能够把目标写成可靠代码判据的问题。</div>
+    </section>
+
+    <section id="lessons">
+      <div class="section-head"><span class="no">05</span><h2>对 SDD Harness 的启示</h2></div>
+      <div class="grid">
+        <article class="card col-4"><div class="pill green">启示 1</div><h3>LLM 是 proposer</h3><p>让它提出 Skill / prompt / gate patch，不要让它既生成又自我宣布成功。</p></article>
+        <article class="card col-4"><div class="pill green">启示 2</div><h3>评价器是护城河</h3><p>测试、成本、安全、循环率和人工接受率应组成硬门禁。</p></article>
+        <article class="card col-4"><div class="pill green">启示 3</div><h3>保留种群和血缘</h3><p>不要只维护一个 current prompt；challenger 能帮助观察长期稳定性。</p></article>
+      </div>
+      <div class="note"><strong>映射关系：</strong>程序 patch 对应 Skill/Workflow patch；正确性测试对应 SDD 门禁；性能测量对应 token/时延/人工成本；进化数据库对应版本化 Skill 库与实验 registry。</div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><span class="no">06</span><h2>公开来源</h2></div>
+      <div class="sources">
+        <div class="source"><b><a href="https://deepmind.google/discover/blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/" target="_blank" rel="noopener">DeepMind AlphaEvolve Blog</a></b><span>进化式编码 Agent、评价器驱动搜索和算法发现。</span></div>
+        <div class="source"><b><a href="https://deepmind.google/" target="_blank" rel="noopener">Google DeepMind</a></b><span>官方研究与技术博客入口。</span></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

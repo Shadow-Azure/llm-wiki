@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Case 03 · OpenAI Evals · LangSmith · Braintrust</title>
+  <link rel="stylesheet" href="case-common.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <a class="back" href="index.html">← 返回案例库</a>
+      <div class="tag">Case 03 · Evaluation Infrastructure</div>
+      <h1>OpenAI Evals · LangSmith · Braintrust</h1>
+      <p>这三个方案的共同目标是把“我觉得新 prompt 更好”变成“同一数据集、同一运行协议、同一评分口径下，新版本确实更好”。OpenAI Evals 偏开放评测框架，LangSmith 偏 trace 加实验平台，Braintrust 偏产品化评测与实验工作流。</p>
+      <div class="hero-meta">
+        <span>关键词：数据集</span><span>Scorer</span><span>Experiment</span><span>Trace</span><span>线上监控</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="problem">
+      <div class="section-head"><span class="no">01</span><h2>它们想解决什么问题</h2></div>
+      <p class="lead">LLM 应用早期常见状态是：prompt 散落在代码里，测试靠人肉看几条样本，线上坏例靠截图传播。这类方式无法支撑持续迭代。</p>
+      <div class="grid">
+        <article class="card col-4"><div class="pill">问题 1</div><h3>主观评分不可复用</h3><p>今天说“回答不错”，明天另一人认为格式不合格。没有评分器，就无法比较版本。</p></article>
+        <article class="card col-4"><div class="pill">问题 2</div><h3>样本不代表分布</h3><p>团队常用 5 条自己造的例子。上线后真实用户输入更长、更歧义、更脏。</p></article>
+        <article class="card col-4"><div class="pill">问题 3</div><h3>坏例无法回溯</h3><p>只保存最终答案，看不到检索、工具、模型版本和中间决策。</p></article>
+        <article class="card col-4"><div class="pill">问题 4</div><h3>版本回归难发现</h3><p>某类问题变好了，另一类悄悄变差；没有分层指标就看不出来。</p></article>
+        <article class="card col-4"><div class="pill">问题 5</div><h3>多人协作困难</h3><p>产品、算法和工程各自保存表格，实验无法复用和审计。</p></article>
+        <article class="card col-4"><div class="pill">问题 6</div><h3>线上漂移无人察觉</h3><p>用户问题、模型版本或工具结果变化后，质量缓慢下降。</p></article>
+      </div>
+    </section>
+
+    <section id="mechanism">
+      <div class="section-head"><span class="no">02</span><h2>它们是怎么解决的</h2></div>
+      <p class="lead">三者实现方式不同，但都能抽象成同一个闭环：<strong>Trace → Dataset → Run → Scorer → Experiment → Monitor</strong>。</p>
+      <figure>
+        <svg viewBox="0 0 1040 380" role="img" aria-label="评测平台闭环">
+          <rect x="55" y="65" width="205" height="100" rx="16" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="157" y="104" text-anchor="middle" class="st">Runtime Trace</text>
+          <text x="157" y="129" text-anchor="middle" class="ss">prompt / tool / output</text>
+          <text x="157" y="149" text-anchor="middle" class="ss">版本 / 成本 /时延</text>
+
+          <rect x="330" y="65" width="205" height="100" rx="16" fill="#ecfeff" stroke="#a5f3fc"/>
+          <text x="432" y="104" text-anchor="middle" class="st">Dataset</text>
+          <text x="432" y="129" text-anchor="middle" class="ss">输入 / 期望 / rubric</text>
+          <text x="432" y="149" text-anchor="middle" class="ss">分层与去重</text>
+
+          <rect x="605" y="65" width="205" height="100" rx="16" fill="#ede9fe" stroke="#ddd6fe"/>
+          <text x="707" y="104" text-anchor="middle" class="st">Candidate Run</text>
+          <text x="707" y="129" text-anchor="middle" class="ss">old / new / model B</text>
+          <text x="707" y="149" text-anchor="middle" class="ss">相同协议重复执行</text>
+
+          <rect x="855" y="65" width="145" height="100" rx="16" fill="#fff7ed" stroke="#fed7aa"/>
+          <text x="927" y="104" text-anchor="middle" class="st">Scorer</text>
+          <text x="927" y="129" text-anchor="middle" class="ss">规则 + judge</text>
+          <text x="927" y="149" text-anchor="middle" class="ss">人工仲裁</text>
+
+          <rect x="230" y="235" width="580" height="100" rx="18" fill="#f0fdf4" stroke="#bbf7d0"/>
+          <text x="520" y="274" text-anchor="middle" class="st">Experiment Report</text>
+          <text x="520" y="300" text-anchor="middle" class="ss">总分、分层指标、失败簇、置信区间、成本、时延</text>
+          <text x="520" y="322" text-anchor="middle" class="ss">上线后继续监控漂移和 bad case</text>
+
+          <path d="M260 115H330M535 115H605M810 115H855M927 165C930 205 830 240 745 258" stroke="#64748b" stroke-width="3" fill="none"/>
+          <path d="M230 115C170 175 180 225 230 260" stroke="#64748b" stroke-width="3" fill="none"/>
+        </svg>
+        <figcaption>图 1：评测平台不是“跑一次打分表”，而是把线上证据转成数据集，把候选版本转成实验，把实验结果转成发布和监控依据。</figcaption>
+      </figure>
+
+      <h3>三个方案的定位</h3>
+      <table>
+        <tr><th>方案</th><th>更像什么</th><th>主要贡献</th><th>适合场景</th></tr>
+        <tr><td>OpenAI Evals</td><td>开放评测框架</td><td>用统一结构描述任务、样本、模型调用和评分器。</td><td>建立可复用、可开源、可代码化管理的评测。</td></tr>
+        <tr><td>LangSmith</td><td>LLM 应用观测与评测平台</td><td>嵌套 trace、数据集、实验、反馈、线上监控。</td><td>调试复杂 Agent 和 RAG，追踪每个工具调用。</td></tr>
+        <tr><td>Braintrust</td><td>产品化实验与评测平台</td><td>实验、数据集、评分器、日志和协作界面。</td><td>产品和工程一起管理 prompt/Agent 版本。</td></tr>
+      </table>
+
+      <h3>评分器应分层</h3>
+      <table>
+        <tr><th>层</th><th>例子</th><th>优点</th><th>风险</th></tr>
+        <tr><td>硬校验</td><td>JSON schema、SQL 可执行、引用存在、价格正确。</td><td>便宜、稳定、可复现。</td><td>覆盖不了语义质量。</td></tr>
+        <tr><td>规则/启发式</td><td>长度、格式、禁止词、必须包含章节。</td><td>能快速拦截明显错误。</td><td>阈值过严会误伤。</td></tr>
+        <tr><td>LLM judge</td><td>按 rubric 评价完整性、事实性、帮助性。</td><td>可覆盖软指标。</td><td>偏长答案、位置偏差、容易被讨好性文本骗过。</td></tr>
+        <tr><td>Pairwise judge</td><td>新版本 A 对比旧版本 B。</td><td>适合相对改进。</td><td>要控制顺序和长度偏差。</td></tr>
+        <tr><td>人工抽检</td><td>高风险样本、争议样本、随机样本。</td><td>校准自动评分器。</td><td>贵、慢、标准会漂移。</td></tr>
+      </table>
+    </section>
+
+    <section id="example">
+      <div class="section-head"><span class="no">03</span><h2>示例：优化一个客服退款 Agent</h2></div>
+      <p class="lead">假设 Agent 要根据订单状态和退款政策决定“自动退款、转人工、请用户补材料”。现在要从 v1 迭代到 v2。</p>
+      <div class="timeline">
+        <div class="step"><h4>第 1 步：采集真实 trace</h4><p>每个请求记录用户问题、订单状态、政策检索片段、工具调用、模型输出、后续人工动作。发现 40 条被客服推翻，20 条用户重复追问。</p></div>
+        <div class="step"><h4>第 2 步：构建分层 Dataset</h4><p>拆成四层：标准退款、跨币种、欺诈嫌疑、政策歧义。每层都有输入、期望动作、关键理由和禁止事项。真实坏例进入挑战集。</p></div>
+        <div class="step"><h4>第 3 步：定义评分器</h4><p>硬校验检查是否调用了正确订单接口；规则检查是否输出合法动作；LLM judge 按 rubric 评价政策引用和解释；人工抽检校准 judge。</p></div>
+        <div class="step"><h4>第 4 步：运行实验</h4><p>在相同数据集上跑 v1 和 v2，各重复多次。记录总分、每层通过率、平均 token、时延和工具调用次数。</p></div>
+        <div class="step"><h4>第 5 步：分析失败簇</h4><p>总分从 78 到 84，但“欺诈嫌疑”层从 70 降到 55：v2 更倾向自动退款。这个回归阻止直接发布。</p></div>
+        <div class="step"><h4>第 6 步：加入护栏</h4><p>v2 增加规则：金额高、订单新、账号异常时必须转人工。重新实验后，总分到 83，高风险层回到 78。</p></div>
+        <div class="step"><h4>第 7 步：上线监控</h4><p>先 shadow 跑真实流量，再 5% 灰度。监控人工推翻率、重复追问率、退款金额异常和时延。劣化时回滚。</p></div>
+      </div>
+      <div class="good"><strong>效果：</strong>团队不再讨论“v2 看起来更强”，而是能回答：在哪层任务提升、哪层回退、成本变化多少、上线后用哪些护栏判断失败。</div>
+    </section>
+
+    <section id="risks">
+      <div class="section-head"><span class="no">04</span><h2>实际会遇到的问题与处理方式</h2></div>
+      <table>
+        <tr><th>阶段</th><th>问题</th><th>表现</th><th>解决方法</th></tr>
+        <tr><td>数据集</td><td>数据泄漏</td><td>优化 prompt 时反复看过测试样本。</td><td>Train/Dev/Frozen Test 分离；按语义和任务去重。</td></tr>
+        <tr><td>数据集</td><td>分布偏移</td><td>旧样本太短、太干净，线上输入复杂。</td><td>定期从真实 trace 补充；保留长尾和对抗样本。</td></tr>
+        <tr><td>Trace</td><td>嵌套断链</td><td>看不到工具调用和检索结果的关系。</td><td>统一 trace_id/span_id，记录父子关系和版本。</td></tr>
+        <tr><td>隐私</td><td>敏感数据入库</td><td>手机号、订单、身份信息暴露。</td><td>入库前脱敏、权限分级、保留最小字段。</td></tr>
+        <tr><td>评分</td><td>judge 偏长答案</td><td>冗长回答得高分。</td><td>长度控制评分；pairwise 打乱顺序；人工校准。</td></tr>
+        <tr><td>评分</td><td>只看平均分</td><td>核心任务回退被简单任务掩盖。</td><td>按风险、任务族、用户类型分层报告。</td></tr>
+        <tr><td>实验</td><td>单次采样噪声</td><td>涨分 2% 无法判断是否真实。</td><td>多次运行、配对比较、置信区间、设置最小差异。</td></tr>
+        <tr><td>上线</td><td>验证集过拟合</td><td>离线很好，线上回退。</td><td>冻结测试、时间外测、shadow、canary 和回滚。</td></tr>
+      </table>
+      <div class="warn"><strong>Goodhart 风险：</strong>一旦团队只优化 judge 分数，模型可能学会写出更漂亮的解释而不是更正确的行动。自动分数必须与硬校验、业务护栏和用户后续行为一起看。</div>
+    </section>
+
+    <section id="lessons">
+      <div class="section-head"><span class="no">05</span><h2>对 SDD Harness 的启示</h2></div>
+      <div class="grid">
+        <article class="card col-4"><div class="pill green">启示 1</div><h3>Trace 是第一公民</h3><p>没有嵌套工具和版本信息，就很难从线上坏例回到根因。</p></article>
+        <article class="card col-4"><div class="pill green">启示 2</div><h3>评分要混合</h3><p>硬校验保底线，judge 覆盖软质量，人工只做校准和仲裁。</p></article>
+        <article class="card col-4"><div class="pill green">启示 3</div><h3>实验要可审计</h3><p>每次比较都保存数据集版本、prompt 版本、模型版本、运行参数和原始输出。</p></article>
+      </div>
+      <div class="note"><strong>最小落地：</strong>先做一个 50 条任务的分层集 + 5 个硬校验器 + 1 个 LLM judge + 1 个实验报告。不要等完美平台才开始评测。</div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><span class="no">06</span><h2>公开来源</h2></div>
+      <div class="sources">
+        <div class="source"><b><a href="https://github.com/openai/evals" target="_blank" rel="noopener">OpenAI Evals</a></b><span>开放评测框架、任务配置和评分器模式。</span></div>
+        <div class="source"><b><a href="https://docs.smith.langchain.com/" target="_blank" rel="noopener">LangSmith Docs</a></b><span>Trace、数据集、实验、评估和监控。</span></div>
+        <div class="source"><b><a href="https://www.braintrust.dev/docs" target="_blank" rel="noopener">Braintrust Docs</a></b><span>实验、日志、评分器、数据集和产品化评测工作流。</span></div>
+        <div class="source"><b><a href="https://opentelemetry.io/docs/concepts/signals/traces/" target="_blank" rel="noopener">OpenTelemetry Traces</a></b><span>Span 和因果追踪的通用概念，可用于自建平台。</span></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

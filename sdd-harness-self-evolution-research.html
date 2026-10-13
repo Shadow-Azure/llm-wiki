@@ -1,0 +1,1502 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SDD Harness 自进化研究：轨迹、归因、评测与发布</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #5d6678;
+      --line: #e4e7ef;
+      --blue: #2563eb;
+      --cyan: #0891b2;
+      --violet: #7c3aed;
+      --amber: #d97706;
+      --green: #059669;
+      --red: #dc2626;
+      --shadow: 0 12px 32px rgba(23, 32, 51, .08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 8% 12%, rgba(37, 99, 235, .10), transparent 28rem),
+        radial-gradient(circle at 90% 8%, rgba(124, 58, 237, .09), transparent 26rem),
+        var(--bg);
+      color: var(--ink);
+      font-family: Inter, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.68;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 28px 80px;
+    }
+
+    header {
+      position: relative;
+      overflow: hidden;
+      padding: 62px 28px 50px;
+      background: linear-gradient(120deg, #111827 0%, #1e3a8a 47%, #312e81 100%);
+      color: #fff;
+    }
+    header::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -180px auto;
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, rgba(56, 189, 248, .28), transparent 62%);
+    }
+    .hero-inner { max-width: 1180px; margin: auto; position: relative; z-index: 1; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,.25);
+      background: rgba(255,255,255,.10);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 13px;
+    }
+    h1 {
+      font-size: clamp(34px, 6vw, 62px);
+      line-height: 1.08;
+      margin: 18px 0 16px;
+      letter-spacing: -1.1px;
+    }
+    .hero-sub { max-width: 850px; font-size: 18px; color: rgba(255,255,255,.82); }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+      font-size: 13px;
+      color: rgba(255,255,255,.82);
+    }
+    .hero-meta span {
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.07);
+      padding: 7px 12px;
+      border-radius: 8px;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 28px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    nav a {
+      color: #475569;
+      text-decoration: none;
+      font-size: 13px;
+      padding: 7px 11px;
+      border-radius: 7px;
+    }
+    nav a:hover, nav a.active { color: white; background: var(--ink); }
+
+    section { margin-top: 52px; scroll-margin-top: 78px; }
+    .section-head { display: flex; align-items: baseline; gap: 16px; }
+    .section-no { color: #94a3b8; font-size: 14px; font-weight: 700; white-space: nowrap; }
+    h2 { font-size: clamp(26px, 3.4vw, 40px); line-height: 1.18; margin: 0; letter-spacing: -.8px; }
+    h3 { font-size: 21px; margin: 30px 0 12px; letter-spacing: -.3px; }
+    h4 { font-size: 16px; margin: 20px 0 8px; }
+    p { color: #364154; }
+    .lead { font-size: 18px; color: #475569; max-width: 920px; }
+    ul, ol { padding-left: 22px; color: #364154; }
+    li + li { margin-top: 7px; }
+    strong { color: #111827; }
+    code {
+      background: #eef2ff;
+      color: #3730a3;
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: .92em;
+    }
+    a { color: #175cd3; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+      margin-top: 24px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+    .card h3 { margin-top: 0; }
+    .card p:last-child { margin-bottom: 0; }
+    .card ul, .card ol { margin-bottom: 0; }
+    .col-3 { grid-column: span 3; }
+    .col-4 { grid-column: span 4; }
+    .col-5 { grid-column: span 5; }
+    .col-6 { grid-column: span 6; }
+    .col-7 { grid-column: span 7; }
+    .col-8 { grid-column: span 8; }
+    .col-12 { grid-column: span 12; }
+
+    .insight {
+      margin-top: 18px;
+      border-left: 5px solid var(--blue);
+      background: #eff6ff;
+      border-radius: 0 14px 14px 0;
+      padding: 18px 20px;
+      color: #1e3a8a;
+    }
+    .warn {
+      margin-top: 18px;
+      border-left: 5px solid var(--amber);
+      background: #fff7ed;
+      border-radius: 0 14px 14px 0;
+      padding: 18px 20px;
+      color: #854d0e;
+    }
+    .takeaway {
+      margin-top: 18px;
+      border-left: 5px solid var(--green);
+      background: #ecfdf5;
+      border-radius: 0 14px 14px 0;
+      padding: 18px 20px;
+      color: #065f46;
+    }
+    .pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #3730a3;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .risk { background: #fff1f2; color: #9f1239; }
+    .case { background: #ecfeff; color: #155e75; }
+    .metric { background: #f0fdf4; color: #166534; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 18px;
+      background: white;
+      box-shadow: var(--shadow);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    th, td {
+      border-bottom: 1px solid #edf0f5;
+      text-align: left;
+      padding: 14px 15px;
+      vertical-align: top;
+      color: #364154;
+    }
+    th { background: #f8fafc; color: #172033; font-size: 14px; }
+    tr:last-child td { border-bottom: 0; }
+    td code { white-space: nowrap; }
+
+    figure {
+      margin: 24px 0 0;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    figcaption { margin-top: 14px; font-size: 14px; color: var(--muted); }
+    svg { width: 100%; height: auto; display: block; }
+    .svg-text { font: 600 12px Inter, "PingFang SC", sans-serif; fill: #172033; }
+    .svg-small { font: 11px Inter, "PingFang SC", sans-serif; fill: #64748b; }
+    .svg-title { font: 700 14px Inter, "PingFang SC", sans-serif; fill: #0f172a; }
+
+    .timeline { margin-top: 24px; }
+    .step {
+      position: relative;
+      border-left: 2px solid #dbeafe;
+      padding: 0 0 28px 28px;
+      margin-left: 10px;
+    }
+    .step:last-child { border-left-color: transparent; padding-bottom: 0; }
+    .step::before {
+      content: "";
+      position: absolute;
+      left: -9px;
+      top: 4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 4px solid white;
+      background: var(--blue);
+      box-shadow: 0 0 0 2px #dbeafe;
+    }
+    .step h4 { margin: 0; }
+    .step p { margin-top: 6px; margin-bottom: 0; }
+
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .matrix div {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 116px;
+    }
+    .matrix b { display: block; margin-bottom: 5px; }
+    .matrix small { color: var(--muted); line-height: 1.45; display: block; }
+
+    .source-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .source {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .source b { display: block; margin-bottom: 4px; }
+    .source span { display: block; color: var(--muted); font-size: 14px; }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 34px 28px 50px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      main, .hero-inner { padding-left: 18px; padding-right: 18px; }
+      .col-3, .col-4, .col-5, .col-6, .col-7, .col-8 { grid-column: span 12; }
+      .matrix, .source-list { grid-template-columns: 1fr; }
+      header { padding: 48px 18px 40px; }
+      nav { padding: 10px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero-inner">
+      <div class="eyebrow">SDD Harness · Skill Evolution · Online Learning</div>
+      <h1>让 AI Agent 的<br>Skill 持续进化</h1>
+      <p class="hero-sub">
+        这份报告从真实使用轨迹出发，回答五个关键问题：长轨迹如何沉淀、单点 Skill 如何测、无标签 bad case 如何找、版本如何发布、大 Skill 小改动如何评估。
+      </p>
+      <div class="hero-meta">
+        <span>读者：Agent 平台 / 研效工具 / SDD Harness 团队</span>
+        <span>方法：轨迹挖掘 · 反事实评测 · 分层发布 · 系统级回归</span>
+        <span>输出：可落地的自进化架构</span>
+      </div>
+    </div>
+  </header>
+
+  <nav id="nav">
+    <a href="#summary">核心结论</a>
+    <a href="#concept">概念与类比</a>
+    <a href="#case">示例推演</a>
+    <a href="#architecture">总体架构</a>
+    <a href="#p1">随机性</a>
+    <a href="#p2">单点 Skill</a>
+    <a href="#p3">Bad Case</a>
+    <a href="#p4">迭代发布</a>
+    <a href="#p5">大 Skill</a>
+    <a href="#industry">业界案例</a>
+    <a href="#roadmap">落地路线</a>
+    <a href="#sources">来源</a>
+  </nav>
+
+  <main>
+    <section id="summary">
+      <div class="section-head"><span class="section-no">00</span><h2>核心结论：自进化不是“让模型自己改提示词”</h2></div>
+      <p class="lead">
+        一个 SDD Harness 的自进化系统，本质上是把 Agent 的使用过程变成可观测、可复现、可归因、可回归、可灰度的软件工程系统。模型改写 Skill 只是其中一环；更关键的是背后的证据链和发布控制。
+      </p>
+      <div class="grid">
+        <article class="card col-4">
+          <div class="pill">判断 1</div>
+          <h3>先做“证据链”，再做“优化器”</h3>
+          <p>
+            没有 Skill 版本、模型版本、工具输入输出、环境状态、测试结果和用户反馈，LLM 提出的修改只是猜测。自进化的第一公民不是“自动改 prompt”，而是可审计的轨迹与实验。
+          </p>
+        </article>
+        <article class="card col-4">
+          <div class="pill">判断 2</div>
+          <h3>不要追求轨迹逐 token 复现</h3>
+          <p>
+            编程 Agent 有随机性、网络工具、文件系统和外部服务。更现实的目标是<strong>语义复现</strong>：同一入口、同一环境、同一版本、同一评测协议下，多跑若干次，统计任务完成率、门禁通过率和失败模式。
+          </p>
+        </article>
+        <article class="card col-4">
+          <div class="pill">判断 3</div>
+          <h3>Skill 单测好不等于系统更好</h3>
+          <p>
+            Skill 是流程组件，不是孤立函数。单点验证必须和<strong>反事实 Harness 评测</strong>结合：同一批任务分别跑 old skill / new skill / no skill / skill + gates，观察局部收益、全局成本、副作用和回归。
+          </p>
+        </article>
+      </div>
+
+      <div class="grid">
+        <article class="card col-6">
+          <div class="pill risk">五个痛点对应策略</div>
+          <table>
+            <tr><th>痛点</th><th>核心策略</th></tr>
+            <tr><td>模型随机、轨迹长、难沉淀</td><td>版本化快照 + 语义回放 + 多次采样 + 稳定不变量 / 门禁</td></tr>
+            <tr><td>单点 Skill 数据集和验证贵</td><td>从真实轨迹聚类造数据 + Skill Contract + Harness 反事实开关</td></tr>
+            <tr><td>无标签 bad case 难发现</td><td>硬失败 + 用户编辑/回滚/追问 + 批评模型 + 不确定性 + 抽检</td></tr>
+            <tr><td>验证集过拟合</td><td>训练/验证/冻结测试分离 + 时间外测 + 灰度 + 回滚</td></tr>
+            <tr><td>大 Skill 小收益被噪声淹没</td><td>模块化 + 局部评测 + 大样本配对实验 + 阈值与效应量</td></tr>
+          </table>
+        </article>
+        <article class="card col-6">
+          <div class="pill">最小可行闭环</div>
+          <ol>
+            <li><strong>采集：</strong>任务、环境、Skill 版本、模型版本、工具事件、测试、用户动作。</li>
+            <li><strong>标注：</strong>自动失败信号 + 人工轻量标签 + 批评模型评估。</li>
+            <li><strong>归因：</strong>区分指令、Skill、工具、环境、门禁和模型能力问题。</li>
+            <li><strong>实验：</strong>构造可重复任务包，配对比较新旧版本。</li>
+            <li><strong>发布：</strong>shadow → 灰度 → 全量，并保留回滚与监控。</li>
+          </ol>
+        </article>
+      </div>
+
+      <div class="takeaway">
+        <strong>一句话总结：</strong>把 Harness 看成“工厂 + 质检 + 试车场”，把 Skill 看成“岗位 SOP”。自进化不是每次让模型重写 SOP，而是持续收集不合格品，定位工序问题，用可控实验验证新 SOP 是否真的提高整条产线的良率。
+      </div>
+    </section>
+
+    <section id="concept">
+      <div class="section-head"><span class="section-no">01</span><h2>概念与类比：Harness、Skill、轨迹到底是什么</h2></div>
+      <p class="lead">
+        不同团队对 Harness 和 Skill 的定义不完全一样。为了避免讨论漂移，这里采用一个偏工程实践的划分：Harness 负责把模型能力变成稳定交付流程，Skill 是其中可复用、可版本化、可评测的流程资产。
+      </p>
+
+      <div class="grid">
+        <article class="card col-4">
+          <div class="pill">Harness</div>
+          <h3>运行时 + 工作流 + 护栏</h3>
+          <p>
+            包括提示模板、上下文管理、工具调用、沙箱、测试命令、审批流、权限、重试策略、日志、反馈入口和发布机制。它决定“模型在什么约束下工作”。
+          </p>
+        </article>
+        <article class="card col-4">
+          <div class="pill">Skill</div>
+          <h3>可复用的专家流程包</h3>
+          <p>
+            不只是一段长 prompt。成熟的 Skill 应包含：适用条件、输入输出、操作步骤、禁忌、脚本、示例、反例、验证方式、失败处理和版本号。
+          </p>
+        </article>
+        <article class="card col-4">
+          <div class="pill">Trajectory</div>
+          <h3>任务从请求到交付的因果链</h3>
+          <p>
+            包括用户目标、计划、检索、编辑、命令、测试输出、门禁、修复、最终 diff 和用户后续行为。轨迹的价值不是保存所有 token，而是保留可归因的因果节点。
+          </p>
+        </article>
+      </div>
+
+      <figure>
+        <svg viewBox="0 0 1040 300" role="img" aria-label="Harness、Skill 与轨迹关系图">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#60a5fa"/><stop offset="100%" stop-color="#7c3aed"/>
+            </linearGradient>
+          </defs>
+          <rect x="30" y="45" width="980" height="215" rx="22" fill="#f8fafc" stroke="#cbd5e1"/>
+          <text x="70" y="90" class="svg-title">Harness：运行时与治理层</text>
+          <rect x="70" y="115" width="160" height="88" rx="12" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="150" y="152" text-anchor="middle" class="svg-text">上下文 / Prompt</text>
+          <text x="150" y="174" text-anchor="middle" class="svg-small">任务目标、记忆、约束</text>
+
+          <rect x="270" y="115" width="170" height="88" rx="12" fill="#ede9fe" stroke="#ddd6fe"/>
+          <text x="355" y="152" text-anchor="middle" class="svg-text">Skill / SOP</text>
+          <text x="355" y="174" text-anchor="middle" class="svg-small">步骤、脚本、反例</text>
+
+          <rect x="480" y="115" width="170" height="88" rx="12" fill="#ecfeff" stroke="#a5f3fc"/>
+          <text x="565" y="152" text-anchor="middle" class="svg-text">Tools / Sandbox</text>
+          <text x="565" y="174" text-anchor="middle" class="svg-small">编辑、命令、测试</text>
+
+          <rect x="690" y="115" width="140" height="88" rx="12" fill="#fff7ed" stroke="#fed7aa"/>
+          <text x="760" y="152" text-anchor="middle" class="svg-text">Gates</text>
+          <text x="760" y="174" text-anchor="middle" class="svg-small">lint / test / review</text>
+
+          <rect x="870" y="115" width="110" height="88" rx="12" fill="#f0fdf4" stroke="#bbf7d0"/>
+          <text x="925" y="152" text-anchor="middle" class="svg-text">Feedback</text>
+          <text x="925" y="174" text-anchor="middle" class="svg-small">用户 / 观测</text>
+
+          <path d="M230 159H270M440 159H480M650 159H690M830 159H870" stroke="url(#g1)" stroke-width="4" stroke-linecap="round"/>
+          <text x="70" y="238" class="svg-small">轨迹记录的不是连续聊天记录，而是这些节点之间的输入、输出、状态迁移和因果解释。</text>
+        </svg>
+        <figcaption>图 1：Harness 是运行容器和治理层；Skill 是其中一个可替换组件；轨迹则记录组件之间真实发生的状态迁移。</figcaption>
+      </figure>
+
+      <div class="insight">
+        <strong>通俗类比：</strong>如果把 Agent 任务看成一次餐厅出餐，模型是厨师，Harness 是厨房流程和监控，Skill 是某道菜的 SOP，工具是灶台和厨具，门禁是出餐前质检。坏一道菜不能只骂厨师，还要看菜单是否清晰、食材是否备齐、质检是否能拦住问题。
+      </div>
+    </section>
+
+    <section id="case">
+      <div class="section-head"><span class="section-no">02</span><h2>示例推演：一次真实的失败如何变成进化资产</h2></div>
+      <p class="lead">
+        假设用户提出一个很常见的工程任务：“购物车叠加优惠券后金额算错了，请修复。” Agent 最终跑过了部分测试，但用户发现满减和限时折扣的叠加顺序仍然不对。下面把这个过程拆成七个阶段，展示如何从一次失败沉淀出可复用的回归资产。
+      </p>
+
+      <div class="timeline">
+        <div class="step">
+          <h4>第 1 步：记录“原始事实”，而不是只记录聊天</h4>
+          <p>
+            任务开始时保存仓库 commit、目标需求、相关测试、Skill 版本、模型版本、温度、工具白名单、环境变量掩码和门禁配置。不要只保存最终 prompt 和模型回复。
+          </p>
+        </div>
+        <div class="step">
+          <h4>第 2 步：把轨迹切成因果节点</h4>
+          <p>
+            <code>理解需求 → 定位 cart.ts → 阅读 pricing.md → 编辑三处 → 跑 unit tests → 失败 → 二次编辑 → 通过现有测试 → 提交 PR</code>。
+            每个 Span 记录输入摘要、输出摘要、工具结果、耗时、token、状态和父节点。
+          </p>
+        </div>
+        <div class="step">
+          <h4>第 3 步：捕捉弱失败信号</h4>
+          <p>
+            现有测试通过，但用户 12 分钟后评论：“满减要先于会员折扣吗？”并手动修改 diff。这是典型<strong>弱 negative</strong>：CI 没红，用户行为却说明交付不完整。
+          </p>
+        </div>
+        <div class="step">
+          <h4>第 4 步：提炼最小任务包</h4>
+          <p>
+            从仓库提取一个最小复现：输入三种优惠组合、期望金额和反例。例如“满 100 减 20 + 9 折 + 运费 5 元”必须规定折扣基数和顺序。把它变成带断言的 fixture，而不是一段自然语言描述。
+          </p>
+        </div>
+        <div class="step">
+          <h4>第 5 步：做多路归因</h4>
+          <p>
+            同一任务包分别执行：<code>old skill</code>、<code>new pricing skill</code>、<code>no skill</code>、<code>new skill + order gate</code>。如果 old skill 在 20 次里 14 次遗漏叠加顺序，new skill 18 次正确但多读 2 个文件，就能同时看到收益和成本。
+          </p>
+        </div>
+        <div class="step">
+          <h4>第 6 步：把教训写进不同层</h4>
+          <p>
+            Skill 增加一句“先列出优惠应用顺序，再实现”；工具层生成“优惠顺序表”；门禁新增“优惠叠加顺序快照测试”。只改 Skill 是不够的，因为模型可能理解了但仍忘记执行。
+          </p>
+        </div>
+        <div class="step">
+          <h4>第 7 步：纳入回归集并灰度</h4>
+          <p>
+            任务包进入 pricing 回归集，同时与库存、退款、税率等任务隔离。新 Skill 先 shadow 跑 3 天，再对 5% 流量灰度。若测试通过率上升、额外 diff 和耗时未恶化，才扩大发布。
+          </p>
+        </div>
+      </div>
+
+      <figure>
+        <svg viewBox="0 0 1040 420" role="img" aria-label="从失败轨迹到 Skill 优化的流程">
+          <rect x="35" y="35" width="180" height="84" rx="14" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="125" y="70" text-anchor="middle" class="svg-text">原始轨迹</text>
+          <text x="125" y="94" text-anchor="middle" class="svg-small">需求 / 编辑 / 测试 / diff</text>
+
+          <rect x="260" y="35" width="180" height="84" rx="14" fill="#ecfeff" stroke="#a5f3fc"/>
+          <text x="350" y="70" text-anchor="middle" class="svg-text">失败信号</text>
+          <text x="350" y="94" text-anchor="middle" class="svg-small">测试红 / 用户修改 / 追问</text>
+
+          <rect x="485" y="35" width="180" height="84" rx="14" fill="#f0fdf4" stroke="#bbf7d0"/>
+          <text x="575" y="70" text-anchor="middle" class="svg-text">最小任务包</text>
+          <text x="575" y="94" text-anchor="middle" class="svg-small">输入 / 期望 / 反例 / 断言</text>
+
+          <rect x="710" y="35" width="180" height="84" rx="14" fill="#ede9fe" stroke="#ddd6fe"/>
+          <text x="800" y="70" text-anchor="middle" class="svg-text">多路归因</text>
+          <text x="800" y="94" text-anchor="middle" class="svg-small">Skill / Gate / Tool / Model</text>
+
+          <path d="M215 77H260M440 77H485M665 77H710" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+
+          <rect x="180" y="170" width="180" height="88" rx="14" fill="#fff7ed" stroke="#fed7aa"/>
+          <text x="270" y="206" text-anchor="middle" class="svg-text">Skill 编辑</text>
+          <text x="270" y="230" text-anchor="middle" class="svg-small">先列优惠顺序</text>
+
+          <rect x="430" y="170" width="180" height="88" rx="14" fill="#fff1f2" stroke="#fecdd3"/>
+          <text x="520" y="206" text-anchor="middle" class="svg-text">Gate / 测试</text>
+          <text x="520" y="230" text-anchor="middle" class="svg-small">顺序快照断言</text>
+
+          <rect x="680" y="170" width="180" height="88" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+          <text x="770" y="206" text-anchor="middle" class="svg-text">Harness 开关</text>
+          <text x="770" y="230" text-anchor="middle" class="svg-small">old / new / off</text>
+
+          <path d="M360 214H430M610 214H680" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+
+          <rect x="330" y="305" width="380" height="82" rx="18" fill="#111827"/>
+          <text x="520" y="340" text-anchor="middle" fill="white" class="svg-text">灰度发布 + 回归监控 + 回滚</text>
+          <text x="520" y="365" text-anchor="middle" fill="#cbd5e1" class="svg-small">shadow 5% → 25% → 100%</text>
+
+          <path d="M420 258L480 305M620 258L560 305" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <figcaption>图 2：一次失败先被结构化，再被归因和实验化。只有能被重复评测的失败，才适合驱动 Skill 修改。</figcaption>
+      </figure>
+
+      <div class="warn">
+        <strong>常见误区：</strong>只保存用户原始需求和模型最终答案，会把后续归因变成“读小说”。如果缺少中间工具状态和版本号，模型随机性一高，团队就会反复争论“到底是 prompt 不好、模型不好、环境不对，还是评测太苛刻”。
+      </div>
+    </section>
+
+    <section id="architecture">
+      <div class="section-head"><span class="section-no">03</span><h2>总体架构：一个可持续进化的 Harness 控制回路</h2></div>
+      <p class="lead">
+        自进化系统建议拆成六个平面：<strong>运行时、观测、证据库、归因、实验、发布</strong>。这样每个组件可以单独演进，不会把所有逻辑塞进一个巨大的 prompt 或一个巨大的 Skill。
+      </p>
+
+      <figure>
+        <svg viewBox="0 0 1040 540" role="img" aria-label="SDD Harness 自进化总体架构">
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+              <path d="M0,0 L10,4 L0,8 Z" fill="#64748b"></path>
+            </marker>
+          </defs>
+          <rect x="30" y="30" width="980" height="480" rx="24" fill="#f8fafc" stroke="#cbd5e1"/>
+          <text x="70" y="75" class="svg-title">SDD Harness 自进化控制回路</text>
+
+          <rect x="70" y="105" width="220" height="105" rx="16" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="180" y="142" text-anchor="middle" class="svg-text">1. Agent Runtime</text>
+          <text x="180" y="166" text-anchor="middle" class="svg-small">Skill / Tools / Plan / Sandbox</text>
+          <text x="180" y="186" text-anchor="middle" class="svg-small">权限 / 重试 / 审批</text>
+
+          <rect x="370" y="105" width="220" height="105" rx="16" fill="#ecfeff" stroke="#a5f3fc"/>
+          <text x="480" y="142" text-anchor="middle" class="svg-text">2. Trace Collector</text>
+          <text x="480" y="166" text-anchor="middle" class="svg-small">Span 化工具与决策事件</text>
+          <text x="480" y="186" text-anchor="middle" class="svg-small">版本矩阵 / 成本 / 时延</text>
+
+          <rect x="670" y="105" width="220" height="105" rx="16" fill="#f0fdf4" stroke="#bbf7d0"/>
+          <text x="780" y="142" text-anchor="middle" class="svg-text">3. Evidence Store</text>
+          <text x="780" y="166" text-anchor="middle" class="svg-small">环境快照 / diff / test log</text>
+          <text x="780" y="186" text-anchor="middle" class="svg-small">用户反馈 / Critic 结论</text>
+
+          <rect x="70" y="260" width="220" height="105" rx="16" fill="#ede9fe" stroke="#ddd6fe"/>
+          <text x="180" y="297" text-anchor="middle" class="svg-text">4. Bad Case Miner</text>
+          <text x="180" y="321" text-anchor="middle" class="svg-small">规则 / 聚类 / 不确定性</text>
+          <text x="180" y="341" text-anchor="middle" class="svg-small">主动学习 / 人工抽检</text>
+
+          <rect x="370" y="260" width="220" height="105" rx="16" fill="#fff7ed" stroke="#fed7aa"/>
+          <text x="480" y="297" text-anchor="middle" class="svg-text">5. Attribution Engine</text>
+          <text x="480" y="321" text-anchor="middle" class="svg-small">反事实开关 / 语义回放</text>
+          <text x="480" y="341" text-anchor="middle" class="svg-small">局部 vs 全局影响</text>
+
+          <rect x="670" y="260" width="220" height="105" rx="16" fill="#fff1f2" stroke="#fecdd3"/>
+          <text x="780" y="297" text-anchor="middle" class="svg-text">6. Experiment Service</text>
+          <text x="780" y="321" text-anchor="middle" class="svg-small">回归集 / 多次采样</text>
+          <text x="780" y="341" text-anchor="middle" class="svg-small">配对比较 / 效应量</text>
+
+          <rect x="250" y="410" width="540" height="70" rx="18" fill="#111827"/>
+          <text x="520" y="440" text-anchor="middle" fill="white" class="svg-text">7. Release Controller</text>
+          <text x="520" y="462" text-anchor="middle" fill="#cbd5e1" class="svg-small">shadow → canary → full → rollback；指标劣化自动暂停</text>
+
+          <path d="M290 158H370M590 158H670M670 180C520 235 330 235 180 260" stroke="#64748b" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+          <path d="M290 312H370M590 312H670" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+          <path d="M670 330C720 390 570 425 520 410" stroke="#64748b" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+          <path d="M250 445C120 430 90 390 110 365" stroke="#64748b" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+          <text x="75" y="395" class="svg-small">反馈回运行时</text>
+        </svg>
+        <figcaption>图 3：推荐架构不是“模型读日志后重写 Skill”，而是由观测层提供证据，由归因层提出假设，由实验层验证，由发布层控制风险。</figcaption>
+      </figure>
+
+      <div class="grid">
+        <article class="card col-6">
+          <h3>轨迹必须保存的最小字段</h3>
+          <table>
+            <tr><th>类别</th><th>字段</th><th>为什么重要</th></tr>
+            <tr><td>任务</td><td><code>task_id</code>、需求原文、任务类型、复杂度</td><td>用于分层回归，避免把简单任务和复杂任务混算</td></tr>
+            <tr><td>版本</td><td>Skill、Prompt、模型、工具、依赖、门禁</td><td>没有版本矩阵就无法归因</td></tr>
+            <tr><td>环境</td><td>repo commit、依赖锁、OS、环境变量掩码、测试 fixture</td><td>编程任务的失败经常是环境差异</td></tr>
+            <tr><td>过程</td><td>计划、检索、编辑、命令、工具输入输出、异常</td><td>定位“没看需求”还是“工具结果不可靠”</td></tr>
+            <tr><td>结果</td><td>测试、lint、构建、diff、审查意见、人工动作</td><td>硬结果加软反馈才是完整质量</td></tr>
+            <tr><td>成本</td><td>token、调用数、耗时、重试、外部工具成本</td><td>避免 Skill 收益被成本和时延吃掉</td></tr>
+          </table>
+        </article>
+
+        <article class="card col-6">
+          <h3>每个 Skill 都应有“Skill Contract”</h3>
+          <ul>
+            <li><strong>适用范围：</strong>何时触发、何时不触发、和哪些 Skill 冲突。</li>
+            <li><strong>输入输出：</strong>需要哪些上下文，产出什么计划、代码或报告。</li>
+            <li><strong>流程不变量：</strong>例如必须先跑测试、必须列出风险、不得改动无关文件。</li>
+            <li><strong>证据要求：</strong>结论必须引用文件、测试或工具输出。</li>
+            <li><strong>失败处理：</strong>工具失败、测试失败、需求歧义时如何降级。</li>
+            <li><strong>评测集：</strong>golden、扰动、对抗、集成和线上任务分层。</li>
+            <li><strong>健康指标：</strong>一次通过率、门禁通过率、额外 diff、人工修改率、成本。</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="insight">
+        <strong>架构启示：</strong>不要把“进化”实现成一次性大重写。更稳的方式是把 Skill 拆成多个可验证单元：策略、流程、检查表、示例、脚本和门禁。优化器只能提交小步变更，并由 Harness 决定能否合并。
+      </div>
+    </section>
+
+    <section id="p1">
+      <div class="section-head"><span class="section-no">04</span><h2>痛点 1：模型随机、轨迹很长，怎么沉淀与复现</h2></div>
+      <p class="lead">
+        编程 Agent 的失败往往不是单步答错，而是一串状态迁移走偏。因此不应该问“这次轨迹能否一字不差复现”，而应该问：<strong>同一任务包、同一版本组合、同一评测协议下，失败模式是否稳定出现？修复后关键失败率是否显著下降？</strong>
+      </p>
+
+      <div class="grid">
+        <article class="card col-4">
+          <div class="pill">方法 1</div>
+          <h3>三层复现，不追求伪确定性</h3>
+          <p>
+            <strong>精确复现</strong>只适合工具结果和环境完全可控的片段；<strong>语义复现</strong>保留输入、环境和断言，允许路径不同；<strong>统计复现</strong>则重复 N 次看分布。对编程 Agent，绝大多数优化应使用后两者。
+          </p>
+        </article>
+        <article class="card col-4">
+          <div class="pill">方法 2</div>
+          <h3>把轨迹压缩成因果切片</h3>
+          <p>
+            长轨迹不要整段塞给优化器。先抽取出“任务歧义、关键检索、首次编辑、测试失败、错误修复、用户修改”等决策切片，再保留必要前后文。这样优化器看到的是证据，不是冗长日志。
+          </p>
+        </article>
+        <article class="card col-4">
+          <div class="pill">方法 3</div>
+          <h3>把 bad case 变成不变量</h3>
+          <p>
+            例如失败模式是“改了实现但没更新迁移脚本”，就沉淀成门禁：<code>schema 改动必须伴随 migration</code>；“异常被吞掉”沉淀为 lint 规则或测试。模型不可靠的地方，应尽量转成确定性护栏。
+          </p>
+        </article>
+      </div>
+
+      <h3>推荐流程：从“一次失败”到“可发布证据”</h3>
+      <table>
+        <tr><th>阶段</th><th>要做什么</th><th>产出</th></tr>
+        <tr>
+          <td>1. 快照</td>
+          <td>保存任务、仓库 commit、依赖锁、Skill/Prompt/模型版本、工具定义、门禁配置。</td>
+          <td>可审计的 Run Envelope</td>
+        </tr>
+        <tr>
+          <td>2. 切片</td>
+          <td>识别关键事件、错误邻域、状态迁移、首次偏离点。</td>
+          <td>因果轨迹图</td>
+        </tr>
+        <tr>
+          <td>3. 造例</td>
+          <td>生成最小 repo fixture、输入输出、反例、验收测试和禁止事项。</td>
+          <td>Regression Task Pack</td>
+        </tr>
+        <tr>
+          <td>4. 重复</td>
+          <td>新旧版本各跑 N 次，固定任务和门禁，记录一次通过率、最终通过率、成本。</td>
+          <td>通过率分布与失败簇</td>
+        </tr>
+        <tr>
+          <td>5. 门禁</td>
+          <td>把可确定性检查的部分从 prompt 移到 lint/test/review 规则。</td>
+          <td>可执行护栏</td>
+        </tr>
+        <tr>
+          <td>6. 归档</td>
+          <td>记录修复假设、实验结果、副作用、发布范围和回滚条件。</td>
+          <td>可追溯变更说明</td>
+        </tr>
+      </table>
+
+      <figure>
+        <svg viewBox="0 0 1040 380" role="img" aria-label="长轨迹语义回放与多轮采样评测">
+          <rect x="55" y="55" width="215" height="105" rx="16" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="162" y="92" text-anchor="middle" class="svg-text">长轨迹</text>
+          <text x="162" y="116" text-anchor="middle" class="svg-small">聊天 / 工具 / diff / 测试</text>
+
+          <rect x="335" y="55" width="215" height="105" rx="16" fill="#ecfeff" stroke="#a5f3fc"/>
+          <text x="442" y="92" text-anchor="middle" class="svg-text">因果切片</text>
+          <text x="442" y="116" text-anchor="middle" class="svg-small">歧义 / 检索 / 首次偏离</text>
+
+          <rect x="615" y="55" width="215" height="105" rx="16" fill="#ede9fe" stroke="#ddd6fe"/>
+          <text x="722" y="92" text-anchor="middle" class="svg-text">失败指纹</text>
+          <text x="722" y="116" text-anchor="middle" class="svg-small">遗漏迁移 / 循环修复</text>
+
+          <rect x="335" y="220" width="215" height="105" rx="16" fill="#fff7ed" stroke="#fed7aa"/>
+          <text x="442" y="257" text-anchor="middle" class="svg-text">语义回放</text>
+          <text x="442" y="281" text-anchor="middle" class="svg-small">同环境 + 同断言</text>
+
+          <rect x="615" y="220" width="215" height="105" rx="16" fill="#f0fdf4" stroke="#bbf7d0"/>
+          <text x="722" y="257" text-anchor="middle" class="svg-text">N 次采样</text>
+          <text x="722" y="281" text-anchor="middle" class="svg-small">通过率 / 成本 / 失败簇</text>
+
+          <path d="M270 108H335M550 108H615" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+          <path d="M722 160C690 210 590 235 550 258" stroke="#64748b" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+          <path d="M550 272H615" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+          <text x="55" y="205" class="svg-small">结论示例：</text>
+          <text x="55" y="228" class="svg-small">old skill 一次通过 55%，</text>
+          <text x="55" y="251" class="svg-small">new skill 75%，</text>
+          <text x="55" y="274" class="svg-small">新增平均 diff +42 行。</text>
+        </svg>
+        <figcaption>图 4：长轨迹先被压缩成可解释的因果切片，再通过语义回放和多次采样转成统计证据。</figcaption>
+      </figure>
+
+      <div class="grid">
+        <article class="card col-6">
+          <h3>坏 case 沉淀模板</h3>
+          <ul>
+            <li><strong>任务指纹：</strong>需求类型、仓库结构、涉及模块、历史相似任务。</li>
+            <li><strong>最小上下文：</strong>相关文件、测试、命令、错误日志，而不是整个仓库。</li>
+            <li><strong>验收标准：</strong>必须通过、必须产出、禁止改动、最大成本。</li>
+            <li><strong>反例：</strong>看似相近但不应触发同一 Skill 的任务。</li>
+            <li><strong>失败签名：</strong>例如“只修 happy path”“跳过 migration”“反复尝试同一命令”。</li>
+            <li><strong>关联门禁：</strong>如果规则可静态化，就转为 lint/test/checklist。</li>
+          </ul>
+        </article>
+        <article class="card col-6">
+          <h3>随机性下的评估规则</h3>
+          <ul>
+            <li>核心 Skill 至少跑 <code>10-30</code> 次，不要用单次成败下结论。</li>
+            <li>同时报告一次通过率、最终通过率、重试成本和人工修改率。</li>
+            <li>报告失败簇分布，不只报告总分。</li>
+            <li>新旧版本使用同一批任务做配对比较。</li>
+            <li>给每类任务设置噪声基线；提升小于噪声带时不要宣称有效。</li>
+            <li>小样本时优先看“严重失败是否消失”，而不是只看平均分涨了 1%。</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="takeaway">
+        <strong>落地建议：</strong>把“复现”重定义为“可检验”。逐 token 复现对模型和应用都太脆；真正要复现的是环境、任务、断言和失败模式。bad case 沉淀的终局不是一段长日志，而是一个能进 CI 的任务包和一组门禁。
+      </div>
+    </section>
+
+    <section id="p2">
+      <div class="section-head"><span class="section-no">05</span><h2>痛点 2：单点 Skill 造数据贵、测得贵，还可能全局变差</h2></div>
+      <p class="lead">
+        单点 Skill 的正确验证不是“把 Skill 单独跑一遍”，而是把它放进一个可切换的 Harness。局部分数回答“这个能力是否学会”，系统分数回答“整条 SDD 流程是否更好”。
+      </p>
+
+      <div class="grid">
+        <article class="card col-6">
+          <div class="pill">问题拆解</div>
+          <h3>单点有效、全局失效的四种原因</h3>
+          <ul>
+            <li><strong>目标错位：</strong>Skill 优化的是“解释质量”，Harness 需要的是“可合并补丁”。</li>
+            <li><strong>上下文挤占：</strong>Skill 太长，挤掉了需求、代码、测试或工具结果。</li>
+            <li><strong>流程冲突：</strong>新 Skill 要求先写设计，旧门禁却立刻要求跑测试。</li>
+            <li><strong>触发过宽：</strong>在不需要该 Skill 的任务上也启动，带来额外步骤和噪音。</li>
+          </ul>
+        </article>
+        <article class="card col-6">
+          <div class="pill">设计原则</div>
+          <h3>Skill 评测金字塔</h3>
+          <ul>
+            <li><strong>契约测试：</strong>是否在正确场景触发、输出是否满足结构、是否尊重禁忌。</li>
+            <li><strong>能力测试：</strong>小型 fixture 上检查核心判断和产出质量。</li>
+            <li><strong>流程测试：</strong>与工具、门禁、审批、重试策略组合后是否顺畅。</li>
+            <li><strong>系统测试：</strong>完整 SDD 任务上的成功率、成本、时延、人工修改率。</li>
+            <li><strong>线上对照：</strong>shadow 或灰度流量验证真实分布。</li>
+          </ul>
+        </article>
+      </div>
+
+      <h3>降低数据集构造成本：不要从零标注，要从轨迹中“挖矿”</h3>
+      <table>
+        <tr><th>数据类型</th><th>来源</th><th>用途</th><th>成本</th></tr>
+        <tr><td>失败簇</td><td>真实轨迹按错误签名聚类</td><td>发现高频问题和 Skill 缺口</td><td>低</td></tr>
+        <tr><td>边界例</td><td>触发 / 不触发 Skill 的相似任务</td><td>训练路由和防止过度触发</td><td>低-中</td></tr>
+        <tr><td>扰动例</td><td>修改需求、文件顺序、测试名、目录结构</td><td>检验稳定性和泛化</td><td>低</td></tr>
+        <tr><td>对抗例</td><td>含冲突需求、过期文档、误导性注释</td><td>检验不盲从和风险识别</td><td>中</td></tr>
+        <tr><td>黄金例</td><td>人工确认的代表性任务</td><td>发布门禁和长期基准</td><td>高，但要少而精</td></tr>
+        <tr><td>线上影子任务</td><td>真实流量，不返回给用户</td><td>发现分布漂移</td><td>中-高</td></tr>
+      </table>
+
+      <figure>
+        <svg viewBox="0 0 1040 430" role="img" aria-label="Skill 测试金字塔与反事实开关">
+          <path d="M520 50 L790 360 L250 360 Z" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="520" y="125" text-anchor="middle" class="svg-title">线上影子 / 灰度</text>
+          <text x="520" y="149" text-anchor="middle" class="svg-small">少量高价值样本</text>
+          <text x="520" y="219" text-anchor="middle" class="svg-title">系统级 SDD 回归</text>
+          <text x="520" y="243" text-anchor="middle" class="svg-small">成功率 / diff / 成本 / 门禁</text>
+          <text x="520" y="308" text-anchor="middle" class="svg-title">Skill Contract + 能力测试</text>
+          <text x="520" y="332" text-anchor="middle" class="svg-small">触发、结构、判断、禁忌</text>
+
+          <rect x="810" y="65" width="190" height="85" rx="14" fill="#ede9fe" stroke="#ddd6fe"/>
+          <text x="905" y="100" text-anchor="middle" class="svg-text">反事实开关</text>
+          <text x="905" y="124" text-anchor="middle" class="svg-small">old / new / off</text>
+
+          <rect x="40" y="250" width="190" height="85" rx="14" fill="#fff7ed" stroke="#fed7aa"/>
+          <text x="135" y="285" text-anchor="middle" class="svg-text">门禁模拟器</text>
+          <text x="135" y="309" text-anchor="middle" class="svg-small">lint / test / review</text>
+
+          <path d="M250 225C330 180 420 140 810 115" stroke="#94a3b8" stroke-width="3" fill="none"/>
+          <path d="M230 292C300 300 400 325 455 345" stroke="#94a3b8" stroke-width="3" fill="none"/>
+        </svg>
+        <figcaption>图 5：底层契约测试可以高频执行；系统级和线上验证数量更少但更接近真实分布。没有底层测试，反馈慢；没有顶层测试，容易局部最优。</figcaption>
+      </figure>
+
+      <h3>一个实际对照方案</h3>
+      <p>
+        以“代码审查 Skill”为例。单独测它时，模型给出的风险点更全面，评分从 72 涨到 86。但放进完整 SDD 流程后，Agent 可能在每个小改动上都执行长审查、重复请求上下文、甚至为风格问题阻塞合并。因此实验应同时记录：
+      </p>
+      <table>
+        <tr><th>指标</th><th>old skill</th><th>new skill</th><th>解读</th></tr>
+        <tr><td>审查质量评分</td><td>72</td><td>86</td><td>单点能力提升</td></tr>
+        <tr><td>任务最终一次通过率</td><td>68%</td><td>61%</td><td>可能过度审查或阻塞流程</td></tr>
+        <tr><td>平均 token / 耗时</td><td>18k / 7 分钟</td><td>27k / 11 分钟</td><td>成本明显上升</td></tr>
+        <tr><td>人工修改 diff 行数</td><td>35</td><td>29</td><td>产出质量略好</td></tr>
+        <tr><td>小改动误触发率</td><td>12%</td><td>38%</td><td>需要收紧触发条件</td></tr>
+      </table>
+      <p>
+        此时正确动作往往不是全量启用新 Skill，而是把它拆成<strong>快速审查</strong>和<strong>深度审查</strong>，根据 diff 行数、模块风险和历史失败率路由。
+      </p>
+
+      <div class="insight">
+        <strong>降低验证成本的三个手段：</strong>
+        <ol>
+          <li>先跑便宜判据：Skill 是否触发、输出是否合法、是否越过禁忌。</li>
+          <li>用小环境复用缓存：同一仓库骨架、同一依赖层、同一测试快照。</li>
+          <li>只对可疑样本做全流程重放；正常样本用抽样和分组指标监控。</li>
+        </ol>
+      </div>
+
+      <div class="takeaway">
+        <strong>结论：</strong>Skill 必须自带契约和评测集，但发布决策要看系统指标。若一个 Skill 在局部涨分却增加全流程成本、误触发或与其他 Skill 冲突，就不能直接合并。
+      </div>
+    </section>
+
+    <section id="p3">
+      <div class="section-head"><span class="section-no">06</span><h2>痛点 3：线上数据没有标签，bad case 从哪里来</h2></div>
+      <p class="lead">
+        编译失败只是最便宜的显式信号。真实 bad case 通常表现为“没失败但用户不放心”“能跑但不符合架构约束”“第一次跑对但成本过高”。应该建立一个多源证据系统，把硬失败、软反馈、过程异常和模型不确定性组合起来。
+      </p>
+
+      <div class="matrix">
+        <div>
+          <b>1. 硬失败</b>
+          <small>构建、lint、单测、集成测试、类型检查、部署、权限、沙箱、工具调用超时或异常。</small>
+        </div>
+        <div>
+          <b>2. 用户软反馈</b>
+          <small>拒绝、撤销、回滚、手动改 diff、追加澄清、重复请求、复制部分答案后自己修、明显延长会话。</small>
+        </div>
+        <div>
+          <b>3. 过程异常</b>
+          <small>重复执行同一命令、反复改同一行、频繁切换方案、读取过多文件、生成超大 diff、绕过测试、多次触发门禁。</small>
+        </div>
+        <div>
+          <b>4. 语义不一致</b>
+          <small>实现与计划偏离、忽略测试、结论缺少证据、两次采样给出相互矛盾方案、批评模型和执行模型分歧。</small>
+        </div>
+      </div>
+
+      <div class="grid">
+        <article class="card col-6">
+          <h3>比“点赞/点踩”更有效的用户信号</h3>
+          <table>
+            <tr><th>信号</th><th>可能含义</th><th>采集方式</th></tr>
+            <tr><td>手动修改 Agent diff</td><td>方案接近但不可直接接受</td><td>对比提交前后 diff，计算修改比例和语义类型</td></tr>
+            <tr><td>马上追问澄清</td><td>需求理解或方案解释不足</td><td>标记任务分段与用户输入类型</td></tr>
+            <tr><td>撤销 / 回滚 / 切分支</td><td>强烈负面信号</td><td>接入 Git 事件和 UI 操作</td></tr>
+            <tr><td>把测试改松</td><td>Agent 可能绕过约束</td><td>静态 diff 检查测试断言强度</td></tr>
+            <tr><td>复制到外部工具</td><td>当前 Harness 体验不足</td><td>复制事件 + 后续任务关联</td></tr>
+            <tr><td>长时间无下一步</td><td>解释不清或用户失去信心</td><td>空闲时长、滚动、展开/折叠行为</td></tr>
+          </table>
+          <p>
+            这些信号单独看都有噪声，但可以组成<strong>风险分</strong>：例如“测试通过 + 用户修改 40% diff + 新增 3 个追问 + 后续回滚”应进入人工标注队列。
+          </p>
+        </article>
+
+        <article class="card col-6">
+          <h3>无标签数据的主动学习策略</h3>
+          <ol>
+            <li><strong>不确定性优先：</strong>多次采样结果分歧大、模型自报置信度低、门禁分数贴近阈值。</li>
+            <li><strong>新颖性优先：</strong>任务聚类中出现新需求类型、新模块、新错误签名。</li>
+            <li><strong>影响面优先：</strong>核心服务、迁移脚本、支付、权限、并发、安全相关任务。</li>
+            <li><strong>成本异常优先：</strong>token、耗时、工具调用数显著超出同任务分位数。</li>
+            <li><strong>对照抽样：</strong>始终保留一部分随机样本，防止只标注极端 case 导致分布偏差。</li>
+            <li><strong>负样本挖掘：</strong>成功轨迹里也可能存在“侥幸通过”和“过度工程”。</li>
+          </ol>
+        </article>
+      </div>
+
+      <figure>
+        <svg viewBox="0 0 1040 430" role="img" aria-label="无标签 bad case 挖掘漏斗">
+          <path d="M100 55 H940 L790 180 H250 Z" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="520" y="110" text-anchor="middle" class="svg-title">全量轨迹自动打标</text>
+          <text x="520" y="134" text-anchor="middle" class="svg-small">硬失败 / 用户动作 / 过程统计 / 成本分位 / 聚类新颖性</text>
+
+          <path d="M250 205 H790 L700 310 H340 Z" fill="#ecfeff" stroke="#a5f3fc"/>
+          <text x="520" y="252" text-anchor="middle" class="svg-title">候选风险队列</text>
+          <text x="520" y="276" text-anchor="middle" class="svg-small">风险分排序 + 去重 + 相似案例合并</text>
+
+          <path d="M340 330 H700 L610 415 H430 Z" fill="#fff7ed" stroke="#fed7aa"/>
+          <text x="520" y="370" text-anchor="middle" class="svg-title">人工轻量标注</text>
+          <text x="520" y="394" text-anchor="middle" class="svg-small">bad / good / uncertain；失败层；是否值得入库</text>
+        </svg>
+        <figcaption>图 6：无标签数据先由规则和模型粗筛，再让人类只处理高价值样本。目标是降低标注成本，而不是让人工看完全量轨迹。</figcaption>
+      </figure>
+
+      <h3>自动评价器应分层，不能只靠一个“LLM 裁判”</h3>
+      <table>
+        <tr><th>层</th><th>评价器</th><th>优点</th><th>风险</th></tr>
+        <tr><td>可执行验证</td><td>构建、测试、类型、lint、安全扫描</td><td>便宜、稳定、可复现</td><td>覆盖不了需求和架构</td></tr>
+        <tr><td>契约检查</td><td>输出结构、必填字段、权限、禁止文件</td><td>能发现流程违规</td><td>规则需维护</td></tr>
+        <tr><td>过程检查</td><td>计划一致性、循环、死胡同、工具依赖</td><td>解释“为什么慢或错”</td><td>阈值易误伤</td></tr>
+        <tr><td>LLM Critic</td><td>需求覆盖、风险识别、可维护性、测试质量</td><td>覆盖软质量</td><td>偏长答案、偏表面、易被操纵</td></tr>
+        <tr><td>Pairwise Judge</td><td>新旧结果对比</td><td>适合版本升级</td><td>位置偏差、长度偏差</td></tr>
+        <tr><td>Human Audit</td><td>抽样和争议仲裁</td><td>校准其他评价器</td><td>贵、慢</td></tr>
+      </table>
+
+      <div class="warn">
+        <strong>注意 Goodhart：</strong>一旦所有优化都朝着“让 LLM 裁判满意”，Skill 可能学会写更漂亮的解释而不是更好的工程交付。因此裁判分数要和测试、用户修改率、成本、后续故障一起看，并定期用人工标注校准。
+      </div>
+
+      <div class="takeaway">
+        <strong>实操建议：</strong>先做三类最小闭环：可执行失败自动入库；用户回滚/大幅改 diff 自动入队；LLM 批评模型对高价值流量按 rubric 打分。其余轨迹只保留统计特征和可检索原文，等出现相似失败簇再回看。
+      </div>
+    </section>
+
+    <section id="p4">
+      <div class="section-head"><span class="section-no">07</span><h2>痛点 4：从 v1 到 v2，如何迭代整个流程且不过拟合验证集</h2></div>
+      <p class="lead">
+        当你根据一段时间轨迹生成 v2，并在验证集上看到高分时，先不要直接发布。验证集已经参与了“选版本”这个动作；如果每轮都向同一个集合优化，它就会逐渐从测试题变成训练题。正确做法是把数据治理、实验治理和发布治理分开。
+      </p>
+
+      <div class="grid">
+        <article class="card col-4">
+          <div class="pill">数据治理</div>
+          <h3>分层、分时间、防泄漏</h3>
+          <p>
+            按<strong>任务族、仓库、用户、时间段</strong>切分，而不是按单条轨迹随机切分。同一个事故的不同表述、同一仓库的重构任务，不能同时落在训练集和测试集。
+          </p>
+        </article>
+        <article class="card col-4">
+          <div class="pill">实验治理</div>
+          <h3>冻结测试 + 预注册指标</h3>
+          <p>
+            冻结测试集不参与任何模型或 prompt 的迭代决策。发布前提前写清主指标、护栏指标、最小提升、最大回退和样本量，避免事后挑好看指标。
+          </p>
+        </article>
+        <article class="card col-4">
+          <div class="pill">发布治理</div>
+          <h3>Shadow、灰度、回滚</h3>
+          <p>
+            新版本先不接用户，影子运行对比轨迹；再小流量灰度，观察后续修复率、回滚率和成本；任何护栏指标劣化自动暂停。
+          </p>
+        </article>
+      </div>
+
+      <h3>推荐的数据池划分</h3>
+      <table>
+        <tr><th>池</th><th>用途</th><th>更新频率</th><th>关键约束</th></tr>
+        <tr><td>Discovery / Train</td><td>挖掘失败模式、生成候选 Skill、构造任务包</td><td>持续更新</td><td>可自由分析，但不做最终判断</td></tr>
+        <tr><td>Selection Dev</td><td>在多个候选版本中选择</td><td>周期性轮换</td><td>会被反复使用，分数会乐观</td></tr>
+        <tr><td>Frozen Test</td><td>发布门禁</td><td>长期冻结</td><td>禁止根据它的结果继续改 prompt</td></tr>
+        <tr><td>Out-of-Time</td><td>检验时间漂移</td><td>每次发布使用后续时间段</td><td>不能与训练期事故同源</td></tr>
+        <tr><td>Out-of-Distribution</td><td>检验泛化</td><td>定期扩充</td><td>覆盖新仓库、新语言、新任务族</td></tr>
+        <tr><td>Online Canary</td><td>真实流量验证</td><td>每次发布</td><td>观察延迟效应和用户后续行为</td></tr>
+      </table>
+
+      <figure>
+        <svg viewBox="0 0 1040 480" role="img" aria-label="防过拟合的发布流水线">
+          <rect x="45" y="65" width="200" height="100" rx="16" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="145" y="102" text-anchor="middle" class="svg-text">历史轨迹池</text>
+          <text x="145" y="126" text-anchor="middle" class="svg-small">按时间 / 仓库 / 任务族切分</text>
+
+          <rect x="300" y="65" width="200" height="100" rx="16" fill="#ede9fe" stroke="#ddd6fe"/>
+          <text x="400" y="102" text-anchor="middle" class="svg-text">候选 v2 生成</text>
+          <text x="400" y="126" text-anchor="middle" class="svg-small">只允许使用 Train 证据</text>
+
+          <rect x="555" y="65" width="200" height="100" rx="16" fill="#ecfeff" stroke="#a5f3fc"/>
+          <text x="655" y="102" text-anchor="middle" class="svg-text">Dev 选择</text>
+          <text x="655" y="126" text-anchor="middle" class="svg-small">多候选对比 / 轮换</text>
+
+          <rect x="810" y="65" width="190" height="100" rx="16" fill="#fff1f2" stroke="#fecdd3"/>
+          <text x="905" y="102" text-anchor="middle" class="svg-text">Frozen Test</text>
+          <text x="905" y="126" text-anchor="middle" class="svg-small">一次性 / 低频访问</text>
+
+          <rect x="230" y="235" width="200" height="95" rx="16" fill="#f0fdf4" stroke="#bbf7d0"/>
+          <text x="330" y="272" text-anchor="middle" class="svg-text">Shadow</text>
+          <text x="330" y="296" text-anchor="middle" class="svg-small">真实流量旁路运行</text>
+
+          <rect x="490" y="235" width="200" height="95" rx="16" fill="#fff7ed" stroke="#fed7aa"/>
+          <text x="590" y="272" text-anchor="middle" class="svg-text">Canary 5%</text>
+          <text x="590" y="296" text-anchor="middle" class="svg-small">用户接受 / 回滚 / 成本</text>
+
+          <rect x="740" y="235" width="200" height="95" rx="16" fill="#f8fafc" stroke="#cbd5e1"/>
+          <text x="840" y="272" text-anchor="middle" class="svg-text">扩大灰度</text>
+          <text x="840" y="296" text-anchor="middle" class="svg-small">25% → 100%</text>
+
+          <rect x="370" y="375" width="300" height="70" rx="18" fill="#111827"/>
+          <text x="520" y="405" text-anchor="middle" fill="white" class="svg-text">Monitor / Rollback</text>
+          <text x="520" y="428" text-anchor="middle" fill="#cbd5e1" class="svg-small">长期质量、安全、成本、漂移</text>
+
+          <path d="M245 115H300M500 115H555M755 115H810" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+          <path d="M905 165C820 235 640 270 690 258" stroke="#64748b" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+          <path d="M430 282H490M690 282H740" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+          <path d="M740 305C630 370 520 370 520 375" stroke="#64748b" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+        </svg>
+        <figcaption>图 7：v2 不是“验证集分数高就可以发布”，而是要在冻结测试、时间外测、影子运行和真实灰度中连续通过同一组护栏。</figcaption>
+      </figure>
+
+      <h3>发布门禁示例</h3>
+      <table>
+        <tr><th>类型</th><th>指标</th><th>示例阈值</th></tr>
+        <tr><td>主指标</td><td>一次通过率 / 用户接受率</td><td>相对提升 ≥ 3%，且置信下界为正</td></tr>
+        <tr><td>质量护栏</td><td>严重失败率、回滚率、后续 hotfix 率</td><td>不得劣化超过 0.5%</td></tr>
+        <tr><td>流程护栏</td><td>循环率、门禁失败次数、无关 diff 行数</td><td>不得显著上升</td></tr>
+        <tr><td>成本护栏</td><td>token、耗时、工具调用数</td><td>P95 增幅 ≤ 10%</td></tr>
+        <tr><td>安全护栏</td><td>危险命令、权限、秘密泄露、依赖变更</td><td>零容忍或必须人工审批</td></tr>
+        <tr><td>稳定性</td><td>多次采样方差、极端失败比例</td><td>失败尾部的 95 分位不得恶化</td></tr>
+      </table>
+
+      <div class="grid">
+        <article class="card col-6">
+          <h3>如何周期性迭代而不是“背模考题”</h3>
+          <ul>
+            <li>每轮只允许有限次访问验证集；记录每次选择和理由。</li>
+            <li>v3 的训练期必须晚于 v2 的验证期，避免未来信息泄漏。</li>
+            <li>保留一个至少数月不动的“古老测试集”，检验长期遗忘。</li>
+            <li>定期加入新仓库、新框架和新任务族，但不要立刻删掉旧挑战。</li>
+            <li>对被频繁选中的任务降权或 retire，防止变成隐式训练集。</li>
+            <li>维护 Champion / Challenger：线上持续跑少量 challenger，观察长期差距。</li>
+          </ul>
+        </article>
+        <article class="card col-6">
+          <h3>候选版本的合并策略</h3>
+          <ul>
+            <li><strong>小步合并：</strong>一个候选只包含一类可解释变更。</li>
+            <li><strong>冲突检测：</strong>检查是否与现有 Skill、门禁和审批策略矛盾。</li>
+            <li><strong>组合验证：</strong>A、B 单独有效不代表 A+B 有效，必须测组合。</li>
+            <li><strong>回滚单元：</strong>Skill、Prompt、工具描述、门禁分别可回滚。</li>
+            <li><strong>版本说明：</strong>记录假设、适用范围、已知风险和失效条件。</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="takeaway">
+        <strong>结论：</strong>验证集分数只决定“是否值得继续”，不决定“是否上线”。上线由冻结测试、时间外测、shadow、灰度和长期监控共同决定。
+      </div>
+    </section>
+
+    <section id="p5">
+      <div class="section-head"><span class="section-no">08</span><h2>痛点 5：大 Skill 里的小改动，收益小、噪声大怎么办</h2></div>
+      <p class="lead">
+        一个 20,000+ token 的 Skill，往往已经从“指令”变成“巨型说明书”。此时单条 edit 的边际收益很容易被采样噪声、上下文稀释和任务异质性掩盖。处理方式不是更用力测一次，而是降低上下文负担、缩小实验粒度、放大有效样本量，并明确“多大差异才值得发布”。
+      </p>
+
+      <div class="grid">
+        <article class="card col-6">
+          <div class="pill risk">诊断</div>
+          <h3>大 Skill 的常见症状</h3>
+          <ul>
+            <li>重要约束埋在中间，模型只记住开头和结尾。</li>
+            <li>大量通用解释挤占任务特定上下文。</li>
+            <li>不同章节互相冲突：有的鼓励探索，有的强调不要过度设计。</li>
+            <li>任何小改都可能影响所有任务，难以定位回归。</li>
+            <li>评测成本高，团队只能跑很少次，于是把噪声当效果。</li>
+          </ul>
+        </article>
+        <article class="card col-6">
+          <div class="pill">解法</div>
+          <h3>把“说明书”改成“运行时知识包”</h3>
+          <ul>
+            <li><strong>入口卡：</strong>只保留适用条件、核心流程和红线。</li>
+            <li><strong>模块卡：</strong>按场景加载，例如迁移、性能、安全、测试修复。</li>
+            <li><strong>脚本 / 模板：</strong>可确定执行的检查不要用自然语言描述。</li>
+            <li><strong>示例库：</strong>正反例按需检索，而不是常驻上下文。</li>
+            <li><strong>门禁：</strong>用 lint、测试和审查规则拦截已知错误。</li>
+          </ul>
+        </article>
+      </div>
+
+      <figure>
+        <svg viewBox="0 0 1040 470" role="img" aria-label="大 Skill 模块化与按需加载">
+          <rect x="70" y="60" width="900" height="82" rx="18" fill="#111827"/>
+          <text x="520" y="96" text-anchor="middle" fill="white" class="svg-title">Skill Entry Card</text>
+          <text x="520" y="122" text-anchor="middle" fill="#cbd5e1" class="svg-small">触发条件 / 核心流程 / 红线 / 输出契约</text>
+
+          <rect x="70" y="190" width="205" height="105" rx="16" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="172" y="228" text-anchor="middle" class="svg-text">Policy</text>
+          <text x="172" y="252" text-anchor="middle" class="svg-small">边界、权限、风险</text>
+
+          <rect x="305" y="190" width="205" height="105" rx="16" fill="#ecfeff" stroke="#a5f3fc"/>
+          <text x="407" y="228" text-anchor="middle" class="svg-text">Procedure</text>
+          <text x="407" y="252" text-anchor="middle" class="svg-small">步骤、模板、检查表</text>
+
+          <rect x="540" y="190" width="205" height="105" rx="16" fill="#f0fdf4" stroke="#bbf7d0"/>
+          <text x="642" y="228" text-anchor="middle" class="svg-text">Examples</text>
+          <text x="642" y="252" text-anchor="middle" class="svg-small">正例 / 反例 / 失败复盘</text>
+
+          <rect x="775" y="190" width="195" height="105" rx="16" fill="#fff7ed" stroke="#fed7aa"/>
+          <text x="872" y="228" text-anchor="middle" class="svg-text">Tools / Gates</text>
+          <text x="872" y="252" text-anchor="middle" class="svg-small">脚本、测试、lint</text>
+
+          <rect x="270" y="350" width="500" height="72" rx="18" fill="#ede9fe" stroke="#ddd6fe"/>
+          <text x="520" y="381" text-anchor="middle" class="svg-text">Task Router / Context Compiler</text>
+          <text x="520" y="405" text-anchor="middle" class="svg-small">根据任务类型、diff 风险和历史失败只加载必要模块</text>
+
+          <path d="M172 295C220 340 330 365 270 375M407 295C420 325 450 345 470 350M642 295C630 325 600 345 570 350M872 295C830 340 720 365 770 375" stroke="#94a3b8" stroke-width="3" fill="none"/>
+          <path d="M520 142V190" stroke="#94a3b8" stroke-width="4"/>
+        </svg>
+        <figcaption>图 8：大 Skill 应该变成入口卡加可检索模块。上下文编译器只注入与当前任务相关的章节，减少注意力稀释，也让小改动有更清晰的测试边界。</figcaption>
+      </figure>
+
+      <h3>小效应评测：先测噪声，再测收益</h3>
+      <table>
+        <tr><th>步骤</th><th>做法</th><th>示例</th></tr>
+        <tr>
+          <td>1. 定义最小关心差异</td>
+          <td>提前确定多大提升才有工程意义，不看统计显著就合并。</td>
+          <td>一次通过率至少 +3%，严重失败 -1%</td>
+        </tr>
+        <tr>
+          <td>2. 测 baseline 噪声</td>
+          <td>同一版本重复跑多次，得到自然波动区间。</td>
+          <td>20 次结果为 70%-80%，说明 ±5% 内差异不可信</td>
+        </tr>
+        <tr>
+          <td>3. 配对实验</td>
+          <td>同一任务、同一环境、相近预算下跑 old/new。</td>
+          <td>只比较每个任务对的成败和成本差</td>
+        </tr>
+        <tr>
+          <td>4. 分层汇总</td>
+          <td>按任务族、模块风险、仓库规模分别看。</td>
+          <td>大仓库 +5%，小仓库 -2%，不应平均后掩盖回退</td></tr>
+        <tr>
+          <td>5. 看尾部</td>
+          <td>报告 P95 耗时、最差失败、重复循环率。</td>
+          <td>平均分提升但极端失败更多，仍不能发布</td>
+        </tr>
+        <tr>
+          <td>6. 组合消融</td>
+          <td>关闭其他 Skill 或固定相邻步骤，隔离新增 edit。</td>
+          <td>验证收益来自新章节，而非 prompt 顺序变化</td>
+        </tr>
+      </table>
+
+      <div class="grid">
+        <article class="card col-6">
+          <h3>统计上的低成本做法</h3>
+          <ul>
+            <li>不要只跑一次；对核心路径至少 <code>20+</code> 次，探索性任务可先 5-10 次筛查。</li>
+            <li>优先使用<strong>配对差值</strong>，因为任务难度造成的大量方差会被抵消。</li>
+            <li>用 bootstrap 计算置信区间，而不是只比较两个平均分。</li>
+            <li>保留连续指标：人工修改比例、门禁次数、token 成本，不要只看成败。</li>
+            <li>把“临界成功”标为 uncertain，避免侥幸通过污染结论。</li>
+            <li>小收益只有同时具备“低风险、低回退、可组合”时才考虑灰度。</li>
+          </ul>
+        </article>
+        <article class="card col-6">
+          <h3>工程上的替代方案</h3>
+          <ul>
+            <li><strong>确定性化：</strong>把重复出现的规则改成脚本、模板或 hook。</li>
+            <li><strong>分层加载：</strong>默认只放入口卡，子流程按需检索。</li>
+            <li><strong>局部重编译：</strong>修改一个模块时，只重测受影响任务族。</li>
+            <li><strong>变更指纹：</strong>每条 edit 注明目的、影响面、依赖章节和预期指标。</li>
+            <li><strong>淘汰机制：</strong>对连续无收益或导致冲突的章节降级、合并或删除。</li>
+            <li><strong>Champion-Challenger：</strong>小改动长期影子比较，避免短窗误判。</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="warn">
+        <strong>不要为了 1% 平均分承受结构性风险：</strong>如果一次 300 token 的 edit 只让平均分从 74% 到 75%，但在某个核心任务族引入新的重复循环，应优先拒绝或继续观察。自进化系统的目标不是每次都找到改进，而是避免把噪声和局部优化固化成全局债。
+      </div>
+
+      <div class="takeaway">
+        <strong>结论：</strong>20k token 的 Skill 本身就是优化信号。先用模块化减少上下文稀释，再用配对、分层和多次采样评估小效应；无法稳定超过噪声带的 edit，不应进入主干。
+      </div>
+    </section>
+
+    <section id="industry">
+      <div class="section-head"><span class="section-no">09</span><h2>业界洞察：从 Skill 包、评测框架到进化式 Agent</h2></div>
+      <p class="lead">
+        下面的公开案例不追求覆盖所有产品，而是提取与你五个痛点直接相关的机制：如何管理上下文、如何构造评测、如何用环境反馈进化、如何把 prompt 变成可编译系统。产品实现会持续变化，这里关注可迁移的架构模式。
+      </p>
+
+      <div class="grid">
+        <article class="card col-6">
+          <div class="pill case">案例 1</div>
+          <h3>Anthropic Agent Skills：渐进式披露的 Skill 包</h3>
+          <p>
+            Anthropic 的 Agent Skills 把能力组织成包含 <code>SKILL.md</code>、说明、脚本和资源的包。运行时不需要一开始加载所有内容，而是先看到精简元数据，需要时再读取正文或调用脚本。这正好回应“大 Skill 20k+ token”的问题。
+          </p>
+          <h4>可借鉴架构</h4>
+          <ul>
+            <li>Skill 是文件化、版本化资产，不是不可审计的聊天片段。</li>
+            <li>元数据、正文、脚本和资源分层加载，减少上下文稀释。</li>
+            <li>可执行脚本比长篇自然语言更稳定，适合承载检查和固定流程。</li>
+          </ul>
+          <div class="insight">启示：不要让 Skill 无限长。把“必须知道”放进入口卡，把“偶尔需要”放进资源，把“必须一致执行”放进脚本或门禁。</div>
+        </article>
+
+        <article class="card col-6">
+          <div class="pill case">案例 2</div>
+          <h3>SWE-agent / SWE-bench：接口与真实仓库评测</h3>
+          <p>
+            SWE-agent 研究了 Agent-Computer Interface 对表现的影响；SWE-bench 用真实 GitHub issue、仓库状态和测试验证模型能否产出可合并补丁。它们共同说明：编程 Agent 的能力很大程度由 Harness、工具接口和评测环境塑造。
+          </p>
+          <h4>可借鉴架构</h4>
+          <ul>
+            <li>工具输出要短、可定位、可比较，避免把整个文件塞给模型。</li>
+            <li>任务包绑定 repo commit、测试 patch 和通过/失败判据。</li>
+            <li>评测不只看最终文本，还要看能否通过真实仓库测试。</li>
+          </ul>
+          <div class="insight">启示：给编程 Agent 设计“可观察、可操作、可纠错”的界面；bad case 最终要落到可执行的任务包上。</div>
+        </article>
+      </div>
+
+      <div class="grid">
+        <article class="card col-6">
+          <div class="pill case">案例 3</div>
+          <h3>OpenAI Evals / LangSmith / Braintrust：评测基础设施化</h3>
+          <p>
+            OpenAI Evals 把模型和系统评测抽象成数据集、运行器与评分器；LangSmith、Braintrust、Langfuse 等平台把 trace、数据集、实验、人工标注和线上监控组合成闭环。它们的核心价值是让“改了一个 prompt 是否更好”变成可比较实验。
+          </p>
+          <h4>典型数据流</h4>
+          <ol>
+            <li>线上 trace 自动采样，生成候选数据集。</li>
+            <li>人工标注、批评模型和程序化判据共同打标。</li>
+            <li>候选版本在相同数据集和运行配置上重复实验。</li>
+            <li>实验结果带版本、指标和置信信息归档。</li>
+          </ol>
+          <div class="insight">启示：评测系统要和运行时同等对待，否则每轮 Skill 修改都会退化成主观判断。</div>
+        </article>
+
+        <article class="card col-6">
+          <div class="pill case">案例 4</div>
+          <h3>DSPy：把 Prompt 组合成可编译程序</h3>
+          <p>
+            DSPy 把 LLM 调用写成签名、模块和流水线，再根据指标自动优化 prompt、示例或配置。这改变了“手改一句话”的迭代方式：优化目标、数据、模块和指标成为一等公民。
+          </p>
+          <h4>可借鉴架构</h4>
+          <ul>
+            <li>声明式定义输入输出，而不是把所有规则硬编码进 prompt。</li>
+            <li>用统一 metric 编译或搜索流水线配置。</li>
+            <li>把 Skill 拆成可组合模块，避免单一巨型 prompt。</li>
+          </ul>
+          <div class="insight">启示：Skill 优化器应提交“模块级变更 + 预期指标 + 实验证据”，而不是一次性重写整个说明书。</div>
+        </article>
+      </div>
+
+      <div class="grid">
+        <article class="card col-6">
+          <div class="pill case">案例 5</div>
+          <h3>Voyager：环境反馈驱动的 Skill Library</h3>
+          <p>
+            Voyager 在 Minecraft 中通过自动课程、环境反馈、迭代提示和可执行技能代码构建终身学习 Agent。失败不是终点，而是下一轮课程和技能检索的输入。
+          </p>
+          <h4>闭环映射到 SDD</h4>
+          <ul>
+            <li>自动课程 → 从失败簇生成练习任务包。</li>
+            <li>环境反馈 → 编译、测试、运行和 review 结果。</li>
+            <li>技能库 → 可复用的脚本、检查表和流程模块。</li>
+            <li>检索 → 新任务根据语义找到相关 Skill。</li>
+          </ul>
+          <div class="insight">启示：Skill 库不只存成功经验，也要存失败模式和“何时不要使用”的反例。</div>
+        </article>
+
+        <article class="card col-6">
+          <div class="pill case">案例 6</div>
+          <h3>AlphaEvolve：可执行评价器驱动的进化搜索</h3>
+          <p>
+            DeepMind 的 AlphaEvolve 用 LLM 提出程序修改，用自动评价器筛选候选，并通过进化式数据库保留高质量方案。它的重点不是模型自由发挥，而是让可计算的评价函数约束搜索。
+          </p>
+          <h4>与 SDD Harness 的对应</h4>
+          <ul>
+            <li>变异候选 = Skill / prompt / workflow patch。</li>
+            <li>评价器 = 测试、lint、基准、成本、安全和人工规则。</li>
+            <li>种群管理 = 多个 challenger，而非只保留当前版本。</li>
+            <li>淘汰 = 无法超过噪声带或破坏护栏的变更。</li>
+          </ul>
+          <div class="insight">启示：进化式优化需要高质量评价器。评价器弱，进化只会快速找到刷分技巧。</div>
+        </article>
+      </div>
+
+      <figure>
+        <svg viewBox="0 0 1040 500" role="img" aria-label="业界机制整合图">
+          <rect x="55" y="60" width="270" height="110" rx="18" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="190" y="98" text-anchor="middle" class="svg-title">Skills 包</text>
+          <text x="190" y="122" text-anchor="middle" class="svg-small">元数据 + 正文 + 脚本</text>
+          <text x="190" y="145" text-anchor="middle" class="svg-small">渐进式披露</text>
+
+          <rect x="385" y="60" width="270" height="110" rx="18" fill="#ecfeff" stroke="#a5f3fc"/>
+          <text x="520" y="98" text-anchor="middle" class="svg-title">真实仓库评测</text>
+          <text x="520" y="122" text-anchor="middle" class="svg-small">repo state + tests + diff</text>
+          <text x="520" y="145" text-anchor="middle" class="svg-small">Agent-Computer Interface</text>
+
+          <rect x="715" y="60" width="270" height="110" rx="18" fill="#f0fdf4" stroke="#bbf7d0"/>
+          <text x="850" y="98" text-anchor="middle" class="svg-title">评测平台</text>
+          <text x="850" y="122" text-anchor="middle" class="svg-small">trace + dataset + experiment</text>
+          <text x="850" y="145" text-anchor="middle" class="svg-small">人工标注 + 线上监控</text>
+
+          <rect x="220" y="245" width="270" height="110" rx="18" fill="#ede9fe" stroke="#ddd6fe"/>
+          <text x="355" y="283" text-anchor="middle" class="svg-title">可编译流水线</text>
+          <text x="355" y="307" text-anchor="middle" class="svg-small">signature / module / metric</text>
+          <text x="355" y="330" text-anchor="middle" class="svg-small">自动优化 prompt 与配置</text>
+
+          <rect x="550" y="245" width="270" height="110" rx="18" fill="#fff7ed" stroke="#fed7aa"/>
+          <text x="685" y="283" text-anchor="middle" class="svg-title">环境反馈学习</text>
+          <text x="685" y="307" text-anchor="middle" class="svg-small">课程 + 技能库 + 检索</text>
+          <text x="685" y="330" text-anchor="middle" class="svg-small">失败也是资产</text>
+
+          <rect x="330" y="405" width="380" height="65" rx="18" fill="#111827"/>
+          <text x="520" y="432" text-anchor="middle" fill="white" class="svg-text">自进化 SDD Harness</text>
+          <text x="520" y="453" text-anchor="middle" fill="#cbd5e1" class="svg-small">版本化 Skill + 可执行门禁 + 灰度发布</text>
+
+          <path d="M190 170C250 220 310 235 330 245M520 170V245M850 170C790 220 730 235 685 245M490 300H550M440 355C480 390 500 395 520 405M600 355C570 385 550 395 540 405" stroke="#94a3b8" stroke-width="3" fill="none"/>
+        </svg>
+        <figcaption>图 9：这些公开体系分别解决了不同层的问题：Skill 上下文、真实任务评测、实验平台、自动优化和环境反馈。一个完整的 SDD 自进化系统需要把五类机制组合起来，而不是照抄单点。</figcaption>
+      </figure>
+
+    </section>
+
+    <section id="roadmap">
+      <div class="section-head"><span class="section-no">10</span><h2>落地路线：90 天把自进化做成工程系统</h2></div>
+      <p class="lead">
+        不建议第一步就让 LLM 大规模重写 Skill。更稳的路径是先让 Harness 变成可测量系统，再逐步开放自动生成、自动评测和自动发布。
+      </p>
+
+      <div class="grid">
+        <article class="card col-4">
+          <div class="pill">0-30 天</div>
+          <h3>先建立证据链</h3>
+          <ul>
+            <li>定义 Run Envelope：模型、Skill、Prompt、工具、依赖、门禁版本。</li>
+            <li>把工具调用、命令、测试、审批、用户动作 Span 化。</li>
+            <li>接入硬失败和用户回滚 / 大幅修改 diff 信号。</li>
+            <li>选出 20-50 个代表性任务，建立小回归集。</li>
+            <li>测量当前版本的噪声带，不急着改 Skill。</li>
+          </ul>
+        </article>
+        <article class="card col-4">
+          <div class="pill">31-60 天</div>
+          <h3>把 bad case 变成资产</h3>
+          <ul>
+            <li>按失败签名、模块、任务族和用户动作聚类。</li>
+            <li>加入 LLM Critic、风险分和人工抽检队列。</li>
+            <li>为高频失败生成最小 repo fixture 和反例。</li>
+            <li>把可静态化的问题转成 lint/test/gate。</li>
+            <li>为每个高频 Skill 写 Contract 和分层评测。</li>
+          </ul>
+        </article>
+        <article class="card col-4">
+          <div class="pill">61-90 天</div>
+          <h3>开放受控自进化</h3>
+          <ul>
+            <li>建立候选 patch、实验记录、指标和版本说明。</li>
+            <li>支持 old / new / off 的反事实 Harness 实验。</li>
+            <li>引入 Train / Dev / Frozen Test / Out-of-Time 分层。</li>
+            <li>上线 shadow、小流量灰度、自动回滚。</li>
+            <li>保留 Champion-Challenger 长期比较。</li>
+          </ul>
+        </article>
+      </div>
+
+      <h3>推荐的最小技术栈</h3>
+      <table>
+        <tr><th>层</th><th>能力</th><th>可选用型 / 实现</th></tr>
+        <tr><td>观测</td><td>Span、trace、指标、日志、版本标签</td><td>OpenTelemetry 风格事件模型，或 LangSmith / Langfuse / Braintrust</td></tr>
+        <tr><td>证据库</td><td>轨迹、快照、diff、测试、反馈、标注</td><td>对象存储 + 版本化数据库 + 内容哈希</td></tr>
+        <tr><td>任务包</td><td>repo fixture、断言、输入输出、反例、预算</td><td>Git repo 模板 + Docker/容器 + 测试 runner</td></tr>
+        <tr><td>实验</td><td>多版本运行、配对比较、指标汇总</td><td>CI job + experiment registry + 统计报告</td></tr>
+        <tr><td>发布</td><td>shadow、canary、护栏、回滚</td><td>feature flag + skill registry + release controller</td></tr>
+        <tr><td>优化器</td><td>生成候选 Skill / Prompt / Gate patch</td><td>LLM proposer + critic + 人工审批</td></tr>
+      </table>
+
+      <h3>反模式清单</h3>
+      <div class="matrix">
+        <div><b>只存聊天记录</b><small>缺少版本、环境和工具状态，无法归因。</small></div>
+        <div><b>只看测试是否变绿</b><small>会漏掉需求偏差、过度工程、安全与维护性问题。</small></div>
+        <div><b>让模型直接重写大 Skill</b><small>改动面不可控，回归和冲突难以定位。</small></div>
+        <div><b>同一验证集反复选版本</b><small>分数持续虚高，线上表现下滑。</small></div>
+      </div>
+
+      <div class="matrix">
+        <div><b>用单次成功下结论</b><small>模型随机性会把噪声误判成收益。</small></div>
+        <div><b>只优化 LLM 裁判分数</b><small>容易刷解释、格式和表面质量。</small></div>
+        <div><b>所有 Skill 无条件常驻上下文</b><small>重要指令被稀释，成本和冲突上升。</small></div>
+        <div><b>发布后不观察长期影响</b><small>后续 hotfix、回滚和用户信任变化才是真实代价。</small></div>
+      </div>
+
+      <div class="takeaway">
+        <strong>最终判断：</strong>SDD Harness 的护城河不是某条神奇 prompt，而是“真实轨迹 → 可检验任务包 → 因果归因 → 系统级实验 → 受控发布 → 长期监控”的复利系统。模型负责提出假设，工程系统负责让正确假设留下来。
+      </div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><span class="section-no">11</span><h2>公开来源与延伸阅读</h2></div>
+      <p class="lead">
+        以下链接用于说明公开架构和论文机制，不构成对任何产品内部实现或效果的声明。
+      </p>
+      <div class="source-list">
+        <div class="source">
+          <b><a href="https://docs.anthropic.com/en/docs/agents-and-tools/agent-skills/overview" target="_blank" rel="noopener">Anthropic Agent Skills Overview</a></b>
+          <span>Skill 包、说明文件、资源和渐进式披露模式。</span>
+        </div>
+        <div class="source">
+          <b><a href="https://github.com/SWE-agent/SWE-agent" target="_blank" rel="noopener">SWE-agent</a></b>
+          <span>Agent-Computer Interface 与软件工程任务中的 Harness 设计。</span>
+        </div>
+        <div class="source">
+          <b><a href="https://www.swebench.com/" target="_blank" rel="noopener">SWE-bench</a></b>
+          <span>基于真实仓库 issue、测试和补丁的软件工程基准。</span>
+        </div>
+        <div class="source">
+          <b><a href="https://github.com/openai/evals" target="_blank" rel="noopener">OpenAI Evals</a></b>
+          <span>数据集、运行器和评分器组成的模型/系统评测框架。</span>
+        </div>
+        <div class="source">
+          <b><a href="https://dspy.ai/" target="_blank" rel="noopener">DSPy</a></b>
+          <span>声明式 LLM 流水线与基于指标的 prompt / pipeline 优化。</span>
+        </div>
+        <div class="source">
+          <b><a href="https://arxiv.org/abs/2305.16291" target="_blank" rel="noopener">Voyager</a></b>
+          <span>自动课程、环境反馈和技能库的终身学习 Agent。</span>
+        </div>
+        <div class="source">
+          <b><a href="https://deepmind.google/discover/blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/" target="_blank" rel="noopener">AlphaEvolve</a></b>
+          <span>LLM 提议程序修改、可执行评价器筛选候选的进化式搜索。</span>
+        </div>
+        <div class="source">
+          <b><a href="https://docs.smith.langchain.com/" target="_blank" rel="noopener">LangSmith</a></b>
+          <span>Trace、数据集、实验、评估和监控的 LLM 工程平台。</span>
+        </div>
+        <div class="source">
+          <b><a href="https://www.braintrust.dev/docs" target="_blank" rel="noopener">Braintrust Docs</a></b>
+          <span>Prompt/Agent 评测、数据集、实验和线上观测模式。</span>
+        </div>
+        <div class="source">
+          <b><a href="https://opentelemetry.io/docs/concepts/signals/traces/" target="_blank" rel="noopener">OpenTelemetry Traces</a></b>
+          <span>Span、因果链和分布式追踪的通用观测模型。</span>
+        </div>
+      </div>
+      <div class="warn">
+        <strong>检索限制说明：</strong>本次生成环境中外网访问不可用，无法实时抓取页面快照。报告中的公开案例和链接基于模型已知资料整理；采用前请以最新官方文档为准，尤其是 API 名称、产品边界和基准分数。
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    生成日期：2026-10-13 · 本报告聚焦方法论与公开架构模式，不声称复现任何产品内部数据。
+  </footer>
+
+  <script>
+    const links = [...document.querySelectorAll('#nav a')];
+    links.forEach(link => link.addEventListener('click', () => {
+      links.forEach(item => item.classList.remove('active'));
+      link.classList.add('active');
+    }));
+  </script>
+</body>
+</html>

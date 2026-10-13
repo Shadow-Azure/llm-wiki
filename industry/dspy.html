@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Case 04 · DSPy</title>
+  <link rel="stylesheet" href="case-common.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <a class="back" href="index.html">← 返回案例库</a>
+      <div class="tag">Case 04 · Programming, Not Prompting</div>
+      <h1>DSPy</h1>
+      <p>DSPy 把 LLM 应用写成“签名 + 模块 + 指标 + 优化器”的声明式程序。开发者描述输入输出和成功标准，优化器在数据上搜索更好的 prompt、示例和配置。它的口号可以通俗理解成：不要手搓咒语，要编译程序。</p>
+      <div class="hero-meta">
+        <span>关键词：Signature</span><span>Module</span><span>Metric</span><span>Optimizer</span><span>Pipeline Compile</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="problem">
+      <div class="section-head"><span class="no">01</span><h2>它想解决什么问题</h2></div>
+      <p class="lead">传统 prompt 工程有很多隐性知识：语气、格式、few-shot 示例、思维链、输出 schema、重试策略都混在一大段文本里。一旦任务、模型或上下文变化，就要重新调一遍。</p>
+      <div class="grid">
+        <article class="card col-4"><div class="pill">问题 1</div><h3>Prompt 脆弱</h3><p>换一个模型、换一个措辞，甚至换示例顺序，结果都会变化。</p></article>
+        <article class="card col-4"><div class="pill">问题 2</div><h3>流水线耦合</h3><p>检索、推理、总结、评分各自都有 prompt。改上游格式，下游就崩。</p></article>
+        <article class="card col-4"><div class="pill">问题 3</div><h3>优化缺目标</h3><p>团队经常说“回答更好一点”，却没有机器可执行的 metric。</p></article>
+        <article class="card col-4"><div class="pill">问题 4</div><h3>示例选择靠感觉</h3><p>few-shot 常用三个漂亮例子，但不代表任务分布，也不一定适合新模型。</p></article>
+        <article class="card col-4"><div class="pill">问题 5</div><h3>手工搜索太贵</h3><p>模板、指令、示例、模型参数组合太多，人不可能枚举。</p></article>
+        <article class="card col-4"><div class="pill">问题 6</div><h3>复现和迁移难</h3><p>prompt 在聊天里被反复改，最后没有人知道哪个版本对应哪个分数。</p></article>
+      </div>
+      <div class="note"><strong>核心思想：</strong>把“怎么向模型表达”和“任务成功是什么”分开。程序定义结构，指标定义目标，优化器负责搜索表达方式。</div>
+    </section>
+
+    <section id="mechanism">
+      <div class="section-head"><span class="no">02</span><h2>它是怎么解决的</h2></div>
+      <p class="lead">DSPy 的关键不是某个神奇 prompt，而是把 LLM 调用变成可编译系统。下面是一条典型的优化链路。</p>
+      <figure>
+        <svg viewBox="0 0 1040 420" role="img" aria-label="DSPy 编译流程">
+          <rect x="50" y="60" width="210" height="100" rx="16" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="155" y="99" text-anchor="middle" class="st">Signature</text>
+          <text x="155" y="124" text-anchor="middle" class="ss">声明输入 / 输出</text>
+          <text x="155" y="144" text-anchor="middle" class="ss">如 question -> answer</text>
+
+          <rect x="325" y="60" width="210" height="100" rx="16" fill="#ecfeff" stroke="#a5f3fc"/>
+          <text x="430" y="99" text-anchor="middle" class="st">Module</text>
+          <text x="430" y="124" text-anchor="middle" class="ss">检索 / 推理 / 总结</text>
+          <text x="430" y="144" text-anchor="middle" class="ss">组合成 pipeline</text>
+
+          <rect x="600" y="60" width="210" height="100" rx="16" fill="#fff7ed" stroke="#fed7aa"/>
+          <text x="705" y="99" text-anchor="middle" class="st">Metric</text>
+          <text x="705" y="124" text-anchor="middle" class="ss">正确性 / 引用 / 格式</text>
+          <text x="705" y="144" text-anchor="middle" class="ss">机器可判定</text>
+
+          <rect x="865" y="60" width="135" height="100" rx="16" fill="#f0fdf4" stroke="#bbf7d0"/>
+          <text x="932" y="99" text-anchor="middle" class="st">Data</text>
+          <text x="932" y="124" text-anchor="middle" class="ss">train / dev</text>
+          <text x="932" y="144" text-anchor="middle" class="ss">有标注样本</text>
+
+          <rect x="300" y="235" width="440" height="115" rx="18" fill="#ede9fe" stroke="#ddd6fe"/>
+          <text x="520" y="274" text-anchor="middle" class="st">Optimizer / Compiler</text>
+          <text x="520" y="300" text-anchor="middle" class="ss">生成指令、筛选 few-shot、评估候选配置</text>
+          <text x="520" y="324" text-anchor="middle" class="ss">把程序编译成更稳定的 prompt pipeline</text>
+
+          <rect x="80" y="250" width="170" height="85" rx="16" fill="#f8fafc" stroke="#cbd5e1"/>
+          <text x="165" y="286" text-anchor="middle" class="st">Compiled Program</text>
+          <text x="165" y="311" text-anchor="middle" class="ss">可版本化 / 可评测</text>
+
+          <path d="M260 110H325M535 110H600M810 110H865M865 125C760 195 600 235 620 235M705 160C670 195 600 225 560 235" stroke="#64748b" stroke-width="3" fill="none"/>
+          <path d="M300 292H250" stroke="#64748b" stroke-width="3"/>
+        </svg>
+        <figcaption>图 1：DSPy 先声明任务结构，再用数据和指标评估候选实现，最后输出一个可版本化的编译后程序。</figcaption>
+      </figure>
+
+      <h3>核心抽象</h3>
+      <table>
+        <tr><th>抽象</th><th>通俗解释</th><th>例子</th></tr>
+        <tr><td>Signature</td><td>声明一个 LLM 步骤的输入输出和语义，而不是写死全文 prompt。</td><td><code>question, context -> answer, citations</code></td></tr>
+        <tr><td>Module</td><td>可组合的流水线组件。</td><td>检索器、生成器、总结器、评分器。</td></tr>
+        <tr><td>Metric</td><td>判断一次输出是否成功的函数。</td><td>答案匹配、引用存在、JSON 合法、裁决模型评分。</td></tr>
+        <tr><td>Optimizer</td><td>根据指标在候选配置中搜索。</td><td>筛选有效 few-shot、改写指令、优化模块配置。</td></tr>
+        <tr><td>Compiled Artifact</td><td>优化后的程序和提示配置。</td><td>带版本号的 pipeline，而不是散落聊天记录的 prompt。</td></tr>
+      </table>
+      <div class="note"><strong>与普通 prompt 模板的区别：</strong>模板只是静态文本；DSPy 把静态文本当成可搜索参数，并且用任务指标决定保留哪个版本。</div>
+    </section>
+
+    <section id="example">
+      <div class="section-head"><span class="no">03</span><h2>示例：构建多跳问答助手</h2></div>
+      <p class="lead">用户问：“A 公司 2024 年收购的 B 公司，其创始人后来创办了什么公司？”这需要先查收购，再查创始人，再查新公司。单轮 prompt 很容易漏步骤。</p>
+      <div class="timeline">
+        <div class="step"><h4>第 1 步：定义签名</h4><p>第一个模块声明：<code>question -> search_query</code>。第二个模块声明：<code>question, context -> answer, evidence</code>。程序不关心最终 prompt 具体怎么写。</p></div>
+        <div class="step"><h4>第 2 步：组合模块</h4><p>Pipeline 是：生成检索词 -> 调用搜索 -> 合并片段 -> 生成答案。每一步都是独立模块，可以单独替换。</p></div>
+        <div class="step"><h4>第 3 步：准备小数据集</h4><p>准备 100 道多跳问题。训练集 60 道，验证集 20 道，测试集 20 道长期冻结。每题有标准答案和支持文档。</p></div>
+        <div class="step"><h4>第 4 步：定义指标</h4><p>答案正确得 1 分；缺少证据扣 0.4；引用文档不支持答案得 0；格式非法直接失败。指标不只是“文字相似”。</p></div>
+        <div class="step"><h4>第 5 步：先跑 baseline</h4><p>未优化程序在验证集得分 52%。失败模式包括：只查 A 公司、忽略创始人、编造公司名、没有引用。</p></div>
+        <div class="step"><h4>第 6 步：优化器筛选示例</h4><p>优化器在训练集上运行程序，保留通过指标的轨迹，把它们转成 few-shot 示例。例如展示“先查收购，再查创始人，再查新公司”的完整推理。</p></div>
+        <div class="step"><h4>第 7 步：编译并验证</h4><p>优化后的 pipeline 在验证集从 52% 到 68%。再在冻结测试集评估，得到 65%。团队记录模型、数据版本、优化器参数和 metric。</p></div>
+        <div class="step"><h4>第 8 步：失败归因</h4><p>剩余失败里，40% 是检索没有第二跳，30% 是证据不支持答案。下一步不是继续改 prompt，而是改进检索和证据校验。</p></div>
+      </div>
+      <div class="good"><strong>效果：</strong>模型从“一次性回答”变成结构化流程；优化器用可执行指标选择更有效的指令和示例；版本变化有实验记录。</div>
+    </section>
+
+    <section id="risks">
+      <div class="section-head"><span class="no">04</span><h2>实际会遇到的问题与处理方式</h2></div>
+      <table>
+        <tr><th>阶段</th><th>问题</th><th>表现</th><th>处理方式</th></tr>
+        <tr><td>指标</td><td>metric 可被刷分</td><td>模型输出很长但答案含糊。</td><td>加入正确性、证据、格式、简洁度多个判据。</td></tr>
+        <tr><td>指标</td><td>exact match 太苛刻</td><td>语义相同但措辞不同被判失败。</td><td>硬答案 + alias + LLM judge + 人工仲裁。</td></tr>
+        <tr><td>数据</td><td>训练集太小</td><td>few-shot 示例不代表分布。</td><td>分层采样，覆盖难例、边界例和负例。</td></tr>
+        <tr><td>数据</td><td>验证集被反复使用</td><td>分数持续虚高。</td><td>分开 dev/test；限制访问次数；保留冻结集。</td></tr>
+        <tr><td>优化</td><td>成本过高</td><td>每个候选都在全量集上跑。</td><td>先小集筛选，再Top候选全量评估。</td></tr>
+        <tr><td>优化</td><td>过拟合 few-shot</td><td>训练题好，新题差。</td><td>保持示例多样性，测试分布外问题。</td></tr>
+        <tr><td>流水线</td><td>上游格式漂移</td><td>检索 JSON 变了，答案模块崩。</td><td>签名 + schema 校验 + 失败重试。</td></tr>
+        <tr><td>复现</td><td>外部检索变化</td><td>同一程序分数波动。</td><td>评测时缓存检索结果；线上再测真实检索。</td></tr>
+      </table>
+      <div class="warn"><strong>不要误用：</strong>DSPy 不能把坏 metric 变成好系统。如果指标只看关键词命中，优化器会学会堆关键词，而不是学会多跳推理。</div>
+    </section>
+
+    <section id="lessons">
+      <div class="section-head"><span class="no">05</span><h2>对 SDD Harness 的启示</h2></div>
+      <div class="grid">
+        <article class="card col-4"><div class="pill green">启示 1</div><h3>Skill 要有接口</h3><p>每个 Skill 步骤声明输入输出，方便组合、替换和回归。</p></article>
+        <article class="card col-4"><div class="pill green">启示 2</div><h3>优化要有 metric</h3><p>先定义“什么算修好、什么算好的计划”，再让模型搜索表达方式。</p></article>
+        <article class="card col-4"><div class="pill green">启示 3</div><h3>小步编译</h3><p>不要一次重写 Skill；把指令、示例、流程和门禁当成可搜索参数。</p></article>
+      </div>
+      <div class="note"><strong>落地模板：</strong>为 Skill 写 signature、最小数据集、metric、baseline 报告、优化候选和冻结测试。每次优化后记录“哪个模块变了、为什么、代价是什么”。</div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><span class="no">06</span><h2>公开来源</h2></div>
+      <div class="sources">
+        <div class="source"><b><a href="https://dspy.ai/" target="_blank" rel="noopener">DSPy Official Docs</a></b><span>Signatures、Modules、Metrics、Optimizers 的官方说明。</span></div>
+        <div class="source"><b><a href="https://arxiv.org/abs/2310.03714" target="_blank" rel="noopener">DSPy Paper</a></b><span>把声明式 LLM 调用编译为流水线的论文。</span></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

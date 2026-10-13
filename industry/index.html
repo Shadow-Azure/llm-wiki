@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>业界先进案例详解库：SDD Harness 自进化</title>
+  <style>
+    :root { --ink:#172033; --muted:#5f6b7d; --line:#e4e8f0; --bg:#f5f7fb; --blue:#2563eb; }
+    * { box-sizing: border-box; }
+    body { margin:0; color:var(--ink); background:var(--bg); font-family:Inter,"PingFang SC","Microsoft YaHei",sans-serif; line-height:1.7; }
+    header { color:white; padding:54px 28px; background:linear-gradient(120deg,#111827,#1e3a8a,#312e81); }
+    .inner { max-width:1080px; margin:auto; }
+    h1 { font-size:clamp(31px,5vw,50px); margin:14px 0 12px; letter-spacing:-1px; }
+    p { color:#3a4757; }
+    .tag { display:inline-block; border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.10); color:white; padding:6px 13px; border-radius:999px; font-size:13px; }
+    .lead { color:rgba(255,255,255,.85); font-size:17px; max-width:850px; }
+    main { max-width:1080px; margin:auto; padding:44px 28px 80px; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+    a.card { display:block; text-decoration:none; color:inherit; background:white; border:1px solid var(--line); border-radius:18px; padding:24px; box-shadow:0 10px 30px rgba(23,32,51,.07); transition:.18s ease; }
+    a.card:hover { transform:translateY(-3px); box-shadow:0 16px 36px rgba(23,32,51,.12); }
+    .num { color:var(--blue); font-weight:800; font-size:13px; }
+    h2 { margin:8px 0 8px; font-size:23px; line-height:1.3; }
+    .desc { color:var(--muted); font-size:15px; }
+    .links { margin-top:18px; font-size:13px; color:#2563eb; font-weight:700; }
+    .note { margin-top:28px; border-left:5px solid var(--blue); background:#eff6ff; border-radius:0 14px 14px 0; padding:18px 20px; color:#17427a; }
+    footer { max-width:1080px; margin:auto; padding:0 28px 70px; color:var(--muted); font-size:13px; }
+    @media(max-width:760px){ .grid{grid-template-columns:1fr;} header,main,footer{padding-left:18px;padding-right:18px;} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="inner">
+      <div class="tag">Industry Case Library</div>
+      <h1>6 组业界先进方案详解</h1>
+      <p class="lead">每份报告都按同一结构展开：先讲它要解决的问题，再讲解决机制，然后用一个完整例子走流程，最后列出实际会遇到的问题和处理办法。</p>
+    </div>
+  </header>
+  <main>
+    <div class="grid">
+      <a class="card" href="anthropic-agent-skills.html">
+        <div class="num">CASE 01</div>
+        <h2>Anthropic Agent Skills</h2>
+        <p class="desc">把专家能力包装成可版本化、可按需加载、可执行验证的 Skill 包。</p>
+        <div class="links">打开详解 →</div>
+      </a>
+      <a class="card" href="swe-agent-and-swe-bench.html">
+        <div class="num">CASE 02</div>
+        <h2>SWE-agent 与 SWE-bench</h2>
+        <p class="desc">一套关注 Agent-Computer Interface，一套关注真实仓库级评测基准。</p>
+        <div class="links">打开详解 →</div>
+      </a>
+      <a class="card" href="eval-platforms-openai-langsmith-braintrust.html">
+        <div class="num">CASE 03</div>
+        <h2>OpenAI Evals · LangSmith · Braintrust</h2>
+        <p class="desc">把 prompt 与 Agent 的“感觉更好”变成数据集、评分器、实验和线上监控。</p>
+        <div class="links">打开详解 →</div>
+      </a>
+      <a class="card" href="dspy.html">
+        <div class="num">CASE 04</div>
+        <h2>DSPy</h2>
+        <p class="desc">把 LLM 流水线写成声明式程序，用指标和优化器编译 prompt 与示例。</p>
+        <div class="links">打开详解 →</div>
+      </a>
+      <a class="card" href="voyager.html">
+        <div class="num">CASE 05</div>
+        <h2>Voyager</h2>
+        <p class="desc">用自动课程、环境反馈和技能库，把探索结果沉淀为可复用程序化技能。</p>
+        <div class="links">打开详解 →</div>
+      </a>
+      <a class="card" href="alphaevolve.html">
+        <div class="num">CASE 06</div>
+        <h2>AlphaEvolve</h2>
+        <p class="desc">用 LLM 提出程序变异，用可执行评价器驱动进化搜索和优胜劣汰。</p>
+        <div class="links">打开详解 →</div>
+      </a>
+    </div>
+    <div class="note">
+      <strong>阅读方式：</strong>如果你只关心 SDD Harness 的 Skill 资产化，先看 01；如果关心真实工程评测，看 02；如果关心平台化实验，看 03；如果关心自动优化，看 04-06。
+    </div>
+  </main>
+  <footer>生成日期：2026-10-13 · 所有页面聚焦公开架构模式与可迁移方法论，不声称复现任何产品内部数据。</footer>
+</body>
+</html>

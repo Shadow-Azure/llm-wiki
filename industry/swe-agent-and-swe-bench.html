@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Case 02 · SWE-agent 与 SWE-bench</title>
+  <link rel="stylesheet" href="case-common.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <a class="back" href="index.html">← 返回案例库</a>
+      <div class="tag">Case 02 · Coding Agent & Benchmark</div>
+      <h1>SWE-agent 与 SWE-bench</h1>
+      <p>SWE-agent 研究“Agent 如何使用计算机”，SWE-bench 研究“如何证明 Agent 真的修好了真实仓库”。它们共同说明：编程 Agent 的能力不只是模型能力，还是接口、环境和评测设计能力。</p>
+      <div class="hero-meta">
+        <span>关键词：Agent-Computer Interface</span><span>真实仓库</span><span>测试驱动</span><span>可复现基准</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="problem">
+      <div class="section-head"><span class="no">01</span><h2>它们共同面对的问题</h2></div>
+      <p class="lead">软件工程任务不像单轮问答。Agent 必须在大量文件中定位问题、理解隐含约束、修改代码、运行测试，并证明没有破坏旧功能。传统 prompt 评测很难衡量这件事。</p>
+      <div class="grid">
+        <article class="card col-4"><div class="pill">问题 1</div><h3>仓库太大</h3><p>Agent 不可能一开始读完整个仓库，必须依靠搜索、导航和局部阅读。</p></article>
+        <article class="card col-4"><div class="pill">问题 2</div><h3>终端反馈太吵</h3><p>原始 shell 输出冗长且不稳定，模型容易把上下文浪费在无关日志上。</p></article>
+        <article class="card col-4"><div class="pill">问题 3</div><h3>编辑易错</h3><p>大段重写容易破坏缩进、类型和接口，Agent 需要更可控的编辑动作。</p></article>
+        <article class="card col-4"><div class="pill">问题 4</div><h3> toy task 不可靠</h3><p>LeetCode 式任务不能代表真实工程；真实仓库有历史债、兼容性和隐含规范。</p></article>
+        <article class="card col-4"><div class="pill">问题 5</div><h3>结果不可复现</h3><p>依赖版本、环境变量、测试顺序不同，同一 patch 可能结果不同。</p></article>
+        <article class="card col-4"><div class="pill">问题 6</div><h3>只看“答案像”不够</h3><p>必须运行测试，验证新 bug 被修复且旧功能没有被破坏。</p></article>
+      </div>
+    </section>
+
+    <section id="swe-agent">
+      <div class="section-head"><span class="no">02</span><h2>SWE-agent：为 Agent 设计计算机接口</h2></div>
+      <p class="lead">SWE-agent 的核心概念是 <strong>Agent-Computer Interface（ACI）</strong>。它不把模型直接丢给裸 shell，而是设计一组更适合 LLM 的搜索、查看、编辑、测试动作。</p>
+      <figure>
+        <svg viewBox="0 0 1040 380" role="img" aria-label="SWE-agent ACI 循环">
+          <rect x="55" y="65" width="200" height="100" rx="16" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="155" y="104" text-anchor="middle" class="st">Issue / Goal</text>
+          <text x="155" y="129" text-anchor="middle" class="ss">bug 报告、复现步骤</text>
+
+          <rect x="330" y="65" width="220" height="100" rx="16" fill="#ecfeff" stroke="#a5f3fc"/>
+          <text x="440" y="104" text-anchor="middle" class="st">ACI 动作</text>
+          <text x="440" y="129" text-anchor="middle" class="ss">search / view / edit / test</text>
+          <text x="440" y="149" text-anchor="middle" class="ss">紧凑反馈</text>
+
+          <rect x="625" y="65" width="200" height="100" rx="16" fill="#f0fdf4" stroke="#bbf7d0"/>
+          <text x="725" y="104" text-anchor="middle" class="st">Repository State</text>
+          <text x="725" y="129" text-anchor="middle" class="ss">文件、patch、日志</text>
+
+          <rect x="330" y="235" width="220" height="100" rx="16" fill="#fff7ed" stroke="#fed7aa"/>
+          <text x="440" y="274" text-anchor="middle" class="st">Feedback</text>
+          <text x="440" y="299" text-anchor="middle" class="ss">错误、lint、测试结果</text>
+
+          <rect x="625" y="235" width="200" height="100" rx="16" fill="#ede9fe" stroke="#ddd6fe"/>
+          <text x="725" y="274" text-anchor="middle" class="st">Patch / Submission</text>
+          <text x="725" y="299" text-anchor="middle" class="ss">可应用代码变更</text>
+
+          <path d="M255 115H330M550 115H625M725 165V235M625 285H550M330 285C205 270 155 225 155 165" stroke="#64748b" stroke-width="3" fill="none"/>
+        </svg>
+        <figcaption>图 1：SWE-agent 把模型放在一个受控的编辑-观察-修复循环里，反馈被压缩成下一步可行动的信息。</figcaption>
+      </figure>
+
+      <h3>关键机制</h3>
+      <table>
+        <tr><th>机制</th><th>解决什么</th><th>通俗类比</th></tr>
+        <tr><td>受限动作空间</td><td>防止模型在几百个任意 shell 命令里漂移。</td><td>给新员工一套标准工位和工具，而不是只给机房管理员密码。</td></tr>
+        <tr><td>搜索与定位</td><td>快速缩小文件和函数范围。</td><td>先查目录，再翻相关章节，而不是从第一页读到最后一页。</td></tr>
+        <tr><td>受控查看</td><td>控制单次读到的代码量，保留窗口和位置感。</td><td>按屏幕翻代码，而不是把整本源码塞进脑子。</td></tr>
+        <tr><td>结构化编辑</td><td>减少大段重写造成的格式和边界错误。</td><td>用编辑器改函数，而不是口述整份文件。</td></tr>
+        <tr><td>短反馈循环</td><td>让模型尽快知道编辑是否有效。</td><td>改一行就编译，而不是改十页再检查。</td></tr>
+      </table>
+
+      <h3>示例流程：修复除零崩溃</h3>
+      <div class="timeline">
+        <div class="step"><h4>第 1 步：理解 issue</h4><p>Agent 读到：“当订单数量为 0 时，<code>/orders/calculate</code> 返回 500。”它先提取关键字：<code>orders</code>、<code>calculate</code>、<code>ZeroDivisionError</code>。</p></div>
+        <div class="step"><h4>第 2 步：搜索代码</h4><p>搜索 <code>def calculate</code> 和 <code>order_quantity</code>，而不是读全部文件。得到三个候选位置。</p></div>
+        <div class="step"><h4>第 3 步：局部查看</h4><p>打开相关函数附近的代码窗口，确认除法发生在价格计算里，并发现调用方已假设数量大于 0。</p></div>
+        <div class="step"><h4>第 4 步：先写复现测试</h4><p>新增测试：<code>quantity=0</code> 应返回 400，而不是 500。测试先失败，证明问题可复现。</p></div>
+        <div class="step"><h4>第 5 步：最小修改</h4><p>在除法前校验数量，抛出领域异常；不改无关格式，不重构整个模块。</p></div>
+        <div class="step"><h4>第 6 步：运行目标测试</h4><p>先跑新增测试和相关模块测试。失败信息显示另一个入口也调用了该函数，Agent 补充调用方处理。</p></div>
+        <div class="step"><h4>第 7 步：跑全量或相关回归</h4><p>确认旧测试通过，生成 patch：实现修复 + 两个测试 + 一行 changelog。</p></div>
+      </div>
+      <div class="good"><strong>ACI 的价值：</strong>每一步反馈都能直接导向下一步动作，避免模型陷入“读了很多文件但不知道该改哪里”的状态。</div>
+    </section>
+
+    <section id="swe-bench">
+      <div class="section-head"><span class="no">03</span><h2>SWE-bench：真实仓库级评测</h2></div>
+      <p class="lead">SWE-bench 从真实 GitHub issue 和修复 PR 构造任务。它关心的不是“答案文本相似”，而是 Agent 产出的 patch 能否让该 issue 的修复测试通过，同时保持已有测试通过。</p>
+      <figure>
+        <svg viewBox="0 0 1040 420" role="img" aria-label="SWE-bench 评测结构">
+          <rect x="55" y="60" width="270" height="105" rx="16" fill="#eff6ff" stroke="#bfdbfe"/>
+          <text x="190" y="99" text-anchor="middle" class="st">Repository Base Commit</text>
+          <text x="190" y="124" text-anchor="middle" class="ss">bug 发生时的代码版本</text>
+          <text x="190" y="145" text-anchor="middle" class="ss">锁定依赖与环境</text>
+
+          <rect x="390" y="60" width="270" height="105" rx="16" fill="#ecfeff" stroke="#a5f3fc"/>
+          <text x="525" y="99" text-anchor="middle" class="st">Issue + Patch Task</text>
+          <text x="525" y="124" text-anchor="middle" class="ss">给 Agent issue，不给修复 PR</text>
+          <text x="525" y="145" text-anchor="middle" class="ss">Agent 产出 patch</text>
+
+          <rect x="725" y="60" width="260" height="105" rx="16" fill="#ede9fe" stroke="#ddd6fe"/>
+          <text x="855" y="99" text-anchor="middle" class="st">Test Specification</text>
+          <text x="855" y="124" text-anchor="middle" class="ss">Fail-to-Pass tests</text>
+          <text x="855" y="145" text-anchor="middle" class="ss">Pass-to-Pass tests</text>
+
+          <rect x="250" y="245" width="540" height="110" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
+          <text x="520" y="284" text-anchor="middle" class="st">受控环境执行</text>
+          <text x="520" y="310" text-anchor="middle" class="ss">应用 patch → 安装依赖 → 运行指定测试 → 记录日志</text>
+          <text x="520" y="334" text-anchor="middle" class="ss">判定：新测试由失败变通过，旧测试保持通过</text>
+
+          <path d="M325 112H390M660 112H725M525 165V245M855 165C800 215 650 245 620 252M190 165C230 215 340 245 390 255" stroke="#64748b" stroke-width="3" fill="none"/>
+        </svg>
+        <figcaption>图 2：SWE-bench 用锁定环境、原始 issue、修复测试和回归测试，把“模型说修好了”变成“测试证明修好了”。</figcaption>
+      </figure>
+
+      <h3>示例：评测一个 Django ORM bug</h3>
+      <div class="timeline">
+        <div class="step"><h4>第 1 步：构造任务</h4><p>取某个 bug 报告对应的仓库 commit，保存该 PR 中新增或修改的测试作为判据。Agent 只收到 issue 描述和仓库状态。</p></div>
+        <div class="step"><h4>第 2 步：建立环境</h4><p>在受控容器中安装锁定依赖，运行预先记录的命令，确认评测环境能复现测试结果。</p></div>
+        <div class="step"><h4>第 3 步：Agent 修 bug</h4><p>Agent 搜索 ORM 查询路径，修改表达式编译逻辑，并生成 patch。它不知道官方 PR 怎么写。</p></div>
+        <div class="step"><h4>第 4 步：应用 patch</h4><p>评测器检查 patch 能否干净应用。若冲突或为空，直接标记失败并保存日志。</p></div>
+        <div class="step"><h4>第 5 步：执行测试</h4><p>先跑 issue 相关测试，再跑一组旧测试。目标是相关测试由失败变通过，旧测试不能由通过变失败。</p></div>
+        <div class="step"><h4>第 6 步：生成证据</h4><p>输出 patch、测试 stdout/stderr、退出码、通过/失败列表和耗时。分数不再是主观判断。</p></div>
+      </div>
+      <div class="note"><strong>重要区别：</strong>SWE-agent 是让 Agent 更会做工程的方法；SWE-bench 是证明结果是否可靠的基准。前者优化过程，后者约束结论。</div>
+    </section>
+
+    <section id="risks">
+      <div class="section-head"><span class="no">04</span><h2>实际会遇到的问题与处理方式</h2></div>
+      <table>
+        <tr><th>阶段</th><th>问题</th><th>表现</th><th>处理方式</th></tr>
+        <tr><td>定位</td><td>搜索词不准</td><td>Agent 只找到 UI 入口，找不到底层异常。</td><td>同时搜报错、函数名、路由、测试名；保留搜索历史。</td></tr>
+        <tr><td>阅读</td><td>上下文爆炸</td><td>整份大文件挤掉 issue 细节。</td><td>窗口化查看，只保留相关函数、导入和调用方。</td></tr>
+        <tr><td>编辑</td><td>补丁格式错误</td><td>缩进、上下文行或文件路径不一致。</td><td>结构化编辑工具，生成后先做语法检查。</td></tr>
+        <tr><td>测试</td><td>只跑 happy path</td><td>新测试过了，旧功能坏了。</td><td>必须有 Fail-to-Pass 和 Pass-to-Pass 两组测试。</td></tr>
+        <tr><td>环境</td><td>依赖漂移</td><td>本地能过，基准失败。</td><td>锁版本、容器化、记录安装和测试命令。</td></tr>
+        <tr><td>数据</td><td>issue 描述含糊</td><td>Agent 修了 A，报告者想修 B。</td><td>用 PR 测试消歧；无法消歧时标记为 low quality。</td></tr>
+        <tr><td>作弊</td><td>reward hacking</td><td>Agent 删除失败测试或硬编码断言。</td><td>禁止修改测试 unless 要求；审查 diff 范围和测试语义。</td></tr>
+        <tr><td>分数</td><td>只报总分</td><td>看不出哪类任务失败。</td><td>按模块、任务类型、错误类型分层分析。</td></tr>
+      </table>
+    </section>
+
+    <section id="lessons">
+      <div class="section-head"><span class="no">05</span><h2>对 SDD Harness 的启示</h2></div>
+      <div class="grid">
+        <article class="card col-4"><div class="pill green">启示 1</div><h3>接口决定能力</h3><p>给 Agent 的工具反馈要短、可定位、可行动，而不是原样输出终端噪音。</p></article>
+        <article class="card col-4"><div class="pill green">启示 2</div><h3>真实仓库才可信</h3><p>单文件 toy task 只能做冒烟测试；发布判断要看真实 repo fixture。</p></article>
+        <article class="card col-4"><div class="pill green">启示 3</div><h3>分数要有证据</h3><p>每次成功都应能回放到 commit、patch、测试日志和环境快照。</p></article>
+      </div>
+      <div class="note"><strong>落地建议：</strong>把 bad case 转成 SWE-bench 式任务包：基础 commit + issue + 最小仓库状态 + 必须通过的测试 + 必须保持通过的测试 + 资源预算。</div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><span class="no">06</span><h2>公开来源</h2></div>
+      <div class="sources">
+        <div class="source"><b><a href="https://swe-agent.com/" target="_blank" rel="noopener">SWE-agent Official Site</a></b><span>Agent-Computer Interface 与软件工程 Agent 系统。</span></div>
+        <div class="source"><b><a href="https://arxiv.org/abs/2405.15793" target="_blank" rel="noopener">SWE-agent Paper</a></b><span>论文：接口设计如何影响自动软件工程表现。</span></div>
+        <div class="source"><b><a href="https://www.swebench.com/" target="_blank" rel="noopener">SWE-bench</a></b><span>真实 GitHub issue / PR 构造的软件工程基准。</span></div>
+        <div class="source"><b><a href="https://arxiv.org/abs/2310.06770" target="_blank" rel="noopener">SWE-bench Paper</a></b><span>基准构造、测试判据和评测协议。</span></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

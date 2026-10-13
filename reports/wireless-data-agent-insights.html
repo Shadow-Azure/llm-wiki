@@ -1,0 +1,1216 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>无线基站数据资产 Data Agent 洞察报告</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-2: #eef2f9;
+      --text: #182233;
+      --muted: #5d6b7f;
+      --line: #d7deea;
+      --primary: #1652f0;
+      --primary-soft: #e7eeff;
+      --accent: #0f9d75;
+      --accent-soft: #e4f6f0;
+      --warn: #c86a11;
+      --warn-soft: #fff2e2;
+      --danger: #d13d51;
+      --danger-soft: #ffeaee;
+      --violet: #6d4aff;
+      --violet-soft: #f0ecff;
+      --shadow: 0 10px 30px rgba(20, 34, 64, .08);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #10141c;
+        --surface: #171d28;
+        --surface-2: #1e2634;
+        --text: #e9eef7;
+        --muted: #a6b2c4;
+        --line: #303b4d;
+        --primary: #7ea3ff;
+        --primary-soft: #213450;
+        --accent: #4ed6a9;
+        --accent-soft: #163f36;
+        --warn: #f4b163;
+        --warn-soft: #453322;
+        --danger: #ff8095;
+        --danger-soft: #4a2a33;
+        --violet: #b4a3ff;
+        --violet-soft: #312b52;
+        --shadow: 0 10px 30px rgba(0, 0, 0, .22);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, -apple-system, sans-serif;
+      line-height: 1.65;
+    }
+    body { font-size: 16px; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      min-height: 64px;
+      padding: 10px max(24px, calc((100% - 1180px) / 2));
+      background: color-mix(in srgb, var(--surface) 92%, transparent);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(14px);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 228px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      color: #fff;
+      background: linear-gradient(135deg, #1652f0, #0f9d75);
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow: auto;
+    }
+    .nav a {
+      flex: 0 0 auto;
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .nav a:hover { color: var(--text); background: var(--surface-2); }
+
+    main {
+      width: min(1180px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+    section { margin: 64px 0; scroll-margin-top: 84px; }
+
+    .hero {
+      overflow: hidden;
+      position: relative;
+      padding: 64px 0 48px;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+      gap: 42px;
+      align-items: center;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    h1 {
+      margin: 18px 0 16px;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1.12;
+      letter-spacing: -.025em;
+    }
+    h1 span {
+      display: block;
+      background: linear-gradient(120deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .lead {
+      max-width: 620px;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(16px, 2vw, 19px);
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--primary);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    .button.secondary {
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+
+    .layout-note {
+      display: grid;
+      gap: 14px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .note-row {
+      display: grid;
+      grid-template-columns: 66px 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+    .note-label {
+      padding: 7px 10px;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--primary);
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .note-row:nth-child(2) .note-label { background: var(--violet); }
+    .note-row:nth-child(3) .note-label { background: var(--accent); }
+    .note-row strong { display: block; font-size: 15px; }
+    .note-row p { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: clamp(25px, 3.5vw, 38px);
+      letter-spacing: -.02em;
+      line-height: 1.2;
+    }
+    h3 { margin: 0 0 10px; font-size: 20px; }
+    .section-head { max-width: 760px; }
+    .section-kicker {
+      margin: 0 0 8px;
+      color: var(--primary);
+      font-size: 14px;
+      font-weight: 750;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .section-desc { color: var(--muted); font-size: 16px; margin-top: 0; }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .pad { padding: 26px; }
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .value-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-top: 30px; }
+    .value-card { padding: 22px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+    .value-num { color: var(--primary); font-size: 29px; font-weight: 800; line-height: 1; }
+    .value-card p { margin: 10px 0 0; color: var(--muted); font-size: 14px; }
+
+    .stack-flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      align-items: stretch;
+    }
+    .flow-node {
+      position: relative;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface-2);
+      font-size: 14px;
+    }
+    .flow-node strong { display: block; margin-bottom: 4px; font-size: 16px; }
+    .flow-node span { color: var(--muted); font-size: 13px; }
+    .flow-arrow { color: var(--muted); }
+    @media (max-width: 760px) {
+      .topbar { gap: 12px; padding-inline: 20px; }
+      .brand { min-width: auto; font-size: 15px; }
+      .hero { padding-top: 28px; }
+      .hero-grid, .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .value-grid { grid-template-columns: repeat(2, 1fr); }
+      .stack-flow { grid-template-columns: 1fr; }
+      .flow-arrow { display: none; }
+      main { width: min(1180px, calc(100% - 32px)); }
+      .pad { padding: 20px; }
+    }
+
+    @media print {
+      body { background: #fff; color: #000; font-size: 12px; }
+      .topbar, .button, .evolution-tabs, .agent-answer-actions { display: none !important; }
+      section { break-inside: avoid-page; margin: 22px 0; }
+      .card, .value-card, .demo-screen, .diagram-box { box-shadow: none; break-inside: avoid; }
+      .agent-answer.hidden { display: block !important; }
+    }
+
+    .diagram-box {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--surface-2) 65%, transparent);
+      overflow: hidden;
+    }
+    .diagram-box svg { display: block; width: 100%; height: auto; }
+    .svg-label { fill: var(--text); font: 650 15px/1.2 "PingFang SC", "Microsoft YaHei", sans-serif; }
+    .svg-sub { fill: var(--muted); font: 500 12px/1.25 "PingFang SC", "Microsoft YaHei", sans-serif; }
+    .svg-title { fill: var(--text); font: 750 16px/1.2 "PingFang SC", "Microsoft YaHei", sans-serif; }
+    .svg-box { fill: var(--surface); stroke: var(--line); stroke-width: 1; }
+    .svg-box-primary { fill: var(--primary-soft); stroke: color-mix(in srgb, var(--primary) 42%, transparent); }
+    .svg-box-accent { fill: var(--accent-soft); stroke: color-mix(in srgb, var(--accent) 42%, transparent); }
+    .svg-box-warn { fill: var(--warn-soft); stroke: color-mix(in srgb, var(--warn) 42%, transparent); }
+    .svg-box-violet { fill: var(--violet-soft); stroke: color-mix(in srgb, var(--violet) 42%, transparent); }
+    .svg-line { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+    .svg-arrow { fill: var(--muted); }
+    .svg-chip { fill: var(--surface); stroke: var(--line); }
+
+    .example-flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .example-step {
+      position: relative;
+      padding: 16px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+    }
+    .example-step::after {
+      content: "→";
+      position: absolute;
+      right: -11px;
+      top: 43%;
+      z-index: 1;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .example-step:last-child::after { content: ""; }
+    .step-no {
+      display: inline-grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      margin-bottom: 9px;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--primary);
+      font-size: 12px;
+      font-weight: 750;
+    }
+    .example-step:nth-child(2) .step-no { background: var(--violet); }
+    .example-step:nth-child(3) .step-no { background: var(--warn); }
+    .example-step:nth-child(4) .step-no { background: var(--danger); }
+    .example-step:nth-child(5) .step-no { background: var(--accent); }
+    .example-step strong { display: block; font-size: 15px; }
+    .example-step span { display: block; color: var(--muted); font-size: 13px; }
+
+    .pain-panel {
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(0, .34fr) minmax(0, .66fr);
+    }
+    .pain-rail {
+      padding: 28px 24px;
+      color: #fff;
+      background: linear-gradient(160deg, #1652f0, #0f9d75);
+    }
+    .pain-rail.p2 { background: linear-gradient(160deg, #6d4aff, #1652f0); }
+    .pain-rail.p3 { background: linear-gradient(160deg, #d13d51, #c86a11); }
+    .pain-index { margin: 0 0 16px; opacity: .72; font-size: 42px; font-weight: 800; line-height: 1; }
+    .pain-rail h2 { color: #fff; font-size: clamp(23px, 2.6vw, 31px); }
+    .pain-rail p { margin: 12px 0 0; opacity: .88; font-size: 15px; }
+    .pain-body { padding: 28px; min-width: 0; }
+    .pain-block + .pain-block { margin-top: 24px; }
+    .pain-heading {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 750;
+    }
+    .heading-pain { color: var(--danger); background: var(--danger-soft); }
+    .heading-insight { color: var(--primary); background: var(--primary-soft); }
+    .heading-action { color: var(--accent); background: var(--accent-soft); }
+
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; }
+    table { width: 100%; border-collapse: collapse; background: var(--surface); }
+    th, td { padding: 13px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 14px; }
+    th { color: var(--muted); background: var(--surface-2); font-size: 13px; white-space: nowrap; }
+    tr:last-child td { border-bottom: 0; }
+    td:first-child { min-width: 210px; font-weight: 680; }
+    td:last-child { min-width: 260px; color: var(--muted); }
+
+    .insight-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .insight-item {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      background: var(--surface);
+      font-size: 14px;
+    }
+    .insight-item strong { display: block; margin-bottom: 4px; }
+    .insight-item span { color: var(--muted); }
+
+    .evolution-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 20px 0 18px;
+    }
+    .evolution-tab {
+      padding: 9px 15px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    .evolution-tab.active { color: #fff; background: var(--primary); border-color: var(--primary); }
+    .evolution-panel[aria-hidden="true"] { display: none; }
+    .evolution-panel {
+      animation: rise .28s ease;
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .demo-shell {
+      display: grid;
+      grid-template-columns: minmax(0, .78fr) minmax(0, 1.22fr);
+      gap: 0;
+      overflow: hidden;
+    }
+    .demo-sidebar {
+      padding: 24px;
+      border-right: 1px solid var(--line);
+      background: var(--surface-2);
+    }
+    .demo-main { padding: 24px; background: var(--surface); }
+    .demo-screen { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); overflow: hidden; }
+    .demo-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-2);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .demo-title { font-weight: 700; color: var(--text); }
+    .demo-input {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 8px;
+      margin-top: 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+    .demo-input input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: 14px;
+    }
+    .ask-button {
+      min-width: 70px;
+      min-height: 36px;
+      border: 0;
+      border-radius: 9px;
+      color: #fff;
+      background: var(--primary);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .chip {
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .agent-answer {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+      animation: rise .25s ease;
+    }
+    .agent-answer.hidden { display: none; }
+    .answer-card { padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .answer-title { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; font-size: 13px; font-weight: 750; color: var(--muted); text-transform: uppercase; }
+    .answer-card p, .answer-card li { margin: 0; font-size: 14px; }
+    .answer-card ul { margin: 0; padding-left: 18px; }
+    .answer-card code {
+      display: block;
+      margin-top: 8px;
+      padding: 11px;
+      overflow-x: auto;
+      border-radius: 8px;
+      color: var(--text);
+      background: var(--surface-2);
+      font: 500 12px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: pre;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .pill.ok { color: var(--accent); background: var(--accent-soft); }
+    .pill.warn { color: var(--warn); background: var(--warn-soft); }
+    .pill.bad { color: var(--danger); background: var(--danger-soft); }
+    .pill.info { color: var(--primary); background: var(--primary-soft); }
+
+    .roadmap {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .roadmap::before {
+      content: "";
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      top: 26px;
+      height: 2px;
+      background: var(--line);
+    }
+    .road-item { position: relative; z-index: 1; text-align: center; }
+    .road-dot {
+      display: inline-grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      border: 4px solid var(--bg);
+      border-radius: 50%;
+      color: #fff;
+      background: var(--primary);
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .road-item:nth-child(2) .road-dot { background: var(--violet); }
+    .road-item:nth-child(3) .road-dot { background: var(--warn); }
+    .road-item:nth-child(4) .road-dot { background: var(--danger); }
+    .road-item:nth-child(5) .road-dot { background: var(--accent); }
+    .road-card { margin-top: 14px; padding: 17px; text-align: left; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+    .road-card strong { display: block; margin-bottom: 5px; font-size: 16px; }
+    .road-card em { display: block; margin-bottom: 8px; color: var(--muted); font-size: 13px; font-style: normal; }
+    .road-card span { font-size: 13px; color: var(--muted); }
+
+    .check-list { display: grid; gap: 10px; }
+    .check-item { display: flex; gap: 10px; align-items: flex-start; }
+    .check-mark {
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      margin-top: 2px;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .check-item p { margin: 0; font-size: 14px; }
+    .check-item strong { display: block; }
+
+    footer {
+      width: min(1180px, calc(100% - 48px));
+      margin: 48px auto 0;
+      padding: 30px 0 42px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    footer strong { color: var(--text); }
+
+    @media (max-width: 1020px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .value-grid { grid-template-columns: repeat(2, 1fr); }
+      .pain-panel, .demo-shell { grid-template-columns: 1fr; }
+      .pain-rail { padding: 24px; }
+      .pain-body, .demo-sidebar, .demo-main { padding: 22px; }
+      .demo-sidebar { border-right: 0; border-bottom: 1px solid var(--line); }
+      .example-flow { grid-template-columns: 1fr; }
+      .example-step::after { content: "↓"; right: auto; left: 20px; top: auto; bottom: -12px; }
+      .example-step:last-child::after { content: ""; }
+      .roadmap { grid-template-columns: 1fr; }
+      .roadmap::before { display: none; }
+      .road-item { display: grid; grid-template-columns: 54px 1fr; gap: 14px; align-items: start; text-align: left; }
+      .road-card { margin-top: 0; }
+      .insight-list { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .nav a { padding: 7px 10px; font-size: 13px; }
+      .value-grid, .grid-2, .grid-3, .insight-list { grid-template-columns: 1fr; }
+      h1 { font-size: 31px; }
+      .hero-actions { align-items: stretch; flex-direction: column; }
+      .button { width: 100%; }
+      .pain-rail h2 { font-size: 24px; }
+      .pain-index { font-size: 34px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .evolution-panel, .agent-answer { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">D</span>无线基站 Data Agent</div>
+    <nav class="nav" aria-label="报告导航">
+      <a href="#context">当前背景</a>
+      <a href="#architecture">总体架构</a>
+      <a href="#pain1">湖仓找数</a>
+      <a href="#pain2">数据集体检</a>
+      <a href="#pain3">仿真现网对比</a>
+      <a href="#roadmap">落地路线</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="top">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">AI × 湖仓 × 无线基站</p>
+          <h1>让基站数据资产<span>可发现、可解释、可复用</span></h1>
+          <p class="lead">这份报告用一个“高铁掉线样本”的例子贯穿三大痛点：湖仓里找数、发布数据集体检、仿真与现网对比。它说明 Data Agent 不是简单 Text2SQL，而是带着业务语义、血缘、质量和治理约束的数据工作台。</p>
+          <div class="hero-actions">
+            <a class="button" href="#pain1">看三大痛点</a>
+            <a class="button secondary" href="#roadmap">看落地路线</a>
+          </div>
+        </div>
+        <aside class="layout-note" aria-label="当前项目与核心结论">
+          <div class="note-row">
+            <span class="note-label">已有</span>
+            <div><strong>采集、建模、场景库和加工链路</strong><p>基站日志进入 Iceberg 湖仓；Spark 按场景加工样本，发布数据集落对象存储。</p></div>
+          </div>
+          <div class="note-row">
+            <span class="note-label">痛点</span>
+            <div><strong>消费侧还没有被产品化</strong><p>业务和算法同学仍要自己判断数据在哪、口径是否一致、质量够不够、能不能混用。</p></div>
+          </div>
+          <div class="note-row">
+            <span class="note-label">答案</span>
+            <div><strong>用 Data Agent 连接数据产品与业务意图</strong><p>先检索语义资产，再规划 SQL/Spark 作业，最后给出结果、证据、风险和下一步动作。</p></div>
+          </div>
+        </aside>
+      </div>
+      <div class="value-grid">
+        <div class="value-card"><div class="value-num">1</div><p><strong>个控制面</strong>：湖仓表和对象存储数据集共用目录、语义、血缘、质量与权限。</p></div>
+        <div class="value-card"><div class="value-num">3</div><p><strong>类消费问题</strong>：资产发现、数据集体检、仿真/现网差异分析。</p></div>
+        <div class="value-card"><div class="value-num">7</div><p><strong>维数据质量</strong>：完整性、唯一性、一致性、及时性、准确性、覆盖度、可训练性。</p></div>
+        <div class="value-card"><div class="value-num">L1-L5</div><p><strong>级演进路线</strong>：从资产可见到问答可用、产品可信、加工自动、闭环优化。</p></div>
+      </div>
+    </section>
+
+    <section id="context">
+      <div class="section-head">
+        <p class="section-kicker">Current context</p>
+        <h2>先用一个例子说清为什么需要 Data Agent</h2>
+        <p class="section-desc">假设算法工程师问：“找一批高铁场景掉线样本，要覆盖晚高峰，还要能追溯来源。”过去这个问题会在群聊、表名搜索、临时 SQL 和手工抽检里反复消耗时间。</p>
+      </div>
+      <div class="example-flow">
+        <div class="example-step"><span class="step-no">1</span><strong>人问</strong><span>“高铁掉线样本在哪里？口径是什么？”</span></div>
+        <div class="example-step"><span class="step-no">2</span><strong>Agent 理解</strong><span>识别场景=高铁、时间=晚高峰、事件=掉线、输出=训练样本。</span></div>
+        <div class="example-step"><span class="step-no">3</span><strong>混合检索</strong><span>关键词、向量、业务图谱和规则一起找到场景资产。</span></div>
+        <div class="example-step"><span class="step-no">4</span><strong>治理执行</strong><span>校验权限、质量、成本；生成分区裁剪 SQL 或 Spark 作业。</span></div>
+        <div class="example-step"><span class="step-no">5</span><strong>给出证据</strong><span>返回数据、口径、行数、血缘、风险和可复用任务。</span></div>
+      </div>
+
+      <div class="grid grid-3" style="margin-top:28px">
+        <article class="card pad">
+          <h3>第一层：湖仓数据</h3>
+          <p style="color:var(--muted);font-size:14px">原始层保留日志与报文，主题层形成小区、事件、配置和指标，样本层沉淀特征与标签快照，集市层输出场景数据产品。</p>
+        </article>
+        <article class="card pad">
+          <h3>第二层：发布数据集</h3>
+          <p style="color:var(--muted);font-size:14px">对象存储中的 Parquet/CSV 不能只是“文件包”，要带 Manifest、Schema、采样规则、质量报告、血缘认证和授权信息。</p>
+        </article>
+        <article class="card pad">
+          <h3>第三层：Data Agent</h3>
+          <p style="color:var(--muted);font-size:14px">LLM 翻译意图、选择工具、解释结果；SQL、Spark、画像、血缘、质量和权限检查由确定性工具完成。</p>
+        </article>
+      </div>
+    </section>
+    <section id="architecture">
+      <div class="section-head">
+        <p class="section-kicker">Reference architecture</p>
+        <h2>总体参考架构：一个湖仓，一个控制面，一类 Agent 入口</h2>
+        <p class="section-desc">关键不是把大模型接到数据库上，而是把目录、语义、血缘、质量、权限和执行工具组装成受治理的任务系统。</p>
+      </div>
+      <div class="diagram-box" role="img" aria-label="无线基站数据资产总体架构图：现网、仿真、网管和告警数据进入 Iceberg 湖仓与对象存储，统一进入资产控制面，再由 Data Agent 调用规划、检索、工具和校验。">
+        <svg viewBox="0 0 980 470" xmlns="http://www.w3.org/2000/svg">
+          <title>无线基站数据资产 Data Agent 总体架构</title>
+          <desc>数据源头进入湖仓和对象存储；资产控制面统一管理目录、语义、血缘、质量与权限；Data Agent 通过规划、检索、工具和校验消费数据。</desc>
+          <rect x="30" y="45" width="205" height="52" rx="12" class="svg-box"/>
+          <text x="132" y="68" text-anchor="middle" class="svg-label">现网采集</text>
+          <text x="132" y="86" text-anchor="middle" class="svg-sub">真实网络 / 长尾事件</text>
+          <rect x="30" y="117" width="205" height="52" rx="12" class="svg-box"/>
+          <text x="132" y="140" text-anchor="middle" class="svg-label">仿真采集</text>
+          <text x="132" y="158" text-anchor="middle" class="svg-sub">可控参数 / 稀缺异常</text>
+          <rect x="30" y="189" width="205" height="52" rx="12" class="svg-box"/>
+          <text x="132" y="212" text-anchor="middle" class="svg-label">网管与配置</text>
+          <text x="132" y="230" text-anchor="middle" class="svg-sub">参数 / 拓扑 / 工参</text>
+          <rect x="30" y="261" width="205" height="52" rx="12" class="svg-box"/>
+          <text x="132" y="284" text-anchor="middle" class="svg-label">告警与工单</text>
+          <text x="132" y="302" text-anchor="middle" class="svg-sub">异常 / 人工处置</text>
+
+          <rect x="295" y="56" width="250" height="300" rx="18" class="svg-box-primary"/>
+          <text x="420" y="89" text-anchor="middle" class="svg-title">Iceberg 湖仓</text>
+          <rect x="318" y="112" width="205" height="44" rx="9" class="svg-chip"/>
+          <text x="420" y="132" text-anchor="middle" class="svg-label">原始层</text><text x="420" y="148" text-anchor="middle" class="svg-sub">日志 / 报文</text>
+          <rect x="318" y="168" width="205" height="44" rx="9" class="svg-chip"/>
+          <text x="420" y="188" text-anchor="middle" class="svg-label">主题层</text><text x="420" y="204" text-anchor="middle" class="svg-sub">小区 / 事件 / KPI</text>
+          <rect x="318" y="224" width="205" height="44" rx="9" class="svg-chip"/>
+          <text x="420" y="244" text-anchor="middle" class="svg-label">样本层</text><text x="420" y="260" text-anchor="middle" class="svg-sub">特征 / 标签快照</text>
+          <rect x="318" y="280" width="205" height="44" rx="9" class="svg-chip"/>
+          <text x="420" y="300" text-anchor="middle" class="svg-label">集市层</text><text x="420" y="316" text-anchor="middle" class="svg-sub">场景数据产品</text>
+
+          <rect x="586" y="108" width="182" height="82" rx="14" class="svg-box-accent"/>
+          <text x="677" y="140" text-anchor="middle" class="svg-label">对象存储</text>
+          <text x="677" y="160" text-anchor="middle" class="svg-sub">发布数据集 / Manifest</text>
+          <path d="M486 149h92M578 149l-10-7v14z" class="svg-line"/><path d="M578 149l-10-7v14z" class="svg-arrow"/>
+
+          <rect x="300" y="392" width="470" height="56" rx="14" class="svg-box-violet"/>
+          <text x="535" y="414" text-anchor="middle" class="svg-label">资产控制面：统一目录 · 业务本体 · 语义层 · 血缘 · 质量 · 权限</text>
+          <text x="535" y="433" text-anchor="middle" class="svg-sub">湖仓表、Iceberg 快照与对象存储数据集登记为同一类可信数据资产</text>
+          <path d="M420 356v30M535 356v30M677 190v196" class="svg-line"/>
+
+          <rect x="720" y="38" width="230" height="278" rx="18" class="svg-box-warn"/>
+          <text x="835" y="70" text-anchor="middle" class="svg-title">Data Agent</text>
+          <rect x="744" y="94" width="182" height="40" rx="9" class="svg-chip"/><text x="835" y="119" text-anchor="middle" class="svg-label">意图规划</text>
+          <rect x="744" y="148" width="182" height="40" rx="9" class="svg-chip"/><text x="835" y="173" text-anchor="middle" class="svg-label">混合检索</text>
+          <rect x="744" y="202" width="182" height="40" rx="9" class="svg-chip"/><text x="835" y="227" text-anchor="middle" class="svg-label">工具调用：SQL / Spark</text>
+          <rect x="744" y="256" width="182" height="40" rx="9" class="svg-chip"/><text x="835" y="281" text-anchor="middle" class="svg-label">结果校验与证据回写</text>
+          <path d="M835 316v70M835 386H770" class="svg-line"/>
+          <path d="M236 91h48M284 91l-9-6v12zM236 143h48M284 143l-9-6v12zM236 215h48M284 215l-9-6v12zM236 287h48M284 287l-9-6v12z" class="svg-line"/>
+        </svg>
+      </div>
+
+      <article class="card pad" style="margin-top:28px">
+        <h3>Data Agent 能力如何逐级长大</h3>
+        <div class="evolution-tabs" role="tablist" aria-label="Data Agent 演进阶段">
+          <button class="evolution-tab active" role="tab" aria-selected="true" aria-controls="level-1" data-panel="level-1">L1 资产可见</button>
+          <button class="evolution-tab" role="tab" aria-selected="false" aria-controls="level-2" data-panel="level-2">L2 问答可用</button>
+          <button class="evolution-tab" role="tab" aria-selected="false" aria-controls="level-3" data-panel="level-3">L3 产品可信</button>
+          <button class="evolution-tab" role="tab" aria-selected="false" aria-controls="level-4" data-panel="level-4">L4 加工自动</button>
+          <button class="evolution-tab" role="tab" aria-selected="false" aria-controls="level-5" data-panel="level-5">L5 闭环优化</button>
+        </div>
+        <div class="evolution-panel" id="level-1" role="tabpanel">
+          <h3>先把“表名搜索”升级为“资产搜索”</h3>
+          <p style="color:var(--muted)">用户能搜到表、列、文件、指标、场景、Owner 和权限。高铁掉线样本不再藏在某张表里，而是一个登记过业务问题、口径和限制的资产。</p>
+          <div class="chip-row"><span class="pill info">统一目录</span><span class="pill info">语义标签</span><span class="pill info">血缘</span><span class="pill info">基础质量报告</span></div>
+        </div>
+        <div class="evolution-panel" id="level-2" role="tabpanel" aria-hidden="true">
+          <h3>自然语言能定位数据并解释口径</h3>
+          <p style="color:var(--muted)">Agent 识别场景、时间、空间、网元和 KPI，优先检索可信场景资产，先 dry-run 再执行，回答“为什么查这几张表、扫描多少数据”。</p>
+          <div class="chip-row"><span class="pill info">混合检索</span><span class="pill info">场景语义模型</span><span class="pill info">dry-run</span><span class="pill info">成本预估</span></div>
+        </div>
+        <div class="evolution-panel" id="level-3" role="tabpanel" aria-hidden="true">
+          <h3>发布数据集自带护照和质量门禁</h3>
+          <p style="color:var(--muted)">对象存储数据集从黑盒文件包变成可审计产品：版本、代码、源快照、过滤规则、Schema、质量分、已知风险和许可证一起发布。</p>
+          <div class="chip-row"><span class="pill ok">Manifest</span><span class="pill ok">数据护照</span><span class="pill ok">质量门禁</span><span class="pill ok">列级血缘</span></div>
+        </div>
+        <div class="evolution-panel" id="level-4" role="tabpanel" aria-hidden="true">
+          <h3>业务问题能生成参数化样本作业</h3>
+          <p style="color:var(--muted)">“生成高铁晚高峰掉线样本”变成可复用 Spark 技能，包含时间窗、地理过滤、正负样本、特征契约和训练验证切分规则。</p>
+          <div class="chip-row"><span class="pill warn">场景模板</span><span class="pill warn">特征契约</span><span class="pill warn">负样本策略</span><span class="pill warn">训练集评测</span></div>
+        </div>
+        <div class="evolution-panel" id="level-5" role="tabpanel" aria-hidden="true">
+          <h3>发现缺口后驱动采集和仿真</h3>
+          <p style="color:var(--muted)">Agent 发现“高负载干扰掉线”样本不足后，不只报警，还会建议补充现网采集、仿真参数、合成样本，并把新资产登记回场景库。</p>
+          <div class="chip-row"><span class="pill bad">场景缺口分析</span><span class="pill bad">Sim-to-Real 报告</span><span class="pill bad">样本增强建议</span><span class="pill bad">采集工单</span></div>
+        </div>
+      </article>
+    </section>
+    <section id="pain1">
+      <div class="section-head">
+        <p class="section-kicker">Pain point 01</p>
+        <h2>如何在庞大湖仓里按场景和自然语言找到并高效使用数据</h2>
+        <p class="section-desc">数据不再缺，缺的是“可信入口”。找到表只是开始，还要知道口径、权限、成本、质量、分区和推荐用法。</p>
+      </div>
+
+      <article class="card pain-panel">
+        <div class="pain-rail">
+          <p class="pain-index">01</p>
+          <h2>资产发现：从表名搜索到场景资产检索</h2>
+          <p>业务语言、技术表名和执行计划之间需要语义层连接。Data Agent 应该优先消费高可信、有 Owner、有 SLA 的场景资产。</p>
+        </div>
+        <div class="pain-body">
+          <div class="pain-block">
+            <span class="pain-heading heading-pain">痛点</span>
+            <p>基站日志横跨网元、小区、用户、事件、指标、配置、时间、地理和厂商。只靠表名搜索回答不了：“高铁场景掉线样本在哪里？”“哪些数据能支撑干扰优化模型？”“这个指标和现网 KPI 是否同一口径？”找到表后，还要判断分区、扫描量、权限、成本、质量和下游用法。</p>
+          </div>
+
+          <div class="pain-block">
+            <span class="pain-heading heading-insight">业界洞察</span>
+            <div class="diagram-box" role="img" aria-label="自然语言取数链路：问题解析、混合检索、语义解释、使用计划、治理门禁、执行和证据回写。">
+              <svg viewBox="0 0 960 250" xmlns="http://www.w3.org/2000/svg">
+                <title>自然语言取数的受治理链路</title>
+                <desc>自然语言先解析为场景、时间、空间、网元和 KPI 约束，再通过混合检索找到候选数据产品，经过语义解释、使用计划和治理门禁后执行，并回写证据。</desc>
+                <rect x="20" y="40" width="170" height="58" rx="12" class="svg-box-primary"/><text x="105" y="63" text-anchor="middle" class="svg-label">意图与约束</text><text x="105" y="82" text-anchor="middle" class="svg-sub">场景 / 时间 / 空间 / KPI</text>
+                <rect x="210" y="40" width="165" height="58" rx="12" class="svg-box"/><text x="292" y="63" text-anchor="middle" class="svg-label">混合检索</text><text x="292" y="82" text-anchor="middle" class="svg-sub">关键词 + 向量 + 图谱 + 规则</text>
+                <rect x="395" y="40" width="165" height="58" rx="12" class="svg-box-accent"/><text x="477" y="63" text-anchor="middle" class="svg-label">候选数据产品</text><text x="477" y="82" text-anchor="middle" class="svg-sub">Owner / 口径 / SLA</text>
+                <rect x="580" y="40" width="165" height="58" rx="12" class="svg-box-violet"/><text x="662" y="63" text-anchor="middle" class="svg-label">使用计划</text><text x="662" y="82" text-anchor="middle" class="svg-sub">SQL / Spark / 采样 / 成本</text>
+                <rect x="765" y="40" width="175" height="58" rx="12" class="svg-box-warn"/><text x="852" y="63" text-anchor="middle" class="svg-label">治理门禁与执行</text><text x="852" y="82" text-anchor="middle" class="svg-sub">权限 / PII / 预算 / 质量</text>
+                <rect x="280" y="158" width="400" height="52" rx="12" class="svg-box"/>
+                <text x="480" y="181" text-anchor="middle" class="svg-label">证据回写</text>
+                <text x="480" y="199" text-anchor="middle" class="svg-sub">SQL、行数、质量、血缘、解释、可复用任务</text>
+                <path d="M190 69h20M375 69h20M560 69h20M745 69h20M852 98v86H480" class="svg-line"/>
+                <path d="M210 69l-9-6v12zM395 69l-9-6v12zM580 69l-9-6v12zM765 69l-9-6v12zM480 156v-8h0" class="svg-arrow"/>
+              </svg>
+            </div>
+            <div class="table-wrap" style="margin-top:18px">
+              <table>
+                <thead><tr><th>业界案例</th><th>架构与技术方案</th><th>对本项目的启示</th></tr></thead>
+                <tbody>
+                  <tr><td>Databricks Genie / Unity Catalog / Lakehouse Monitoring</td><td>统一表、文件、模型、函数的权限与血缘；Genie 使用受治理表和语义提示回答问题；Lakehouse Monitoring 做画像与漂移监测。</td><td>把“场景库”注册为可信资产，Agent 只优先检索 Owner、用途、SLA、口径明确的场景资产，而不是全网所有表。</td></tr>
+                  <tr><td>Snowflake Cortex Analyst + Semantic Models</td><td>语义模型声明指标、维度、同义词、关系和可用问题；Cortex Analyst 基于语义模型生成受约束查询。</td><td>“掉线率”“切换成功率”“PRB 利用率”不能只藏在 ETL 代码里，要进入无线 KPI 语义层。</td></tr>
+                  <tr><td>Microsoft Fabric OneLake + Copilot + Purview</td><td>OneLake 做统一湖存储与 shortcut 虚拟化，Copilot 辅助探索建模，Purview 治理敏感数据。</td><td>用一个逻辑湖管理仿真和现网数据，保留权限、敏感等级和多计算引擎能力。</td></tr>
+                  <tr><td>AWS DataZone / Glue / Athena / S3 Tables / Bedrock Agents</td><td>DataZone 做业务目录和数据产品订阅；Glue 提供目录与爬取；Athena/Spark 查询；Bedrock Agent 编排工具。</td><td>采用“搜索 → 订阅 → 授权 → 查询 → 审计”，把临时取数变成产品化消费。</td></tr>
+                  <tr><td>Google Dataplex / BigQuery column lineage / Looker</td><td>Dataplex 提供目录、画像和治理；BigQuery 提供表和列级血缘；Looker 统一指标口径。</td><td>列级血缘进入样本生成链路，回答标签来自哪列、被哪条规则过滤、影响哪些模型。</td></tr>
+                  <tr><td>DataHub / OpenMetadata / OpenLineage / Amundsen</td><td>开源组合提供目录、业务描述、所有权、标签、操作元数据、表与列血缘、使用热度。</td><td>先做轻量版：目录 + 向量索引 + 血缘图 + 使用记录，不必等商业平台全覆盖。</td></tr>
+                  <tr><td>dbt Semantic Layer / Cube / Feast</td><td>分别沉淀指标语义、统一查询接口和特征服务能力。</td><td>Spark 样本加工输出“特征契约 + 样本契约”，供 Agent、训练和复用方共同引用。</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="pain-block">
+            <span class="pain-heading heading-action">启示</span>
+            <div class="insight-list">
+              <div class="insight-item"><strong>建“场景资产”，不只建“场景表”</strong><span>登记业务问题、适用小区/时间/事件、KPI 口径、原始来源、样本规则、负样本策略、Owner、更新频率、授权、典型 SQL 和已知限制。</span></div>
+              <div class="insight-item"><strong>返回数据产品，而非只返回文本块</strong><span>索引表、列、KPI、场景、数据集、样本任务、质量报告、看板和历史问答；结果附权限、新鲜度、扫描成本和推荐用法。</span></div>
+              <div class="insight-item"><strong>自然语言入口必须接语义层和治理门禁</strong><span>Agent 先识别合规约束，再选择 SQL/Spark 工具；高风险查询先 dry-run，输出扫描量与费用预估。</span></div>
+              <div class="insight-item"><strong>用 Iceberg 元数据加速“找到之后怎么用”</strong><span>分区裁剪、min/max 裁剪、manifest 统计、排序、小文件合并、物化视图、热点缓存和采样表都要被 Agent 解释成“为什么便宜”。</span></div>
+              <div class="insight-item"><strong>把问答沉淀为可复用技能</strong><span>一次成功取数生成参数化作业、契约、校验规则、样例解释和血缘快照，下次复用而不是重新对话。</span></div>
+              <div class="insight-item"><strong>答案必须可追溯</strong><span>没有 SQL、源表、Iceberg 快照、过滤规则和质量证据的结果，不应进入训练或对外汇报。</span></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card demo-shell" style="margin-top:22px">
+        <aside class="demo-sidebar">
+          <h3>交互演示：高铁掉线样本</h3>
+          <p style="color:var(--muted);font-size:14px">这个示例展示 L2 问答可用后 Agent 的回答方式。它先约束场景与口径，再给出执行计划、风险和可复用动作。</p>
+          <div class="chip-row">
+            <button class="chip" data-question="高铁晚高峰掉线样本在哪里？">高铁晚高峰掉线</button>
+            <button class="chip" data-question="干扰优化模型可用哪些数据？">干扰优化数据</button>
+            <button class="chip" data-question="切换成功率是否有统一口径？">统一口径检查</button>
+          </div>
+        </aside>
+        <div class="demo-main">
+          <div class="demo-screen">
+            <div class="demo-toolbar"><span class="demo-title">Data Agent · 湖仓取数</span><span>治理门禁开启</span></div>
+            <div class="pad">
+              <div class="demo-input">
+                <label class="sr-only" for="question-input" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">数据问题</label>
+                <input id="question-input" value="高铁晚高峰掉线样本在哪里？" autocomplete="off">
+                <button class="ask-button" id="ask-button" type="button">提问</button>
+              </div>
+              <div class="agent-answer hidden" id="agent-answer">
+                <div class="answer-card">
+                  <div class="answer-title">候选资产</div>
+                  <p><strong>scenario.high_speed_rail_call_drop_v3</strong> <span class="pill ok">可信</span></p>
+                  <p style="margin-top:6px;color:var(--muted)">Owner：无线优化组；SLA：T+1；口径：RRCAUSE=radio-link-timeout 且连续 3 个 5 分钟窗口；授权：算法组可读脱敏列。</p>
+                </div>
+                <div class="answer-card">
+                  <div class="answer-title">执行计划</div>
+                  <p>按省份、线路、时间分区裁剪，仅扫描晚高峰样本；使用 5% 分层采样先做可训练性检查，再生成正式 Spark 作业。</p>
+                  <code>SELECT ... FROM iceberg.theme.cell_event<br>JOIN iceberg.sample.hsr_call_drop USING (cell_id, window_5m)<br>WHERE hour BETWEEN 18 AND 20 AND terrain='HSR'</code>
+                </div>
+                <div class="answer-card">
+                  <div class="answer-title">质量与风险</div>
+                  <ul>
+                    <li><span class="pill ok">完整性</span> 关键特征缺失率 0.8%，低于 2% 门槛。</li>
+                    <li><span class="pill warn">覆盖度</span> 高负载干扰场景样本偏少，建议补充采集。</li>
+                    <li><span class="pill bad">泄漏风险</span> <code>drop_reason_text</code> 禁止进入训练。</li>
+                  </ul>
+                </div>
+                <div class="answer-card">
+                  <div class="answer-title">下一步</div>
+                  <p>保存为“高铁晚高峰掉线样本”可复用技能；任务记录源 Iceberg 快照、SQL、采样规则、质量报告和 Owner 审批。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+    <section id="pain2">
+      <div class="section-head">
+        <p class="section-kicker">Pain point 02</p>
+        <h2>如何快速分析发布数据集的成分、特征分布、上下游关系和质量</h2>
+        <p class="section-desc">发布数据集不应是对象存储里的黑盒文件包，而应自带“数据护照”：来自哪里、包含什么、规则是否变化、适合什么任务、风险在哪里。</p>
+      </div>
+
+      <article class="card pain-panel">
+        <div class="pain-rail p2">
+          <p class="pain-index">02</p>
+          <h2>数据集体检：一键生成数据护照</h2>
+          <p>用业务切片看成分，用条件分布看特征，用列级血缘看上下游，用七维指标看质量，最后由 Agent 给出处置建议。</p>
+        </div>
+        <div class="pain-body">
+          <div class="pain-block">
+            <span class="pain-heading heading-pain">痛点</span>
+            <p>对象存储中的发布数据集常常只有路径和训练效果。使用者不知道样本来自哪些小区、时间、场景和厂商，也不知道特征是否泄漏、类别是否失衡、上下游规则是否变化、质量是否满足目标模型。人工检查 Schema 和抽样脚本慢，结果也不可复现。</p>
+          </div>
+
+          <div class="pain-block">
+            <span class="pain-heading heading-insight">业界洞察</span>
+            <div class="diagram-box" role="img" aria-label="发布数据集体检链路：Manifest 解析后并行进行成分画像、特征画像、血缘分析和质量评测，汇总为数据护照和 Agent 结论。">
+              <svg viewBox="0 0 960 280" xmlns="http://www.w3.org/2000/svg">
+                <title>发布数据集自动体检链路</title>
+                <desc>发布数据集读取 Manifest 后，分别做成分画像、特征画像、血缘分析和质量评测，输出数据护照和 Agent 结论建议。</desc>
+                <rect x="395" y="28" width="170" height="54" rx="13" class="svg-box-primary"/><text x="480" y="50" text-anchor="middle" class="svg-label">发布数据集</text><text x="480" y="68" text-anchor="middle" class="svg-sub">对象存储 / Parquet</text>
+                <rect x="395" y="104" width="170" height="44" rx="11" class="svg-box"/><text x="480" y="131" text-anchor="middle" class="svg-label">Manifest 解析</text>
+                <rect x="35" y="185" width="200" height="58" rx="12" class="svg-box-accent"/><text x="135" y="207" text-anchor="middle" class="svg-label">成分画像</text><text x="135" y="226" text-anchor="middle" class="svg-sub">场景 / 地理 / 厂商 / 标签</text>
+                <rect x="270" y="185" width="200" height="58" rx="12" class="svg-box-accent"/><text x="370" y="207" text-anchor="middle" class="svg-label">特征画像</text><text x="370" y="226" text-anchor="middle" class="svg-sub">缺失 / 分布 / 漂移 / 泄漏</text>
+                <rect x="505" y="185" width="200" height="58" rx="12" class="svg-box-violet"/><text x="605" y="207" text-anchor="middle" class="svg-label">血缘分析</text><text x="605" y="226" text-anchor="middle" class="svg-sub">源快照 / Spark / 规则</text>
+                <rect x="740" y="185" width="185" height="58" rx="12" class="svg-box-warn"/><text x="832" y="207" text-anchor="middle" class="svg-label">质量评测</text><text x="832" y="226" text-anchor="middle" class="svg-sub">完整性 / 覆盖 / 可训练性</text>
+                <path d="M480 82v22M480 148l-325 37M480 148l-110 37M480 148l125 37M480 148l352 37" class="svg-line"/>
+              </svg>
+            </div>
+            <div class="table-wrap" style="margin-top:18px">
+              <table>
+                <thead><tr><th>业界案例</th><th>架构与技术方案</th><th>对本项目的启示</th></tr></thead>
+                <tbody>
+                  <tr><td>Databricks Lakehouse Monitoring / Unity Catalog / Feature Store</td><td>自动画像、分布统计、快照对比、表与作业血缘、特征版本管理。</td><td>自动生成“成分 + 特征 + 漂移 + 血缘”报告，不靠算法同学临时跑脚本。</td></tr>
+                  <tr><td>Snowflake Data Metric Functions / Access History / Object Tagging</td><td>内置质量指标、访问历史和标签治理，可发现异常访问和口径变化。</td><td>为发布数据集建立质量函数、访问审计、敏感等级三件套，避免对象存储成为审计盲区。</td></tr>
+                  <tr><td>Monte Carlo / Soda / Great Expectations / dbt tests</td><td>用规则、异常检测和期望测试监控 freshness、volume、schema、null 率、唯一性和分布异常。</td><td>把无线业务规则写成可执行契约：KPI 范围、小区状态、时间连续性、单位、地理边界、标签合法性。</td></tr>
+                  <tr><td>OpenMetadata / DataHub / OpenLineage / Marquez</td><td>统一技术、业务和操作元数据，采集表到列、作业到数据集的血缘。</td><td>Spark 抽样作业启动和结束时写入 OpenLineage 事件，使对象文件能反查 Iceberg 版本。</td></tr>
+                  <tr><td>Microsoft Purview / Fabric / Power BI semantic model</td><td>从数据源到语义模型再到报表的端到端血缘，治理标签随资产传播。</td><td>样本、特征、模型评测、看板共享同一语义口径，避免训练特征和运营指标两套解释。</td></tr>
+                  <tr><td>Feast / Tecton</td><td>管理特征定义、离线/在线一致性、特征版本和训练/服务回溯。</td><td>建立特征注册表，记录生成 SQL、窗口、聚合方式、默认值和是否可用于训练。</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="pain-block">
+            <span class="pain-heading heading-action">启示</span>
+            <div class="grid grid-2">
+              <div class="answer-card">
+                <div class="answer-title">数据护照固定字段</div>
+                <ul>
+                  <li>版本、创建时间、生产 Spark 代码。</li>
+                  <li>源 Iceberg 快照 ID、过滤与采样规则。</li>
+                  <li>行数、文件清单、Schema、单位、标签定义。</li>
+                  <li>场景覆盖、质量分数、已知风险、授权和许可证。</li>
+                </ul>
+              </div>
+              <div class="answer-card">
+                <div class="answer-title">成分分析默认切片</div>
+                <ul>
+                  <li>省份/城市/地形/场景；室外/室内/高铁/密集城区。</li>
+                  <li>频段与载波、厂商与型号。</li>
+                  <li>工作日/节假日、忙时/闲时。</li>
+                  <li>正常/异常、标签正负比、重复与近重复样本。</li>
+                </ul>
+              </div>
+              <div class="answer-card">
+                <div class="answer-title">特征画像要做条件分布</div>
+                <p>除全局统计外，还要看分场景、分负载、分厂商的缺失率、分位数、类别频率、相关性、异常值、时间漂移、空间漂移和标签泄漏。关键特征应给出置信区间。</p>
+              </div>
+              <div class="answer-card">
+                <div class="answer-title">质量评价拆成七维</div>
+                <p><span class="pill info">完整性</span> <span class="pill info">唯一性</span> <span class="pill info">一致性</span> <span class="pill info">及时性</span> <span class="pill info">准确性</span> <span class="pill info">覆盖度</span> <span class="pill info">可训练性</span>；最后一项包含标签可学性、类别平衡、泄漏检测、切分一致性和模型基线。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <div class="grid grid-2" style="margin-top:22px">
+        <article class="card pad">
+          <h3>示例体检报告：v2026.10.08</h3>
+          <div class="check-list" style="margin-top:16px">
+            <div class="check-item"><span class="check-mark">✓</span><p><strong>成分</strong>覆盖 18 省、4 类地形、晚高峰占 37%；高铁样本 12%，密集城区 46%。</p></div>
+            <div class="check-item"><span class="check-mark">!</span><p><strong>风险</strong>“高负载干扰掉线”仅占 1.8%；某厂商 14 天字段口径变化未同步。</p></div>
+            <div class="check-item"><span class="check-mark">×</span><p><strong>阻断</strong>标签可由 <code>drop_reason_code</code> 直接推导，必须剔除后再训练。</p></div>
+            <div class="check-item"><span class="check-mark">→</span><p><strong>建议</strong>按小区+时间去重；改用时间外推切分；补充高负载干扰现网样本。</p></div>
+          </div>
+        </article>
+        <article class="card pad">
+          <h3>Agent 的处置动作</h3>
+          <p style="color:var(--muted)">体检不是输出一堆图表就结束，而是回答“能不能用、怎么修、修完后给谁复测”。</p>
+          <div class="table-wrap" style="margin-top:14px">
+            <table><thead><tr><th>发现</th><th>动作</th></tr></thead><tbody>
+              <tr><td>某小区特征缺失率高</td><td>剔除、填充或降权，并登记到下一版数据契约。</td></tr>
+              <tr><td>某场景样本不足</td><td>生成补充采集工单或仿真参数建议。</td></tr>
+              <tr><td>近重复样本过高</td><td>按小区和时间分组去重，保留代表性失败样本。</td></tr>
+              <tr><td>训练/测试时间重叠</td><td>改为时间外推切分，避免性能虚高。</td></tr>
+              <tr><td>标签可由特征推导</td><td>阻断训练，提示特征泄漏并修正样本生成规则。</td></tr>
+            </tbody></table>
+          </div>
+        </article>
+      </div>
+    </section>
+    <section id="pain3">
+      <div class="section-head">
+        <p class="section-kicker">Pain point 03</p>
+        <h2>如何对比仿真采集与现网采集数据的差异</h2>
+        <p class="section-desc">仿真数据可控、标签充足；现网数据真实但有偏差。重点不是看两张全局直方图像不像，而是看同场景、同负载、同事件下机制是否一致，任务是否可迁移。</p>
+      </div>
+
+      <article class="card pain-panel">
+        <div class="pain-rail p3">
+          <p class="pain-index">03</p>
+          <h2>Sim-to-Real：从统计对比到任务迁移</h2>
+          <p>先统一实体、时间粒度和事件口径，再做场景匹配、分布对比、机制对比和跨域训练评测，最后输出可迁移、需重加权、需补数据三类结论。</p>
+        </div>
+        <div class="pain-body">
+          <div class="pain-block">
+            <span class="pain-heading heading-pain">痛点</span>
+            <p>仿真数据可能缺少真实噪声、异常网元、用户行为、邻区干扰和测量误差；现网数据存在采样偏差、口径不一致、配置差异和长尾场景稀疏。直接混合训练会引入 sim-to-real 差距；直接看均值又可能掩盖条件分布和因果机制差异。</p>
+          </div>
+
+          <div class="pain-block">
+            <span class="pain-heading heading-insight">业界洞察</span>
+            <div class="diagram-box" role="img" aria-label="仿真与现网数据对比链路：规范化、统一实体与时间粒度、场景匹配、分布对比、条件切片对比、任务效用对比、报告和反馈闭环。">
+              <svg viewBox="0 0 960 260" xmlns="http://www.w3.org/2000/svg">
+                <title>仿真与现网数据 Sim-to-Real 对比链路</title>
+                <desc>仿真和现网数据规范化后统一实体与时间粒度，通过场景匹配、分布对比、条件切片和任务效用对比生成差异报告，并反馈到仿真参数校正与样本增强。</desc>
+                <rect x="28" y="28" width="170" height="52" rx="12" class="svg-box-violet"/><text x="113" y="50" text-anchor="middle" class="svg-label">仿真数据</text><text x="113" y="68" text-anchor="middle" class="svg-sub">可控 / 标签充足</text>
+                <rect x="28" y="110" width="170" height="52" rx="12" class="svg-box-accent"/><text x="113" y="132" text-anchor="middle" class="svg-label">现网数据</text><text x="113" y="150" text-anchor="middle" class="svg-sub">真实 / 长尾稀疏</text>
+                <rect x="255" y="69" width="180" height="52" rx="12" class="svg-box"/><text x="345" y="91" text-anchor="middle" class="svg-label">统一本体</text><text x="345" y="109" text-anchor="middle" class="svg-sub">小区 / 载波 / 事件 / 粒度</text>
+                <rect x="470" y="69" width="155" height="52" rx="12" class="svg-box-primary"/><text x="547" y="91" text-anchor="middle" class="svg-label">场景匹配</text><text x="547" y="109" text-anchor="middle" class="svg-sub">地形 / 负载 / 频段</text>
+                <rect x="658" y="69" width="145" height="52" rx="12" class="svg-box-warn"/><text x="730" y="91" text-anchor="middle" class="svg-label">分布对比</text><text x="730" y="109" text-anchor="middle" class="svg-sub">PSI / K-S / MMD</text>
+                <rect x="826" y="69" width="110" height="52" rx="12" class="svg-box"/><text x="881" y="91" text-anchor="middle" class="svg-label">效用裁判</text><text x="881" y="109" text-anchor="middle" class="svg-sub">跨域训练</text>
+                <rect x="255" y="173" width="312" height="52" rx="12" class="svg-box-accent"/><text x="411" y="195" text-anchor="middle" class="svg-label">Sim-to-Real 报告</text><text x="411" y="213" text-anchor="middle" class="svg-sub">可迁移 / 需重加权 / 需补数据</text>
+                <rect x="598" y="173" width="338" height="52" rx="12" class="svg-box-violet"/><text x="767" y="195" text-anchor="middle" class="svg-label">反馈闭环</text><text x="767" y="213" text-anchor="middle" class="svg-sub">仿真参数校正 / 样本增强 / 采集工单</text>
+                <path d="M198 54c32 0 18 41 57 41M198 136c32 0 18-41 57-41M435 95h35M610 95h48M803 95h23M411 121v52M567 225h31" class="svg-line"/>
+              </svg>
+            </div>
+            <div class="table-wrap" style="margin-top:18px">
+              <table>
+                <thead><tr><th>业界案例</th><th>架构与技术方案</th><th>对本项目的启示</th></tr></thead>
+                <tbody>
+                  <tr><td>Waymo Simulation / Safety Hub</td><td>用真实驾驶日志重建场景、生成挑战场景、做闭环仿真，并用安全指标评估模拟与实路差异。</td><td>构造可复现场景集，比较安全/异常事件的条件分布和模型失败模式，不只看全局均值。</td></tr>
+                  <tr><td>NVIDIA DRIVE Sim / Omniverse Replicator / Cosmos</td><td>物理仿真、传感器级仿真、可控合成数据、世界模型与真实数据联合评估。</td><td>基站仿真输出可追溯参数：传播模型、用户分布、干扰假设、测量误差和场景种子。</td></tr>
+                  <tr><td>Applied Intuition / 自动驾驶数据闭环通用实践</td><td>场景挖掘、合成数据生成、域随机化、真实边缘案例补齐、模型回归评测。</td><td>用现网长尾事件反哺仿真场景库，用仿真增强稀缺异常，再用真实集做最终验证。</td></tr>
+                  <tr><td>Keysight / Ansys / MATLAB 5G Toolbox 等通信仿真工具链</td><td>从链路级、系统级、射频/信道到网元行为建模，支持可控实验与协议一致性验证。</td><td>把仿真物理参数映射进业务本体，否则仿真指标无法与现网 KPI 精准对齐。</td></tr>
+                  <tr><td>MLOps 漂移监测通用实践</td><td>PSI、K-S、Jensen-Shannon、Wasserstein、MMD、adversarial validation、模型性能跨域评估。</td><td>分布指标必须与任务指标绑定；只报统计差异不足以说明能否迁移。</td></tr>
+                  <tr><td>合成数据评测实践</td><td>评价 fidelity、privacy、utility、coverage，重点看下游模型增益和失败样本覆盖率。</td><td>给仿真数据独立评分卡：保真度、覆盖度、隐私/合规、下游增益、条件稳定性。</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="pain-block">
+            <span class="pain-heading heading-action">启示</span>
+            <div class="insight-list">
+              <div class="insight-item"><strong>先统一本体，再比较数值</strong><span>统一小区、载波、时间窗、事件定义、测量粒度、单位、空值语义、过滤规则和异常定义。口径不同，统计差异都会失真。</span></div>
+              <div class="insight-item"><strong>做场景匹配，不做全网平均</strong><span>构建相同城市类型、地形、负载、频段、拓扑、用户分布和事件类型的匹配对，避免 Simpson's paradox。</span></div>
+              <div class="insight-item"><strong>分布差异分层报告</strong><span>单变量用 PSI、K-S、Jensen-Shannon、Wasserstein；多变量用协方差差异、MMD、adversarial validation；还要看时间/空间自相关和热点漂移。</span></div>
+              <div class="insight-item"><strong>机制差异比直方图更重要</strong><span>比较负载升高时 PRB、调度失败、切换失败是否相似；干扰增强时 SINR、MCS、吞吐量是否保持相似因果方向和时延。</span></div>
+              <div class="insight-item"><strong>任务效用是最终裁判</strong><span>做仿真训练→现网测试、现网训练→仿真测试、混合训练→真实测试、预训练+微调→真实测试，观察准确率、召回、校准和长尾失败。</span></div>
+              <div class="insight-item"><strong>让差异驱动闭环</strong><span>发现高负载干扰事件缺失后，自动生成仿真参数建议、补充采集工单或合成样本需求，并把新数据集登记回场景库。</span></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <div class="grid grid-2" style="margin-top:22px">
+        <article class="card pad">
+          <h3>跨域评测矩阵</h3>
+          <div class="table-wrap" style="margin-top:14px">
+            <table><thead><tr><th>训练数据</th><th>测试数据</th><th>回答的问题</th></tr></thead><tbody>
+              <tr><td>仿真</td><td>现网</td><td>仿真到真实的泛化差距。</td></tr>
+              <tr><td>现网</td><td>仿真</td><td>仿真是否保留了真实机制。</td></tr>
+              <tr><td>仿真+现网</td><td>现网</td><td>混合增益和重加权价值。</td></tr>
+              <tr><td>现网预训练</td><td>仿真/混合微调后现网</td><td>稀缺异常增强是否带来真实收益。</td></tr>
+            </tbody></table>
+          </div>
+        </article>
+        <article class="card pad">
+          <h3>示例结论卡片</h3>
+          <div class="check-list" style="margin-top:16px">
+            <div class="check-item"><span class="check-mark">✓</span><p><strong>可直接迁移</strong>同负载下 SINR→MCS 的方向和时延基本一致。</p></div>
+            <div class="check-item"><span class="check-mark">!</span><p><strong>需重加权</strong>现网晚高峰 PRB 利用率右尾更重；按负载分位重新加权。</p></div>
+            <div class="check-item"><span class="check-mark">×</span><p><strong>不可迁移</strong>异常网元导致的掉线在仿真中缺失，需要补真实样本或规则。</p></div>
+            <div class="check-item"><span class="check-mark">→</span><p><strong>闭环</strong>生成“高负载邻区干扰 + 弱覆盖”仿真参数建议和采集工单。</p></div>
+          </div>
+        </article>
+      </div>
+    </section>
+    <section id="roadmap">
+      <div class="section-head">
+        <p class="section-kicker">Roadmap</p>
+        <h2>落地路线：不要一步追求“全自动”</h2>
+        <p class="section-desc">先把资产和口径讲清楚，再开放问答；先把数据护照补齐，再让 Agent 自动生成样本作业；最后才让差异分析驱动采集和仿真。</p>
+      </div>
+      <div class="roadmap">
+        <div class="road-item">
+          <div class="road-dot">L1</div>
+          <div class="road-card"><strong>资产可见</strong><em>表、列、文件、指标、场景、Owner、权限可搜索</em><span>统一目录、语义标签、血缘、基础质量报告。</span></div>
+        </div>
+        <div class="road-item">
+          <div class="road-dot">L2</div>
+          <div class="road-card"><strong>问答可用</strong><em>自然语言定位数据并解释口径</em><span>混合检索、场景语义模型、SQL/Spark dry-run、成本预估。</span></div>
+        </div>
+        <div class="road-item">
+          <div class="road-dot">L3</div>
+          <div class="road-card"><strong>产品可信</strong><em>发布数据集自带契约和质量分</em><span>Manifest、数据护照、质量门禁、列级血缘、版本快照。</span></div>
+        </div>
+        <div class="road-item">
+          <div class="road-dot">L4</div>
+          <div class="road-card"><strong>加工自动</strong><em>业务问题生成参数化样本作业</em><span>场景模板、特征契约、负样本策略、训练集生成与评测。</span></div>
+        </div>
+        <div class="road-item">
+          <div class="road-dot">L5</div>
+          <div class="road-card"><strong>闭环优化</strong><em>缺口驱动采集、仿真和建模</em><span>场景缺口、Sim-to-Real 报告、重加权与样本增强建议。</span></div>
+        </div>
+      </div>
+
+      <div class="grid grid-2" style="margin-top:26px">
+        <article class="card pad">
+          <h3>先做的 30 天清单</h3>
+          <div class="check-list" style="margin-top:16px">
+            <div class="check-item"><span class="check-mark">1</span><p><strong>选 3 个高价值场景</strong>高铁掉线、干扰优化、切换异常。不要一开始索引全网所有表。</p></div>
+            <div class="check-item"><span class="check-mark">2</span><p><strong>写清场景资产卡</strong>业务问题、KPI 口径、源表、时间窗、样本规则、负样本、Owner、已知限制。</p></div>
+            <div class="check-item"><span class="check-mark">3</span><p><strong>打通最小血缘</strong>源 Iceberg 快照 → Spark 作业 → 对象存储 Manifest。</p></div>
+            <div class="check-item"><span class="check-mark">4</span><p><strong>给 10 个必检规则</strong>缺失率、KPI 范围、时间连续性、标签泄漏、正负比、重复度等。</p></div>
+          </div>
+        </article>
+        <article class="card pad">
+          <h3>需要守住的边界</h3>
+          <div class="check-list" style="margin-top:16px">
+            <div class="check-item"><span class="check-mark">✓</span><p><strong>自然语言问答</strong>无线 KPI、厂商私有字段和口径复杂，必须有语义层约束和人工确认。</p></div>
+            <div class="check-item"><span class="check-mark">✓</span><p><strong>自动画像</strong>缺失率、分布和相关性能发现异常，但不能自动解释所有异常，需领域规则复核。</p></div>
+            <div class="check-item"><span class="check-mark">✓</span><p><strong>仿真评估</strong>统计保真度、覆盖度、隐私和下游增益可能冲突，应按训练目标加权。</p></div>
+            <div class="check-item"><span class="check-mark">✓</span><p><strong>双通道打通</strong>对象文件必须反查 Iceberg 快照、Spark 作业和源表版本，否则血缘断链。</p></div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>资料边界：</strong>本页基于无线基站湖仓、场景库、Spark 样本加工和对象存储发布数据集的业务上下文整理。业界产品能力按公开材料与业界通识归纳，尚未绑定 raw/ 来源剪藏；正式对外前建议复核 Databricks、Snowflake、AWS、Microsoft、Google、DataHub、OpenMetadata、OpenLineage、Great Expectations、Soda、Feast、Waymo、NVIDIA 和通信仿真工具链的官方文档。</p>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabs = Array.from(document.querySelectorAll('.evolution-tab'));
+      const panels = Array.from(document.querySelectorAll('.evolution-panel'));
+      tabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+          tabs.forEach((item) => {
+            const selected = item === tab;
+            item.classList.toggle('active', selected);
+            item.setAttribute('aria-selected', String(selected));
+          });
+          panels.forEach((panel) => {
+            panel.setAttribute('aria-hidden', String(panel.id !== tab.dataset.panel));
+          });
+        });
+      });
+
+      const questionInput = document.getElementById('question-input');
+      const askButton = document.getElementById('ask-button');
+      const answer = document.getElementById('agent-answer');
+      const chips = Array.from(document.querySelectorAll('.chip[data-question]'));
+      if (questionInput && askButton && answer) {
+        const answerAssetTitle = answer.querySelector('.answer-card strong');
+        const answerAssetMeta = answer.querySelector('.answer-card p + p');
+        const answerSQL = answer.querySelector('code');
+        const ask = () => {
+          const question = questionInput.value.trim() || '高铁晚高峰掉线样本在哪里？';
+          let asset = 'scenario.high_speed_rail_call_drop_v3';
+          let owner = 'Owner：无线优化组；SLA：T+1；口径：RRCAUSE=radio-link-timeout 且连续 3 个 5 分钟窗口；授权：算法组可读脱敏列。';
+          let sql = "SELECT ...\nFROM iceberg.theme.cell_event\nJOIN iceberg.sample.hsr_call_drop USING (cell_id, window_5m)\nWHERE hour BETWEEN 18 AND 20 AND terrain='HSR'";
+          if (question.includes('干扰')) {
+            asset = 'scenario.interference_optimization_v5';
+            owner = 'Owner：覆盖与干扰组；SLA：T+1；口径：同频邻区干扰、SINR、PRB 与吞吐联合建模；授权：算法组可读脱敏列。';
+            sql = "SELECT ...\nFROM iceberg.theme.cell_kpi k\nJOIN iceberg.theme.neighbor_relation nr USING (cell_id)\nWHERE k.prb_util >= 0.8 AND k.sinr < 6";
+          } else if (question.includes('切换')) {
+            asset = 'metric.handover_success_rate_v2';
+            owner = 'Owner：KPI 治理组；SLA：15 分钟；口径：切换成功次数 / 切换请求次数，剔除预注册失败；授权：全员只读。';
+            sql = "SELECT window_15m, province,\\n       success_count / NULLIF(request_count, 0) AS ho_success_rate\\nFROM iceberg.metric.handover";
+          }
+          answerAssetTitle.textContent = asset;
+          answerAssetMeta.textContent = owner;
+          answerSQL.textContent = sql;
+          answer.classList.remove('hidden');
+        };
+        askButton.addEventListener('click', ask);
+        questionInput.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') ask();
+        });
+        chips.forEach((chip) => {
+          chip.addEventListener('click', () => {
+            questionInput.value = chip.dataset.question;
+            ask();
+          });
+        });
+      }
+    });
+  </script>
+  </body>
+</html>

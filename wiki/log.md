@@ -269,3 +269,12 @@ sources: []
 - 关键决策：立 concept 页而非 source 页——无新 raw/ 剪藏，实读存证沿用 dsh-source-runtime 的 commit；dsh「文档侧」自此与运行时四支柱并列
 - AI 推断已标注：AGENTS.md≈上下文/token 预算的归因、与 LLM Wiki 同构的判断（均标"待来源验证"）
 - 待剪藏登记（新页后续线索）：docs/AGENTS.md（tier 表 + 写作规则）、docs/i18n/README.md（双语契约）——可直接借鉴的方法论文档；packages/typert 生成器实现未深挖
+# 2026-10-13
+
+## [2026-10-13] query-filed | 无线基站湖仓与发布数据集的 Data Agent 洞察
+
+- 触发：用户提出无线基站大数据场景的三个痛点——湖仓数据发现与高效使用、发布数据集成分/特征/血缘/质量分析、仿真与现网数据差异对比；要求按“痛点 + 业界洞察 + 启示”组织，并结合 Data Agent。
+- 新建：concepts/wireless-data-agent-insights——总体参考架构、四个湖仓分层与对象存储数据产品的关系、Databricks/Snowflake/Microsoft/AWS/Google/开源目录与质量工具的行业映射、仿真/现网统一本体与跨域评测方法、Data Agent L1-L5 落地路线。
+- 关键判断：①Agent 不是纯 Text2SQL，而是“意图解析 → 资产检索 → 治理化执行 → 证据回写”的系统；②对象存储发布数据集必须升级为带 Manifest、数据护照、血缘指针和质量分的数据产品；③仿真/现网比较应先统一本体和场景匹配，再统计分布，最终以跨域训练/测试效用判定可迁移性。
+- 无 raw/ 新来源：本页为即时研究回填，frontmatter `sources: []`，正文已标注待用官方资料复核；未建商业产品实体页。
+- 更新：index（concepts 新增条目，updated bump）、本 log。

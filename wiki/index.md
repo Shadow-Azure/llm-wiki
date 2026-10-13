@@ -1,7 +1,7 @@
 ---
 type: index
 created: 2026-08-23
-updated: 2026-09-06
+updated: 2026-10-13
 sources: []
 ---
 
@@ -33,6 +33,7 @@ sources: []
 
 - [[wiki/concepts/llm-wiki|LLM Wiki]] — 由 LLM 持久编译维护的知识库：三层架构、三大操作、index+log 导航，维护成本趋零使知识复利
 - [[wiki/concepts/wiki-vs-rag|编译式知识库 vs RAG]] — 查询时临时检索拼装 vs 摄入时编译一次持续保鲜；积累性、交叉引用、矛盾处理的全维度对比；视频模态同一对照的印证（预索引 vs 直塞）
+- [[wiki/concepts/wireless-data-agent-insights|无线基站数据资产的 Data Agent 洞察]] — 湖仓/对象存储双通道统一为数据产品控制面；资产发现、发布数据集体检、仿真与现网对比三条链路 + 五阶段落地路线
 - [[wiki/concepts/note-tool-landscape|笔记工具格局]] — 本地优先 vs 云端 SaaS 两大阵营；国内外开源/闭源盘点 + star/活跃度实测（2026-09-06）；协议商用含义谱系（MIT→AGPL→BUSL/源码可见）；二次开发支持分级；"Obsidian 最适合接 AI"论证（AI 推断待验证，开源侧印证其生态位无人完整占据）
 - [[wiki/concepts/bidirectional-links|双向链接与关系图谱]] — 前向链接只存一份、反向索引算"谁指向我"、图谱是可视化投影；断链合法与多重上下文两大机制；与 LLM Wiki 模式的微观连接
 - [[wiki/concepts/obsidian-plugin-development|Obsidian 插件开发]] — 三件套解剖（manifest/主入口/样式）、Plugin 生命周期、esbuild 构建、versions.json 回退、设置存 data.json、UI 接入六插槽（前端新手向，含视频面板最小示例）

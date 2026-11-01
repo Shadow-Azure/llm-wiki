@@ -269,3 +269,12 @@ sources: []
 - 关键决策：立 concept 页而非 source 页——无新 raw/ 剪藏，实读存证沿用 dsh-source-runtime 的 commit；dsh「文档侧」自此与运行时四支柱并列
 - AI 推断已标注：AGENTS.md≈上下文/token 预算的归因、与 LLM Wiki 同构的判断（均标"待来源验证"）
 - 待剪藏登记（新页后续线索）：docs/AGENTS.md（tier 表 + 写作规则）、docs/i18n/README.md（双语契约）——可直接借鉴的方法论文档；packages/typert 生成器实现未深挖
+
+## [2026-10-31] research | LoongSuite 可观测套件（阿里云）
+
+- 触发：用户"切 main + git pull（已最新）+ 收集 longsuite 信息 + 生成通俗 HTML 说明页"；经 GitHub 检索 + 用户确认，目标为阿里 LoongSuite（双 o，非 ENDEVSOLS/Long-Suite、非 dsh-longrun-suite）
+- 落库 raw（4 篇，均为官方一手）：`raw/2026-10-31-loongsuite-announcement.md`（开源公告 602489 + loongsuite-go/loongsuite-python README 实读）、`raw/2026-10-31-loongsuite-pilot-blog.md`（Pilot 公告 603387：三层次问题 + 五设计抉择 + 四个数据问题）、`raw/2026-10-31-loongsuite-semconv-blog.md`（GenAI 语义规范 603212：ENTRY/STEP/Skill/token 级 + GenAI Utils + 蚂蚁 10x 定界案例）、`raw/2026-10-31-loongsuite-zero-code-practice.md`（零代码实践 602515：Python monkey patch/Go toolexec 原理 + Dify 实战）
+- 新建：sources/loongsuite-observability-suite（4 来源快照，沿用 player-embedded-ai-snapshot 多源一页先例）、entities/loongsuite（组件矩阵 + star 实测 907/232/139/88/26/31/19@2026-10-31）、concepts/genai-observability（问题域 + 非侵入谱系 + 语义杠杆 + 四消费方向；矛盾标记：厂商增强 vs 上游标准、开销无系统基准）
+- 交叉连接：dsh-plugin（loongsuite 官方 DSH 观测插件，默认不捕内容）与 concepts/dsh-plugin-capability-boundaries"上报打点=seam 默认关"、concepts/dsh-agent-loop 的 turn/step 状态机互链；反向补链未做（待下次触碰相关页时 bump）
+- 交付物：`industry/similar/loongsuite.html`（自包含 CSS + 内联 SVG 流程图，问题→方法→示例→效果结构，编号 03 接续 ouroboros/se-agent）
+- 未执行：loongsuite-java/js/pilot README 逐字剪藏；官方博客 Tracing DSH with OTel（2026-08-20）等 4 篇待剪藏已登记来源页"后续线索"；overview 未动（本次主题与现有综述主线正交，待 LoongSuite 相关积累更多来源后再修订）

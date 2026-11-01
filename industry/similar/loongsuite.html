@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>03 · LoongSuite：让 AI Agent 的黑盒变成可查的白盒</title>
+  <style>
+    :root{--ink:#172033;--muted:#5f6b7d;--line:#e5e9f2;--bg:#f5f7fb;--blue:#2563eb;--green:#16a34a;--orange:#ea580c;--violet:#7c3aed}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.75}
+    header.hero{color:#fff;padding:60px 24px 48px;background:linear-gradient(120deg,#0f172a,#1d4ed8,#312e81)}
+    .hero-inner{max-width:1120px;margin:auto}
+    .back{color:rgba(255,255,255,.75);font-size:13px;text-decoration:none}
+    .back:hover{color:#fff}
+    .tag{display:inline-block;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.10);border-radius:999px;padding:6px 13px;font-size:13px;margin-top:18px}
+    h1{font-size:clamp(32px,5vw,50px);margin:14px 0 12px;letter-spacing:-1px}
+    .hero p{max-width:880px;color:rgba(255,255,255,.86);font-size:17px;margin:0}
+    code{background:rgba(255,255,255,.14);border-radius:6px;padding:1px 7px;font-size:.92em}
+    main code{background:#eef2ff;color:#3730a3}
+    .hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px;font-size:13px}
+    .hero-meta span{border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:4px 12px;background:rgba(255,255,255,.08)}
+    main{max-width:1120px;margin:auto;padding:42px 24px 90px}
+    section{margin-bottom:64px}
+    .section-head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+    .no{background:var(--blue);color:#fff;font-weight:800;border-radius:12px;width:44px;height:44px;display:grid;place-items:center;font-size:18px;flex:none}
+    .section-head h2{font-size:26px;margin:0}
+    .lead{color:#415063;font-size:16.5px;max-width:940px}
+    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:20px}
+    .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 8px 24px rgba(23,32,51,.06)}
+    .pill{display:inline-block;font-size:12px;font-weight:700;color:var(--blue);background:#eff6ff;border-radius:999px;padding:3px 11px;margin-bottom:8px}
+    .pill.green{color:var(--green);background:#f0fdf4}.pill.orange{color:var(--orange);background:#fff7ed}.pill.violet{color:var(--violet);background:#ede9fe}
+    .card h3{font-size:16.5px;margin:4px 0 8px}
+    .card p{color:#415063;margin:0;font-size:14.5px}
+    figure{margin:26px 0;background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 8px 24px rgba(23,32,51,.06)}
+    figcaption{color:var(--muted);font-size:13.5px;margin-top:12px;text-align:center}
+    svg{width:100%;height:auto;display:block}
+    .st{font-size:15px;font-weight:700;fill:#172033}
+    .ss{font-size:12px;fill:#5f6b7d}
+    .stt{font-size:14px;font-weight:700;fill:#fff}
+    table{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 8px 24px rgba(23,32,51,.06);margin-top:18px;font-size:14.5px}
+    th{background:#f1f5f9;text-align:left;padding:11px 14px;font-size:13.5px;color:#334155}
+    td{padding:11px 14px;border-top:1px solid var(--line);color:#37475c;vertical-align:top}
+    td:first-child{font-weight:600;color:#172033;white-space:nowrap}
+    .timeline{margin-top:20px}
+    .step{background:#fff;border:1px solid var(--line);border-left:5px solid var(--blue);border-radius:0 14px 14px 0;padding:14px 20px;margin-bottom:12px;box-shadow:0 6px 18px rgba(23,32,51,.05)}
+    .step h4{margin:0 0 6px;font-size:15.5px}
+    .step p{margin:0;color:#415063;font-size:14.5px}
+    .good{margin-top:18px;background:#f0fdf4;border-left:5px solid var(--green);border-radius:0 14px 14px 0;padding:16px 20px;color:#14532d;font-size:15px}
+    .note{margin-top:18px;background:#eff6ff;border-left:5px solid var(--blue);border-radius:0 14px 14px 0;padding:16px 20px;color:#17427a;font-size:15px}
+    .warn{margin-top:18px;background:#fffbeb;border-left:5px solid #f59e0b;border-radius:0 14px 14px 0;padding:16px 20px;color:#78350f;font-size:15px}
+    .sources{display:grid;gap:10px;margin-top:18px}
+    .source{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 16px;display:flex;gap:14px;align-items:baseline}
+    .source b{flex:none;min-width:280px}
+    .source b a{color:var(--blue);text-decoration:none}
+    .source span{color:var(--muted);font-size:13.5px}
+    .duo{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+    @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.duo{grid-template-columns:1fr}}
+    @media(max-width:560px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header class="hero"><div class="hero-inner">
+    <a class="back" href="index.html">← 返回方案库</a>
+    <div class="tag">03 · 可观测性 / LoongSuite</div>
+    <h1>LoongSuite</h1>
+    <p>阿里云 2025 年 8 月开源的<strong> AI 时代可观测数据采集套件</strong>（读作“龙-甜”）。它回答三个问题：AI Agent 的钱花到哪去了？出了问题卡在哪一步？谁来审计 agent 干了什么？主线路线是：<code>非侵入采集 → 统一语义 → 多端消费</code>，全程贴着 OpenTelemetry 标准。</p>
+    <div class="hero-meta"><span>LoongCollector 主机采集</span><span>Java / Go / Python / JS 探针</span><span>Pilot 端侧采集</span><span>GenAI 语义规范</span><span>OTel 生态</span></div>
+  </div></header>
+
+  <main>
+    <!-- ========== 01 问题 ========== -->
+    <section><div class="section-head"><span class="no">01</span><h2>它想解决什么问题：从一次“踩坑”说起</h2></div>
+      <p class="lead">想象一个常见场景：你的团队用 Claude Code / Cursor 改代码，用 Dify 搭客服机器人。某天机器人回答开始变慢、变贵，还时不时答非所问。你想查——然后发现<strong>根本无从下手</strong>。这就是 LoongSuite 针对的四类困境。</p>
+      <div class="grid">
+        <article class="card"><div class="pill">问题 1</div><h3>黑盒决策，链路不可见</h3><p>一个 agent 任务内含 10+ 轮“推理→调工具→反思”循环。传统监控只看到几个 HTTP 请求，看不到每一轮里模型想了什么、调了哪个工具、哪一步开始跑偏。</p></article>
+        <article class="card"><div class="pill">问题 2</div><h3>Token 黑洞</h3><p>多轮对话的中间过程消耗惊人：循环试错、上下文越滚越大、反复确认的“过度谨慎”，甚至死循环。账单暴涨，却说不清钱烧在哪一轮。</p></article>
+        <article class="card"><div class="pill">问题 3</div><h3>数据各说各话</h3><p>Claude Code、Cursor、Qoder 的数据格式、存储位置、记录粒度都不同。想横向比较“哪个 agent 更适合我们”，没有统一口径，只能凭感觉站队。</p></article>
+        <article class="card"><div class="pill">问题 4</div><h3>端侧是盲区</h3><p>编程 agent 跑在开发者<strong>本机</strong>：数据散落在 IDE 历史、本地 SQLite、session 日志里。传统探针全都是面向服务器的，完全够不着。</p></article>
+      </div>
+
+      <figure><svg viewBox="0 0 1060 300" role="img" aria-label="传统监控视角与真实结构对比">
+        <text x="20" y="30" class="st">传统监控眼里：</text>
+        <rect x="20" y="50" width="200" height="60" rx="12" fill="#eff6ff" stroke="#bfdbfe"/><text x="120" y="86" text-anchor="middle" class="st">用户请求</text>
+        <path d="M220 80 H340" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+        <rect x="340" y="50" width="200" height="60" rx="12" fill="#eff6ff" stroke="#bfdbfe"/><text x="440" y="86" text-anchor="middle" class="st">Agent 应用</text>
+        <path d="M540 80 H660" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+        <rect x="660" y="50" width="200" height="60" rx="12" fill="#eff6ff" stroke="#bfdbfe"/><text x="760" y="86" text-anchor="middle" class="st">大模型 API</text>
+        <path d="M860 80 H940" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+        <rect x="940" y="50" width="100" height="60" rx="12" fill="#f1f5f9" stroke="#e2e8f0"/><text x="990" y="86" text-anchor="middle" class="ss">返回结果</text>
+        <text x="500" y="145" text-anchor="middle" class="ss">—— 只有 3 个“HTTP 请求”，中间发生了什么？不知道 ——</text>
+        <text x="20" y="185" class="st">真实发生的事：</text>
+        <rect x="20" y="205" width="120" height="56" rx="12" fill="#f0fdf4" stroke="#bbf7d0"/><text x="80" y="230" text-anchor="middle" class="ss">第1轮 推理</text><text x="80" y="248" text-anchor="middle" class="ss">调 Read 工具</text>
+        <rect x="160" y="205" width="120" height="56" rx="12" fill="#f0fdf4" stroke="#bbf7d0"/><text x="220" y="230" text-anchor="middle" class="ss">第2轮 推理</text><text x="220" y="248" text-anchor="middle" class="ss">调 Grep 工具</text>
+        <rect x="300" y="205" width="120" height="56" rx="12" fill="#fff7ed" stroke="#fed7aa"/><text x="360" y="230" text-anchor="middle" class="ss">第3轮 推理</text><text x="360" y="248" text-anchor="middle" class="ss">写代码 ✗</text>
+        <rect x="440" y="205" width="120" height="56" rx="12" fill="#fff7ed" stroke="#fed7aa"/><text x="500" y="230" text-anchor="middle" class="ss">第4轮 推理</text><text x="500" y="248" text-anchor="middle" class="ss">重写 ✓</text>
+        <rect x="580" y="205" width="120" height="56" rx="12" fill="#fff7ed" stroke="#fed7aa"/><text x="640" y="230" text-anchor="middle" class="ss">第5-6轮</text><text x="640" y="248" text-anchor="middle" class="ss">跑测试修错</text>
+        <rect x="720" y="205" width="140" height="56" rx="12" fill="#ede9fe" stroke="#ddd6fe"/><text x="790" y="230" text-anchor="middle" class="ss">第7轮</text><text x="790" y="248" text-anchor="middle" class="ss">总结交付</text>
+        <path d="M140 233 H160 M280 233 H300 M420 233 H440 M560 233 H580 M700 233 H720" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+        <rect x="890" y="196" width="150" height="74" rx="12" fill="#111827"/><text x="965" y="226" text-anchor="middle" style="fill:#fca5a5" class="ss">token 消耗 ×12 轮</text><text x="965" y="248" text-anchor="middle" style="fill:#cbd5e1" class="ss">哪轮烧钱？哪轮出错？</text>
+      </svg><figcaption>图 1：同一个调用，传统监控看到 3 个请求；真实结构是十几个决策步骤。不可观测，意味着不可排障、不可算账、不可审计。</figcaption></figure>
+    </section>
+
+    <!-- ========== 02 总体思路 ========== -->
+    <section><div class="section-head"><span class="no">02</span><h2>它的总体思路：三层采集 + 一层语义</h2></div>
+      <p class="lead">LoongSuite 不是单一工具，而是一套组合拳：<strong>主机层</strong>的 LoongCollector 收机器级数据，<strong>进程层</strong>的语言探针收应用内部数据，<strong>端侧</strong>的 Pilot 收本机编程 agent 数据；底下垫一张<strong>统一语义规范</strong>，让所有数据说同一种“普通话”，最后用标准 OTLP 协议流向任意后端。</p>
+      <figure><svg viewBox="0 0 1060 430" role="img" aria-label="LoongSuite 全景架构">
+        <rect x="20" y="20" width="1020" height="70" rx="14" fill="#ede9fe" stroke="#ddd6fe"/>
+        <text x="60" y="50" class="st">端侧（开发者本机）</text><text x="60" y="72" class="ss">Claude Code / Codex / Cursor / Qoder 等闭源 agent，数据在 IDE 历史、SQLite、session 日志</text>
+        <rect x="770" y="34" width="240" height="42" rx="10" fill="#7c3aed"/><text x="890" y="61" text-anchor="middle" style="fill:#fff" class="st">LoongSuite Pilot</text>
+        <path d="M890 90 V130" stroke="#7c3aed" stroke-width="3"/>
+
+        <rect x="20" y="130" width="1020" height="70" rx="14" fill="#eff6ff" stroke="#bfdbfe"/>
+        <text x="60" y="160" class="st">进程层（服务端应用）</text><text x="60" y="182" class="ss">Java 字节码 · Go 编译期 · Python monkey patch · JS —— 零改码</text>
+        <rect x="470" y="144" width="120" height="42" rx="10" fill="#2563eb"/><text x="530" y="171" text-anchor="middle" style="fill:#fff" class="ss">Java Agent</text>
+        <rect x="610" y="144" width="120" height="42" rx="10" fill="#2563eb"/><text x="670" y="171" text-anchor="middle" style="fill:#fff" class="ss">Go Agent</text>
+        <rect x="750" y="144" width="135" height="42" rx="10" fill="#2563eb"/><text x="817" y="171" text-anchor="middle" style="fill:#fff" class="ss">Python Agent</text>
+        <rect x="905" y="144" width="115" height="42" rx="10" fill="#2563eb"/><text x="962" y="171" text-anchor="middle" style="fill:#fff" class="ss">JS 插件</text>
+        <path d="M440 165 H470" stroke="#2563eb" stroke-width="3"/>
+
+        <rect x="20" y="240" width="1020" height="70" rx="14" fill="#ecfeff" stroke="#a5f3fc"/>
+        <text x="60" y="270" class="st">主机层</text><text x="60" y="292" class="ss">Logs / Metrics / Traces / Events / Profiles 统一采集 · eBPF 无侵入 · 无锁管道 + 水位背压，不丢数据</text>
+        <rect x="770" y="254" width="240" height="42" rx="10" fill="#0891b2"/><text x="890" y="281" text-anchor="middle" style="fill:#fff" class="st">LoongCollector</text>
+        <path d="M890 200 V240 M440 275 H770" stroke="#0891b2" stroke-width="3"/>
+
+        <rect x="20" y="340" width="500" height="66" rx="14" fill="#f0fdf4" stroke="#bbf7d0"/>
+        <text x="60" y="368" class="st">语义底座：GenAI 语义规范</text>
+        <text x="60" y="390" class="ss">gen_ai.usage.input_tokens · session→turn→step · ENTRY/STEP/Skill/token 级</text>
+        <rect x="560" y="340" width="480" height="66" rx="14" fill="#111827"/>
+        <text x="800" y="368" text-anchor="middle" style="fill:#fff" class="st">标准输出：OTLP 协议</text>
+        <text x="800" y="390" text-anchor="middle" style="fill:#cbd5e1" class="ss">Jaeger · Grafana Tempo · Langfuse · SLS · 自建后端</text>
+        <path d="M270 340 V310 M890 310 V340" stroke="#64748b" stroke-width="3" fill="none"/>
+      </svg><figcaption>图 2：LoongSuite 全景。三个采集层各管一摊，全部汇入同一套 GenAI 语义规范，再经标准 OTLP 协议流向任何兼容后端——不锁定任何一家存储。</figcaption></figure>
+
+      <table>
+        <tr><th style="width:150px">组件</th><th>管什么</th><th>一句话记忆</th></tr>
+        <tr><td>LoongCollector</td><td>主机上的日志/指标/链路/Profile，含 eBPF 进程外采集</td><td>整台机器的“总水管工”</td></tr>
+        <tr><td>Java / Go / Python / JS 探针</td><td>应用内部的函数调用、LLM 调用、token 用量——全部零改码</td><td>给代码装“行车记录仪”</td></tr>
+        <tr><td>Pilot</td><td>本机编程 agent（Claude Code/Codex/Cursor/Qoder）的会话、工具调用、成本</td><td>开发者电脑上的“监控摄像头”</td></tr>
+        <tr><td>GenAI 语义规范</td><td>统一字段名和层级结构（session→turn→step、token 级）</td><td>让所有数据说“普通话”</td></tr>
+      </table>
+    </section>
+
+    <!-- ========== 03 方法拆解 ========== -->
+    <section><div class="section-head"><span class="no">03</span><h2>它是怎么解决的：四个关键方法</h2></div>
+      <p class="lead">LoongSuite 的设计哲学就一句：<strong>“适配 Agent，而不是让 Agent 适配你”</strong>。闭源产品改不了、业务代码不该改、标准生态不能绕——四个方法分别对应这三种约束。</p>
+
+      <h3 style="margin-top:26px">方法一：非侵入采集——不同语言，不同“下手”时机</h3>
+      <figure><svg viewBox="0 0 1060 250" role="img" aria-label="三种语言的非侵入机制">
+        <rect x="20" y="20" width="320" height="200" rx="14" fill="#eff6ff" stroke="#bfdbfe"/>
+        <text x="180" y="50" text-anchor="middle" class="st">Go：编译期动手</text>
+        <text x="180" y="76" text-anchor="middle" class="ss">go build → otel go build</text>
+        <rect x="60" y="95" width="240" height="34" rx="8" fill="#fff"/><text x="180" y="117" text-anchor="middle" class="ss">源代码 → 生成语法树(AST)</text>
+        <path d="M180 129 V140" stroke="#2563eb" stroke-width="3"/>
+        <rect x="60" y="140" width="240" height="34" rx="8" fill="#dbeafe"/><text x="180" y="162" text-anchor="middle" class="ss">中间层往 AST 里“塞”埋点代码</text>
+        <text x="180" y="200" text-anchor="middle" class="ss">产物：正常二进制 + 自带观测</text>
+
+        <rect x="370" y="20" width="320" height="200" rx="14" fill="#f0fdf4" stroke="#bbf7d0"/>
+        <text x="530" y="50" text-anchor="middle" class="st">Java：运行时改字节码</text>
+        <text x="530" y="76" text-anchor="middle" class="ss">JVM 加载类时动态增强</text>
+        <rect x="410" y="95" width="240" height="34" rx="8" fill="#fff"/><text x="530" y="117" text-anchor="middle" class="ss">业务类正常加载</text>
+        <rect x="410" y="140" width="240" height="34" rx="8" fill="#dcfce7"/><text x="530" y="162" text-anchor="middle" class="ss">字节码被“加料”：埋点逻辑注入</text>
+        <text x="530" y="200" text-anchor="middle" class="ss">50+ 组件自动覆盖（Spring/DB/MQ）</text>
+
+        <rect x="720" y="20" width="320" height="200" rx="14" fill="#fff7ed" stroke="#fed7aa"/>
+        <text x="880" y="50" text-anchor="middle" class="st">Python：偷梁换柱</text>
+        <text x="880" y="76" text-anchor="middle" class="ss">monkey patch 替换函数引用</text>
+        <rect x="760" y="95" width="240" height="34" rx="8" fill="#fff"/><text x="880" y="117" text-anchor="middle" class="ss">启动时把原函数换成“包装版”</text>
+        <rect x="760" y="140" width="240" height="34" rx="8" fill="#ffedd5"/><text x="880" y="162" text-anchor="middle" class="ss">包装版：前后插观测 + 照常调原函数</text>
+        <text x="880" y="200" text-anchor="middle" class="ss">13+ AI 框架插件（Dify/LangChain…）</text>
+      </svg><figcaption>图 3：三种语言三种姿势，共同点只有一个——业务代码一行不改。Go 甚至只改构建命令：<code>go build</code> 变成 <code>otel go build</code>。</figcaption></figure>
+
+      <h3 style="margin-top:26px">方法二：统一语义——让所有数据说“普通话”</h3>
+      <p class="lead">采集到数据只是第一步。LoongSuite 把阿里+蚂蚁内部实战沉淀的 GenAI 语义规范开源：每个事件都带标准字段，光看字段名就能还原现场。官方给过一个真实 Claude Code 事件的例子：</p>
+      <table>
+        <tr><th>字段（节选）</th><th>值（示例）</th><th>它在回答什么</th></tr>
+        <tr><td>gen_ai.agent.type</td><td>claude-code</td><td>谁干的</td></tr>
+        <tr><td>gen_ai.session.id → turn.id → step.id</td><td>8e06…:t1:s3</td><td>哪次会话 → 第 1 轮对话 → 第 3 个推理步</td></tr>
+        <tr><td>gen_ai.tool.name + arguments</td><td>Bash: "ls /workspace/docs/"</td><td>干了什么、参数是什么（安全审计关键）</td></tr>
+        <tr><td>gen_ai.tool.call.id</td><td>toolu_vrtx_0115…</td><td>把“发起调用”和“返回结果”配成对</td></tr>
+        <tr><td>trace_id / span_id / parent_span_id</td><td>09f1… / dc68… / d5af…</td><td>把整场任务串成一棵调用树</td></tr>
+      </table>
+      <div class="note"><strong>杠杆效应：</strong>字段统一后，<em>同一条 SQL 吃遍所有 agent</em>——比如“揪出单请求超 5 万 token 的会话”“统计每个 agent 最常用的 10 个工具”，不用关心数据来自 Claude Code 还是 Cursor。新接一个 agent，下游的看板、告警、查询自动生效。</div>
+
+      <h3 style="margin-top:26px">方法三：端侧 Pilot——给本机 agent 装“摄像头”</h3>
+      <figure><svg viewBox="0 0 1060 330" role="img" aria-label="Pilot 采集流水线">
+        <rect x="20" y="30" width="220" height="90" rx="12" fill="#ede9fe" stroke="#ddd6fe"/>
+        <text x="130" y="58" text-anchor="middle" class="st">① 声明式发现</text>
+        <text x="130" y="82" text-anchor="middle" class="ss">agents.d/*.json 声明：</text>
+        <text x="130" y="102" text-anchor="middle" class="ss">探测路径/hook/事件，自动覆盖已装 agent</text>
+        <path d="M240 75 H290" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
+        <rect x="290" y="30" width="230" height="90" rx="12" fill="#eff6ff" stroke="#bfdbfe"/>
+        <text x="405" y="58" text-anchor="middle" class="st">② 五类采集基类</text>
+        <text x="405" y="82" text-anchor="middle" class="ss">Hook 日志 / IDE 历史 / SQLite</text>
+        <text x="405" y="102" text-anchor="middle" class="ss">session 文件 / CLI 转发 + 断点续采</text>
+        <path d="M520 75 H570" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+        <rect x="570" y="30" width="220" height="90" rx="12" fill="#f0fdf4" stroke="#bbf7d0"/>
+        <text x="680" y="58" text-anchor="middle" class="st">③ 归一化 + 脱敏</text>
+        <text x="680" y="82" text-anchor="middle" class="ss">统一 AgentActivityEntry 事件</text>
+        <text x="680" y="102" text-anchor="middle" class="ss">密钥/私钥/连接串自动打码</text>
+        <path d="M790 75 H840" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
+        <rect x="840" y="30" width="200" height="90" rx="12" fill="#111827"/>
+        <text x="940" y="58" text-anchor="middle" style="fill:#fff" class="st">④ 多路输出</text>
+        <text x="940" y="82" text-anchor="middle" style="fill:#cbd5e1" class="ss">JSONL / SLS / HTTP / OTLP</text>
+        <text x="940" y="102" text-anchor="middle" style="fill:#cbd5e1" class="ss">并行 fan-out，互不阻塞</text>
+
+        <rect x="20" y="180" width="1020" height="120" rx="12" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text x="50" y="212" class="st">数据落到哪，就能回答什么：</text>
+        <rect x="50" y="230" width="220" height="50" rx="10" fill="#eff6ff"/><text x="160" y="252" text-anchor="middle" class="ss">本地 Dashboard</text><text x="160" y="270" text-anchor="middle" class="ss">127.0.0.1:8765 一眼看采集状态</text>
+        <rect x="300" y="230" width="220" height="50" rx="10" fill="#f0fdf4"/><text x="410" y="252" text-anchor="middle" class="ss">SLS / SQL 分析</text><text x="410" y="270" text-anchor="middle" class="ss">每人 token 花销、Top 工具、异常会话</text>
+        <rect x="550" y="230" width="220" height="50" rx="10" fill="#fff7ed"/><text x="660" y="252" text-anchor="middle" class="ss">Trace 树回放</text><text x="660" y="270" text-anchor="middle" class="ss">Jaeger/Tempo 里逐层展开每轮推理</text>
+        <rect x="800" y="230" width="220" height="50" rx="10" fill="#ede9fe"/><text x="910" y="252" text-anchor="middle" class="ss">安全审计</text><text x="910" y="270" text-anchor="middle" class="ss">六层体系定位风险主体并回放取证</text>
+      </svg><figcaption>图 4：Pilot 流水线。它不要求 agent 做任何配合——探测、抽取、归一、脱敏、输出全自动；数据始终存在用户自己的基础设施里。</figcaption></figure>
+
+      <h3 style="margin-top:26px">方法四：语义规范的“工程化外壳”——GenAI Utils</h3>
+      <p class="lead">如果每个框架的探针都各自实现“建 span、挂字段、记指标”，规范一升级就要改 N 处。GenAI Utils 把这些样板逻辑收进一个公共 Handler：<strong>探针只负责“从框架里抽数据”，输出规范的事一律交给公共层</strong>——规范升级改一处，所有探针自动生效。</p>
+    </section>
+
+    <!-- ========== 04 示例 ========== -->
+    <section><div class="section-head"><span class="no">04</span><h2>示例：从安装到看板，Pilot 的完整一遍流程</h2></div>
+      <p class="lead">以官方博客的实操为例：团队想让 Claude Code 的使用变得可查。全程约 1 分钟，中间不改任何使用习惯。</p>
+      <div class="timeline">
+        <div class="step"><h4>第 1 步：一行命令安装</h4><p>执行 installer.sh 并填上 SLS（日志服务）参数。脚本自动下载、部署到 <code>~/.loongsuite-pilot/</code>、给 Claude Code 装 hook、拉起后台进程。想看调用树再加 <code>--collect-trace true</code>。</p></div>
+        <div class="step"><h4>第 2 步：自动发现，静默采集</h4><p>Pilot 扫描本机，发现已安装的 Claude Code / Cursor / Codex / Qoder，按各自的声明配置自动注入采集能力。之后你照常干活，它不打扰。</p></div>
+        <div class="step"><h4>第 3 步：本地看板确认“在流数据”</h4><p><code>loongsuite-pilot monitor start</code> 打开 127.0.0.1:8765：每个 agent 的事件数、最近活跃时间、上报成功率、Pilot 自身资源占用，一眼确认采集正常。</p></div>
+        <div class="step"><h4>第 4 步：看一条原始事件</h4><p>本地 JSONL 里躺着标准事件。比如一条 <code>tool.call</code>：session :t1:s3 说明是“第 1 轮对话第 3 步”，工具 Bash、参数 "ls docs/"，配对的 <code>tool.result</code> 用同一 call id——现场完整还原。</p></div>
+        <div class="step"><h4>第 5 步：用 SQL 提问</h4><p>数据进 SLS 后直接写 SQL：“某人过去 7 天消耗多少 token”“每个 agent 的 Top 10 工具及平均耗时”“单请求超 5 万 token 的异常会话”——同一套 SQL 对所有 agent 通用。</p></div>
+        <div class="step"><h4>第 6 步：回答四个业务问题</h4><p>ROI（任务完成率、token 效率比、人机协作比、自修正率）；选型（同一任务交给三家 agent 的行为差异）；成本（识别三类 token 黑洞）；安全（六层审计 + 敏感信息自动脱敏）。</p></div>
+      </div>
+      <div class="good"><strong>结果：</strong>从“凭感觉用 agent”变成“用数据管理 agent”。同一任务实测三家（Claude Code / Cursor / Qoder）：Claude Code 总时长最短、Bash 风格像终端老手；Cursor 单轮思考最深、产出最细但最慢；Qoder token 最省、小步快跑。差异之前全被“体感”掩盖。</div>
+    </section>
+
+    <!-- ========== 05 效果 ========== -->
+    <section><div class="section-head"><span class="no">05</span><h2>效果怎么样：官方给出的证据清单</h2></div>
+      <p class="lead">以下均来自官方博客与仓库（链接见文末），属于<strong>来源论断</strong>；其中性能类数字暂无独立第三方复测，采信时请保留这个折扣。</p>
+      <table>
+        <tr><th>维度</th><th>证据</th><th>出处</th></tr>
+        <tr><td>零成本接入</td><td>Go：仅改构建命令 <code>otel go build</code>；Java：运行时字节码增强，50+ 组件自动埋点；Python：一条 <code>loongsuite-instrument</code> 接入 13+ AI 框架（Dify / LangChain / AgentScope / CrewAI / MCP…）</td><td>各仓库 README</td></tr>
+        <tr><td>反哺国际标准</td><td>Go Agent 已贡献上游，孵化出 OTel 官方项目 <em>opentelemetry-go-compile-instrumentation</em>——编译期插桩路线被 OTel 官方收编</td><td>loongsuite-go README</td></tr>
+        <tr><td>生产级验证</td><td>Java Agent 已在阿里云百炼（大模型平台）大规模生产运行；蚂蚁 token 级推理观测产品经历“年尾大促”实战</td><td>开源公告 / 语义规范博客</td></tr>
+        <tr><td>排障提速</td><td>蚂蚁“引擎显微镜”（token 级 trace + 引擎并发剖析）定位推理引擎稳定性问题，<strong>问题定界效率提升 10 倍</strong>；可定位“第 125 个 token 花了 6.8s，因为别家 prefill 打断了 decode”这类细粒度问题</td><td>语义规范博客</td></tr>
+        <tr><td>成本治理</td><td>实证发现“<strong>token 花得最多的会话，输出质量反而最差</strong>”的非线性关系，并归纳三类 token 黑洞（循环试错 / 上下文膨胀 / 过度谨慎），让降本有的放矢</td><td>Pilot 博客</td></tr>
+        <tr><td>端到端打通</td><td>Dify 实战：Python 侧加几个 label、Go 侧换一行编译命令，即打通 dify-api ↔ dify-plugin-daemon 全链路——补上“原生只能看内部孤岛、OTel 只能看平台层”的缺口</td><td>零代码实践博客</td></tr>
+        <tr><td>社区生态</td><td>阿里系团队在 OTel 社区累计 1000+ PR review、400+ PR、3 位 Maintainer 等角色；语义规范已提交 OTel 上游提案（invoke_skill issue #86）</td><td>开源公告 / 语义规范博客</td></tr>
+      </table>
+      <div class="warn"><strong>读数字时留意：</strong>①“高性能低成本”目前是官方叙事，探针自身开销的系统基准未公开（Go 仓库带 benchmark 示例但 README 未列数字）；②部分 Dify 演示能力当时为商业版、逐步开源中；③语义规范状态为 Development，回馈 OTel 上游仍在路上。</div>
+    </section>
+
+    <!-- ========== 06 与 DSH 的关系 ========== -->
+    <section><div class="section-head"><span class="no">06</span><h2>彩蛋：它和 DeepSeek Harness 的直接对接</h2></div>
+      <p class="lead">LoongSuite 生态里有个对本库读者格外亲切的组件：<code>loongsuite/dsh-plugin</code>——DeepSeek Harness 的官方观测插件。它把 DSH 的每个 turn 变成一棵标准 GenAI span 树：</p>
+      <figure><svg viewBox="0 0 900 210" role="img" aria-label="dsh-plugin 的 span 树">
+        <rect x="30" y="70" width="130" height="60" rx="12" fill="#111827"/><text x="95" y="106" text-anchor="middle" style="fill:#fff" class="st">ENTRY</text>
+        <path d="M160 100 H210" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+        <rect x="210" y="70" width="140" height="60" rx="12" fill="#1e3a8a"/><text x="280" y="106" text-anchor="middle" style="fill:#fff" class="st">AGENT</text>
+        <path d="M350 100 H400" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+        <rect x="400" y="70" width="140" height="60" rx="12" fill="#2563eb"/><text x="470" y="106" text-anchor="middle" style="fill:#fff" class="st">STEP ×N</text>
+        <path d="M540 88 H590" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+        <path d="M540 112 H590" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+        <rect x="590" y="58" width="130" height="52" rx="12" fill="#f0fdf4" stroke="#bbf7d0"/><text x="655" y="90" text-anchor="middle" class="st">LLM</text>
+        <rect x="590" y="118" width="130" height="52" rx="12" fill="#fff7ed" stroke="#fed7aa"/><text x="655" y="150" text-anchor="middle" class="st">TOOL</text>
+        <text x="750" y="90" class="ss">每次真实调用一条 span，</text>
+        <text x="750" y="112" class="ss">重试也各自可见；含 TTFT</text>
+        <text x="750" y="134" class="ss">与 token 计量</text>
+        <text x="30" y="30" class="st">一条 DSH turn = 一条 trace</text>
+        <text x="30" y="185" class="ss">导出标准 OTLP/HTTP → Jaeger / Grafana Tempo / Langfuse 等；默认不捕获对话内容（隐私），需要时显式开启</text>
+      </svg><figcaption>图 5：dsh-plugin 的数据模型。失败的 web_search 和后续 bash 兜底、每步延迟、token 用量，在 Langfuse 里一目了然。</figcaption></figure>
+      <div class="note"><strong>与本库研究的呼应：</strong>该插件默认关闭内容捕获——正与本库笔记 <a href="../../wiki/concepts/dsh-plugin-capability-boundaries.md">concepts/dsh-plugin-capability-boundaries</a> 记录的“上报打点 = seam 默认关”互为印证：<em>可观测与隐私的边界，在 DSH 生态里同样是显式设计而非事后补丁</em>。官方另有博客《Tracing DeepSeek Harness with OpenTelemetry》（2026-08），待剪藏。</div>
+    </section>
+
+    <!-- ========== 07 冷思考 ========== -->
+    <section><div class="section-head"><span class="no">07</span><h2>冷思考：它没有解决的问题</h2></div>
+      <div class="grid">
+        <article class="card"><div class="pill orange">边界 1</div><h3>采集 ≠ 治理</h3><p>LoongSuite 负责“把数据拿全、拿准”，但 ROI 提升需要组织配套动作（选型决策、流程改造）。数据只是必要条件。</p></article>
+        <article class="card"><div class="pill orange">边界 2</div><h3>闭源 agent 的依赖</h3><p>端侧采集走 hook/SQLite/session 旁路，agent 一改存储格式就可能断流——这是“适配而非改造”路线的固有代价，靠声明式配置降低维护量但不消除。</p></article>
+        <article class="card"><div class="pill orange">边界 3</div><h3>标准话语权博弈</h3><p>语义规范先落在厂商品牌下、再择机回馈上游。若上游演进方向分叉，双轨期会产生迁移成本（官方已用“继承上游 Handler”的兼容设计对冲）。</p></article>
+        <article class="card"><div class="pill orange">边界 4</div><h3>开源与商业的灰度</h3><p>部分能力先商业版（ARMS）后开源，文档中的演示与开源版存在时间差。评估时需逐项核对开源版可用性。</p></article>
+      </div>
+    </section>
+
+    <!-- ========== 08 来源 ========== -->
+    <section><div class="section-head"><span class="no">08</span><h2>公开来源</h2></div>
+      <div class="sources">
+        <div class="source"><b><a href="https://www.alibabacloud.com/blog/602489" target="_blank" rel="noopener">开源公告（2025-08-25）</a></b><span>LoongSuite 定位、四大组件、未来规划、OTel 社区参与数字。</span></div>
+        <div class="source"><b><a href="https://www.alibabacloud.com/blog/when-ai-coding-agent-becomes-infrastructure-why-we-open-sourced-loongsuite-pilot_603387" target="_blank" rel="noopener">Pilot 开源公告（2026-07-23）</a></b><span>三层次问题、五个设计抉择、四问四答（ROI/选型/token 黑洞/安全审计）。</span></div>
+        <div class="source"><b><a href="https://www.alibabacloud.com/blog/alibaba-%26-ant-group-loongsuite-genai-observability-semantics-specification-from-unified-data-language-to-large-scale-implementation_603212" target="_blank" rel="noopener">GenAI 语义规范（2026-06-04）</a></b><span>ENTRY/STEP/Skill/token 级观测建模 + GenAI Utils + 蚂蚁 10 倍定界案例。</span></div>
+        <div class="source"><b><a href="https://www.alibabacloud.com/blog/zero-code-transformation-observability-in-practice-with-loongsuite_602515" target="_blank" rel="noopener">零代码实践（2025-09-04）</a></b><span>Python monkey patch / Go toolexec 原理图解 + Dify 端到端实战。</span></div>
+        <div class="source"><b><a href="https://github.com/alibaba/loongsuite-go" target="_blank" rel="noopener">alibaba/loongsuite-go</a></b><span>Go 编译期插桩仓库（⭐907，2026-10-31 实测），含 benchmark 示例。</span></div>
+        <div class="source"><b><a href="https://github.com/alibaba/loongsuite-pilot" target="_blank" rel="noopener">alibaba/loongsuite-pilot</a></b><span>端侧编程 agent 采集器（⭐232），本地优先、多目标导出。</span></div>
+        <div class="source"><b><a href="https://github.com/loongsuite/dsh-plugin" target="_blank" rel="noopener">loongsuite/dsh-plugin</a></b><span>DeepSeek Harness 官方观测插件（⭐31）：turn → GenAI span 树。</span></div>
+      </div>
+      <p style="color:#5f6b7d;font-size:13px;margin-top:14px">star 数为 2026-10-31 GitHub API 实测值，会漂移。本页同源笔记已落库本库 wiki：sources/loongsuite-observability-suite · entities/loongsuite · concepts/genai-observability。</p>
+    </section>
+  </main>
+</body>
+</html>

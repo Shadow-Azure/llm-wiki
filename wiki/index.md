@@ -1,11 +1,11 @@
 ---
 type: index
 created: 2026-08-23
-updated: 2026-09-06
+updated: 2026-10-31
 sources: []
 ---
 
-<!-- 2026-09-06 四次更新：开源扩展盘点 + open-notebook 实读 + 类 Obsidian 开源格局实测（research）+ Tauri/Electron/cc-switch 架构分析回填（query-filed） -->
+<!-- 2026-10-31 更新：LoongSuite 可观测套件研究（research）——4 篇官方博客/README 落库 + 实体页/概念页新建 -->
 
 # 索引
 
@@ -28,6 +28,7 @@ sources: []
 - [[wiki/sources/open-notebook-architecture|Open Notebook 关键文件选辑（2026-09-06 本地实读）]] — ⭐38.3k NotebookLM 开源替代：ADR-004/007 全文 + 摄取图源码注解 + 容器编排配置
 - [[wiki/sources/bilinote-architecture|BiliNote 关键源码选辑（2026-09-06 本地实读）]] — B站 player API 字幕直拉七步 + yt-dlp 412 风控 monkey patch + 编排核心 skip_download 决策
 - [[wiki/sources/obsidian-oss-alternatives-landscape|类 Obsidian 开源项目格局（star/协议实测 2026-09-06）]] — 22 仓盘点：PKM 三强 SiYuan 46.2k/Logseq 44.8k/Trilium 37.7k 全 AGPL；Anytype 实为 source-available、Outline 转 BUSL；SiYuan 二次开发通道最全
+- [[wiki/sources/loongsuite-observability-suite|LoongSuite 可观测套件（4 来源快照，2026-10-31）]] — 阿里云 AI 时代可观测采集套件：主机 LoongCollector + 进程 Java/Go/Python/JS 探针 + 端侧 Pilot + GenAI 语义规范；"适配 Agent 而不是改造 Agent"
 
 ## 概念（concepts/）
 
@@ -60,6 +61,7 @@ sources: []
 - [[wiki/concepts/electron|Electron]] — Chromium+Node+C++ 胶水全家桶；主/渲染双进程 + contextBridge 安全桥；VS Code 与 Obsidian 的地基
 - [[wiki/concepts/tauri-vs-electron|Tauri vs Electron]] — 桌面应用「借 vs 带」两范式全维度对比；后端语言被体积约束锁死的分叉树论证；中间形态收敛
 - [[wiki/concepts/self-contained-binaries|自包含二进制分发]] — 静态链接（musl/crt-static/rustls）与 glibc 地狱归因；「依赖消灭 vs 搬家」；Node native addon ABI 对照
+- [[wiki/concepts/genai-observability|GenAI 可观测性]] — AI Agent 多轮决策的可采集/可还原/可审计：传统 MLL 三件套失效与 token 黑洞；非侵入采集谱系（eBPF/编译期/字节码/monkey patch/端侧旁路）；统一语义杠杆（ENTRY/STEP/Skill/token 级）
 
 ## 实体（entities/）
 
@@ -68,6 +70,7 @@ sources: []
 - [[wiki/entities/claudian|Claudian]] — 把 Claude Agent SDK 嵌入 Obsidian 的桌面插件（本库 agent 侧）；同进程 spawn CLI + 聊天内联批准；"插件里养插件"的生态桥实例
 - [[wiki/entities/deepseek-harness|deepseek-harness（dsh）]] — DeepSeek 开源 agent harness；Cordis 插件框架（vendored，上游 MIT），"everything is a plugin"（形态统一；能力边界 30 core/28 seam/1 bundle）；双端插件 + 动态插件（agent 自写自挂）；官方文档已落库
 - [[wiki/entities/cc-switch|cc-switch]] — 六款 AI CLI 的供应商切换器（⭐131k 实测）；Tauri 2 实读样本：Rust 58% 五层架构 + axum 本地反向代理子系统
+- [[wiki/entities/loongsuite|LoongSuite]] — 阿里云开源 AI 时代可观测采集套件（2025-08）；三层组件矩阵（2026-10-31 star 实测）+ dsh-plugin 与本库 DSH 研究的对接点
 
 ## 综述
 
